@@ -92,8 +92,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		Vector2 frameVelocity = player.velocity;
 		frameVelocity = frameVelocity.sub(collision);
 		
-		player.offset = new Vector2(player.offset.x + frameVelocity.x, player.offset.y + frameVelocity.y);
-		background.offset = player.offset;
+		//player.offset = new Vector2(player.offset.x + frameVelocity.x, player.offset.y + frameVelocity.y);
+		//background.offset = player.offset;
+		
+		player.position = new Vector2(player.position.x - frameVelocity.x, player.position.y - frameVelocity.y);
+		player.offset = new Vector2();
+		background.offset = new Vector2();
 		
 		background.setSize(screen.dimension());
 		background.setLocation(0, 0);

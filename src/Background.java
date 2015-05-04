@@ -20,19 +20,19 @@ public class Background extends JPanel {
 		this.setSize(screen.dimension());
 		this.setLocation(0, 0);
 		
-		testback a = new testback(new Vector2(0, 170), screen, new Vector2(screen.x/2, 30));
+		testback a = new testback(new Vector2(0, 0), screen, new Vector2(screen.x, 30));
 		a.collidable = true;
 		this.addObject(a);
 		
-		testback b = new testback(new Vector2(0, 200), screen, new Vector2(30, screen.y/2));
+		testback b = new testback(new Vector2(0, 30), screen, new Vector2(30, screen.y - 90));
 		b.collidable = true;
 		this.addObject(b);
 		
-		testback c = new testback(new Vector2(0, screen.y/2 + 200), screen, new Vector2(screen.x/2, 30));
+		testback c = new testback(new Vector2(0, screen.y - 60), screen, new Vector2(screen.x, 30));
 		c.collidable = true;
 		this.addObject(c);
 		
-		testback d = new testback(new Vector2(screen.x/2 - 30, 200), screen, new Vector2(30, screen.y/2));
+		testback d = new testback(new Vector2(screen.x - 30, 30), screen, new Vector2(30, screen.y - 90));
 		d.collidable = true;
 		this.addObject(d);
 	}

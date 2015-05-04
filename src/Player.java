@@ -24,10 +24,12 @@ public class Player extends Object {
 		super.paintLocation();
 		
 		g.setColor(Color.GRAY);
-		g.fillRect((int) (this.screen.x/2 - 32), (int) (this.screen.y/2 - 32), 19, 19);
+		g.fillRect((int) (this.position.x), (int) (this.position.y), 19, 19);
+		//g.fillRect((int) (this.screen.x/2 - 32), (int) (this.screen.y/2 - 32), 19, 19);
 		
 		g.setColor(Color.ORANGE);
-		g.fillRect((int) (this.screen.x/2 - 30), (int) (this.screen.y/2 - 30), 15, 15);
+		g.fillRect((int) (this.position.x + 2), (int) (this.position.y + 2), 15, 15);
+		//g.fillRect((int) (this.screen.x/2 - 30), (int) (this.screen.y/2 - 30), 15, 15);
 	}
 	
 	public Vector2 getPosition() {

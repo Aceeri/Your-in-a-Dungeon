@@ -13,17 +13,18 @@ public class Main {
 	public static JPanel frame;
 	
 	public static void main(String[] args) {
-		Vector2 test = new Vector2(1, 2);
-		Vector2 test2 = new Vector2(1, 2);
-		System.out.println(test);
-		
 		Vector2 screen = new Vector2(800, 600);
-		Manager t = new Manager(screen);
 		
 		window = new JFrame();
 		window.setTitle("test");
 		window.pack();
 		window.setSize(screen.dimension());
+		
+		//fix offset of window
+		screen.y -= 7;
+		screen.x -= 16;
+		Manager t = new Manager(screen);
+		
 		window.add(t);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
