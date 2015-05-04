@@ -68,6 +68,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		d.collidable = true;
 		wallContainer.add(d);
 		
+		testback pillar1 = new testback(new Vector2(150, 150), screen, new Vector2(80, 30));
+		pillar1.collidable = true;
+		wallContainer.add(pillar1);
+		
+		testback pillar2 = new testback(new Vector2(screen.x - 230, 150), screen, new Vector2(80, 30));
+		pillar2.collidable = true;
+		wallContainer.add(pillar2);
+		
 		addKeyListener(this);
 		addMouseListener(this);
 		setFocusable(true);
@@ -132,6 +140,15 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			if (projectile.expired()) {
 				this.projectileContainer.remove(i);
 			}
+			
+			for (int j = 0; j < this.wallContainer.getComponentCount(); j++) {
+				Object component = (Object) this.wallContainer.getComponent(j);
+				boolean inside = component.inside(projectile.position, new Vector2(5, 5));
+				
+				if (inside) {
+					this.projectileContainer.remove(i);
+				}
+			}
 		}
 		
 		Vector2 frameVelocity = player.velocity;
@@ -184,7 +201,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			}
 			
 			Projectile p = new Projectile(player, direction, 1, 2000);
-			p.setSpeed(5);
+			p.setSpeed(15);
 			this.projectileContainer.add(p);
 		}
 		
