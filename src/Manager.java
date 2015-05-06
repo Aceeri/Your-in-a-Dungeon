@@ -21,6 +21,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public ArrayList<Player> players = new ArrayList<Player>();
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	
+	
+	//highest -> lowest level containers: (highest is displayed above, lowest is displayed below)
+	//	ui -> wall -> player -> projectile -> floor
+	public Container uiContainer;
 	public Container playerContainer;
 	public Container projectileContainer;
 	public Container wallContainer;
@@ -39,12 +43,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		player = new Player(new Vector2(screen.x/2 - 30, screen.y/2 - 30), screen);
 		players.add(player);
 		
+		uiContainer = new Container();
 		playerContainer = new Container();
 		projectileContainer = new Container();
 		wallContainer = new Container();
 		floorContainer = new Container();
 		
 		//add containers to JPanel
+		this.add(uiContainer);
 		this.add(wallContainer);
 		this.add(playerContainer);
 		this.add(projectileContainer);
@@ -77,7 +83,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		wallContainer.add(pillar2);
 		
 		testback pillar3 = new testback(new Vector2(150, screen.y - 230), screen, new Vector2(80, 30));
-		pillar3.collidable = true;
+		pillar3.collidable = false;
 		wallContainer.add(pillar3);
 		
 		testback pillar4 = new testback(new Vector2(screen.x - 230, screen.y - 230), screen, new Vector2(80, 30));
@@ -233,11 +239,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		if (code == 81) {
 			for (int i = 0; i < 360; i++) {
 				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 50000);
-				p.speed = .25;
+				p.speed = 15;
 				this.projectileContainer.add(p);
 			}
 		}
-		System.out.println(code);
 		
 		this.keyPress[e.getKeyCode()] = true;
 	}
