@@ -76,6 +76,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		pillar2.collidable = true;
 		wallContainer.add(pillar2);
 		
+		testback pillar3 = new testback(new Vector2(150, screen.y - 230), screen, new Vector2(80, 30));
+		pillar3.collidable = true;
+		wallContainer.add(pillar3);
+		
+		testback pillar4 = new testback(new Vector2(screen.x - 230, screen.y - 230), screen, new Vector2(80, 30));
+		pillar4.collidable = true;
+		wallContainer.add(pillar4);
+		
 		addKeyListener(this);
 		addMouseListener(this);
 		setFocusable(true);
@@ -117,6 +125,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		for (int i = 0; i < this.wallContainer.getComponentCount(); i++) {
 			Object component = (Object) this.wallContainer.getComponent(i);
+			component.screen = this.screen;
+			
 			boolean inside = component.inside(player.getNextPosition(), player.Size);
 			
 			if (inside) {
@@ -146,9 +156,17 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				boolean inside = component.inside(projectile.position, new Vector2(5, 5));
 				
 				if (inside) {
-					this.projectileContainer.remove(i);
+					if (projectile.bounce) {
+						//projectile.position.sub(projectile.velocity.mult(projectile.speed))
+						Vector2 newVelocity = component.collide(projectile.position.sub(projectile.velocity.mult(projectile.speed)), new Vector2(5, 5), projectile.velocity);
+						projectile.velocity = projectile.velocity.add(newVelocity.mult(2));
+					} else {
+						this.projectileContainer.remove(i);
+					}
 				}
 			}
+			
+			//for (int j = 0; j < this.)
 		}
 		
 		Vector2 frameVelocity = player.velocity;
@@ -164,7 +182,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public void keyPressed(KeyEvent e) {
 		int code = e.getKeyCode();
 		
-		//player movement
+		//movement
+		//	68 -> A
+		//	65 -> D
+		//  83 -> W
+		//	87 -> S
 		if (code == 68 && !this.keyPress[68]) {
 			player.velocity.x -= player.speed;
 		}
@@ -187,7 +209,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			Vector2 direction = new Vector2();
 			switch (code) {
 				case 37:
-					direction = new Vector2(-1, 0);
+					direction = new Vector2(-1, -1);
 					break;
 				case 38:
 					direction = new Vector2(0, -1);
@@ -201,9 +223,21 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			}
 			
 			Projectile p = new Projectile(player, direction, 1, 2000);
-			p.setSpeed(15);
+			p.speed = 15;
 			this.projectileContainer.add(p);
 		}
+		
+		//abilities
+		//	81 -> Q
+		//	69 -> E
+		if (code == 81) {
+			for (int i = 0; i < 360; i++) {
+				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 50000);
+				p.speed = .25;
+				this.projectileContainer.add(p);
+			}
+		}
+		System.out.println(code);
 		
 		this.keyPress[e.getKeyCode()] = true;
 	}

@@ -43,6 +43,8 @@ public class Vector2 {
 	}
 	
 	
+	
+	//Rounding of vector positions
 	public Vector2 ceil() {
 		return new Vector2(Math.ceil(this.x), Math.ceil(this.y));
 	}
@@ -51,6 +53,9 @@ public class Vector2 {
 		return new Vector2(Math.floor(this.x), Math.floor(this.y));
 	}
 	
+	public Vector2 round() {
+		return new Vector2(Math.round(this.x), Math.round(this.y));
+	}
 	
 	
 	public double magnitude() {
