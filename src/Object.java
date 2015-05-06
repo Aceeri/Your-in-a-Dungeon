@@ -49,22 +49,27 @@ public class Object extends JComponent {
 	
 	public Vector2 side(Vector2 position, Vector2 size) {
 		Vector2 center = position.add(size.div(2));
+		Vector2 direction = new Vector2();
 		
 		if (center.y > this.position.y + this.Size.y) {
 			//bottom
-			return new Vector2(0, 1);
+			direction.y = 1;
 		} else if (center.y < this.position.y) {
 			//top
-			return new Vector2(0, -1);
-		} else if (center.x < this.position.x) {
-			//left
-			return new Vector2(-1, 0);
-		} else if (center.x > this.position.x + this.Size.x) {
-			//right
-			return new Vector2(1, 0);
+			direction.y = -1;
 		}
 		
-		return new Vector2();
+		if (center.x < this.position.x) {
+			//left
+			direction.x = -1;
+		} else if (center.x > this.position.x + this.Size.x ) {
+			//right
+			direction.x = 1;
+		}
+		
+		System.out.println(direction);
+		
+		return direction;
 	}
 	
 	public Vector2 getNextPosition() {

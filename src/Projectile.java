@@ -16,6 +16,7 @@ public class Projectile extends Object {
 	public Projectile(Player parent, Vector2 direction, double damage, double expiration) {
 		super(parent.position.add(direction.mult(parent.Size.x)).add(parent.Size.div(2)), parent.screen);
 		
+		this.Size = new Vector2(5, 5);
 		this.parent = parent;
 		this.velocity = direction;
 		this.damage = damage;

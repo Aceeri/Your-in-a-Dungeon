@@ -80,6 +80,10 @@ public class Vector2 {
 		return this.div(this.magnitude());
 	}
 	
+	public double distance(Vector2 v) {
+		return Math.sqrt((this.x - v.x)*(this.x - v.x) + (this.y - v.y)*(this.y - v.y));
+	}
+	
 	
 	
 	public Dimension dimension() {

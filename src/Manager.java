@@ -18,9 +18,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public boolean running = false;
 	
 	public boolean[] keyPress = new boolean[255];
-	public ArrayList<Player> players = new ArrayList<Player>();
-	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
-	
 	
 	//highest -> lowest level containers: (highest is displayed above, lowest is displayed below)
 	//	ui -> wall -> player -> projectile -> floor
@@ -40,14 +37,16 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		this.setBackground(Color.BLACK);
 		
-		player = new Player(new Vector2(screen.x/2 - 30, screen.y/2 - 30), screen);
-		players.add(player);
-		
 		uiContainer = new Container();
 		playerContainer = new Container();
 		projectileContainer = new Container();
 		wallContainer = new Container();
 		floorContainer = new Container();
+		
+		player = new Player(this, new Vector2(screen.x/2 - 30, screen.y/2 - 30));
+		player.speed = 3;
+		Enemy e = new Enemy(this, new Vector2(100, 100));
+		
 		
 		//add containers to JPanel
 		this.add(uiContainer);
@@ -56,6 +55,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		this.add(projectileContainer);
 		this.add(floorContainer);
 		playerContainer.add(player);
+		//playerContainer.add(e);
 		
 		//create walls
 		testback a = new testback(new Vector2(0, 0), screen, new Vector2(screen.x, 30));
@@ -115,7 +115,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		player.paintLocation();
 		
 		//reset size and location
 		playerContainer.setSize(screen.dimension());
@@ -127,25 +126,32 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		floorContainer.setSize(screen.dimension());
 		floorContainer.setLocation(0, 0);
 		
-		Vector2 collision = new Vector2();
-		
-		for (int i = 0; i < this.wallContainer.getComponentCount(); i++) {
-			Object component = (Object) this.wallContainer.getComponent(i);
-			component.screen = this.screen;
+		for (int i = 0; i < this.playerContainer.getComponentCount(); i++) {
+			Player plr = (Player) this.playerContainer.getComponent(i);
 			
-			boolean inside = component.inside(player.getNextPosition(), player.Size);
+			Vector2 collision = new Vector2();
 			
-			if (inside) {
-				Vector2 push = component.collide(player.getNextPosition(), player.Size, player.velocity);
+			for (int j = 0; j < this.wallContainer.getComponentCount(); j++) {
+				Object component = (Object) this.wallContainer.getComponent(j);
+				component.screen = this.screen;
 				
-				if (collision.x == 0) {
-					collision.x = push.div(player.speed).x;
-				}
+				boolean inside = component.inside(plr.getNextPosition(), plr.Size);
 				
-				if (collision.y == 0) {
-					collision.y = push.div(player.speed).y;
+				if (inside) {
+					Vector2 push = component.collide(plr.getNextPosition(), plr.Size, plr.velocity);
+					
+					if (collision.x == 0) {
+						collision.x = push.div(plr.speed).x;
+					}
+					
+					if (collision.y == 0) {
+						collision.y = push.div(plr.speed).y;
+					}
 				}
 			}
+			
+			plr.collision = collision;
+			plr.step();
 		}
 		
 		for (int i = 0; i < this.projectileContainer.getComponentCount(); i++) {
@@ -159,11 +165,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			
 			for (int j = 0; j < this.wallContainer.getComponentCount(); j++) {
 				Object component = (Object) this.wallContainer.getComponent(j);
-				boolean inside = component.inside(projectile.position, new Vector2(5, 5));
+				boolean inside = component.inside(projectile.position, projectile.Size);
 				
 				if (inside) {
 					if (projectile.bounce) {
-						//projectile.position.sub(projectile.velocity.mult(projectile.speed))
 						Vector2 newVelocity = component.collide(projectile.position.sub(projectile.velocity.mult(projectile.speed)), new Vector2(5, 5), projectile.velocity);
 						projectile.velocity = projectile.velocity.add(newVelocity.mult(2));
 					} else {
@@ -172,13 +177,32 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				}
 			}
 			
-			//for (int j = 0; j < this.)
+			for (int j = 0; j < this.playerContainer.getComponentCount(); j++) {
+				Player plr = (Player) this.playerContainer.getComponent(j);
+				boolean inside = plr.inside(projectile.position, projectile.Size);
+				
+				if (inside && plr != projectile.parent) {
+					//projectile hit
+					this.projectileContainer.remove(i);
+					plr.health -= projectile.damage;
+					
+					if (plr.health <= 0) {
+						this.playerContainer.remove(plr);
+					}
+				}
+			}
+			
+			for (int j = 0; j < this.projectileContainer.getComponentCount(); j++) {
+				Projectile p = (Projectile) this.projectileContainer.getComponent(j);
+				
+				if (p != projectile && p.collidable && p.inside(projectile.position, projectile.Size)) {
+					this.projectileContainer.remove(p);
+					this.projectileContainer.remove(projectile);
+				}
+			}
 		}
 		
-		Vector2 frameVelocity = player.velocity;
-		frameVelocity = frameVelocity.sub(collision);
-		
-		player.position = new Vector2(player.position.x - frameVelocity.x, player.position.y - frameVelocity.y);
+		//player.position = player.position.sub(player.velocity.sub(collision));
 		player.offset = new Vector2();
 		
 		repaint();
@@ -215,7 +239,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			Vector2 direction = new Vector2();
 			switch (code) {
 				case 37:
-					direction = new Vector2(-1, -1);
+					direction = new Vector2(-1, 0);
 					break;
 				case 38:
 					direction = new Vector2(0, -1);
@@ -229,7 +253,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			}
 			
 			Projectile p = new Projectile(player, direction, 1, 2000);
-			p.speed = 15;
+			p.speed = 3;
 			this.projectileContainer.add(p);
 		}
 		
@@ -237,9 +261,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//	81 -> Q
 		//	69 -> E
 		if (code == 81) {
-			for (int i = 0; i < 360; i++) {
-				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 50000);
-				p.speed = 15;
+			for (int i = 0; i < 360; i += 10) {
+				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 4000);
+				p.speed = 5;
 				this.projectileContainer.add(p);
 			}
 		}
