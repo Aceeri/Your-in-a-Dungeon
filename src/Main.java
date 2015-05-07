@@ -1,12 +1,6 @@
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import java.awt.Dimension;
-import java.awt.Color;
-import java.awt.Graphics;
-
-import java.util.Vector;
-
 public class Main {
 	
 	public static JFrame window;

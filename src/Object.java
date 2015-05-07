@@ -67,8 +67,6 @@ public class Object extends JComponent {
 			direction.x = 1;
 		}
 		
-		System.out.println(direction);
-		
 		return direction;
 	}
 	

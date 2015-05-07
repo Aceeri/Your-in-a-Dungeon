@@ -9,13 +9,16 @@ import java.awt.event.MouseListener;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
-import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.Timer;
 
-public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener {
+public class Manager extends JPanel implements KeyListener, MouseListener {
 	
 	public boolean running = false;
+	public long previousFrame;
+	public double missedFrames = 0;
+	public double framesPerSecond = 60;
 	
 	public boolean[] keyPress = new boolean[255];
 	
@@ -45,7 +48,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		player = new Player(this, new Vector2(screen.x/2 - 30, screen.y/2 - 30));
 		player.speed = 3;
-		Enemy e = new Enemy(this, new Vector2(100, 100));
+		//Enemy e = new Enemy(this, new Vector2(100, 100));
 		
 		
 		//add containers to JPanel
@@ -96,8 +99,23 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         
-		gameTimer = new Timer(16, this);
-		gameTimer.start();
+        running = true;
+        Thread gameThread = new Thread() {
+        	public void run() {
+        		previousFrame = System.nanoTime();
+        		while (running) {
+        			if ((System.nanoTime() - previousFrame)/1000000 > 1/framesPerSecond*1000) {
+        				//output missing frames
+        				//System.out.println("missing frames: " + ((System.nanoTime() - previousFrame)/1000000 - 1/framesPerSecond*1000));
+        				missedFrames += ((System.nanoTime() - previousFrame)/1000000 - 1/framesPerSecond*1000)/(1/framesPerSecond*1000);
+        			}
+        			
+		        	previousFrame = System.nanoTime();
+			        step();
+        		}
+        	}
+        };
+        gameThread.start();
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -114,8 +132,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		return false;
 	}
 	
-	public void actionPerformed(ActionEvent e) {
-		
+	public void step() {
 		//reset size and location
 		playerContainer.setSize(screen.dimension());
 		playerContainer.setLocation(0, 0);
@@ -156,11 +173,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		for (int i = 0; i < this.projectileContainer.getComponentCount(); i++) {
 			Projectile projectile = (Projectile) this.projectileContainer.getComponent(i);
-			
 			projectile.position = projectile.position.add(projectile.velocity.mult(projectile.speed));
 			
 			if (projectile.expired()) {
-				this.projectileContainer.remove(i);
+				this.projectileContainer.remove(projectile);
 			}
 			
 			for (int j = 0; j < this.wallContainer.getComponentCount(); j++) {
@@ -172,7 +188,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 						Vector2 newVelocity = component.collide(projectile.position.sub(projectile.velocity.mult(projectile.speed)), new Vector2(5, 5), projectile.velocity);
 						projectile.velocity = projectile.velocity.add(newVelocity.mult(2));
 					} else {
-						this.projectileContainer.remove(i);
+						this.projectileContainer.remove(projectile);
 					}
 				}
 			}
@@ -183,7 +199,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				
 				if (inside && plr != projectile.parent) {
 					//projectile hit
-					this.projectileContainer.remove(i);
+					this.projectileContainer.remove(projectile);
 					plr.health -= projectile.damage;
 					
 					if (plr.health <= 0) {
@@ -191,21 +207,24 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					}
 				}
 			}
-			
-			for (int j = 0; j < this.projectileContainer.getComponentCount(); j++) {
-				Projectile p = (Projectile) this.projectileContainer.getComponent(j);
-				
-				if (p != projectile && p.collidable && p.inside(projectile.position, projectile.Size)) {
-					this.projectileContainer.remove(p);
-					this.projectileContainer.remove(projectile);
-				}
-			}
 		}
 		
-		//player.position = player.position.sub(player.velocity.sub(collision));
-		player.offset = new Vector2();
-		
 		repaint();
+		
+		try {
+			//frame management
+			//	check if there are missing frames
+			//	if there are then wait less time for current frame to end
+			//	if there are more missing frames than the time for this frame then skip over frame
+			Thread.sleep((long) (1/framesPerSecond*1000 < (missedFrames*(1/framesPerSecond*1000)) ? 0 : (1/framesPerSecond*1000) - (missedFrames*(1/framesPerSecond*1000))));
+			if (1/framesPerSecond*1000 < (missedFrames*(1/framesPerSecond*1000))) {
+				missedFrames--;
+			} else {
+				missedFrames = 0;
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

@@ -1,8 +1,5 @@
 import java.awt.Graphics;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 public class Player extends Object {
 	
