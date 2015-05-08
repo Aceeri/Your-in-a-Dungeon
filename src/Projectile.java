@@ -14,17 +14,17 @@ public class Projectile extends Object {
 	public Color color = Color.ORANGE;
 	
 	public Projectile(Player parent, Vector2 direction, double damage, double expiration) {
-		super(parent.position.add(direction.mult(parent.Size.x)).add(parent.Size.div(2)), parent.screen);
+		super(parent.manager, parent.position.add(parent.Size.div(2)));
 		
 		this.Size = new Vector2(5, 5);
 		this.parent = parent;
 		this.velocity = direction;
 		this.damage = damage;
-		this.expiration = new Date().getTime() + expiration;
+		this.expiration = expiration;
 	}
 	
 	public boolean expired() {
-		return this.expiration < new Date().getTime();
+		return this.expiration <= 0;
 	}
 	
 	public void paintComponent(Graphics g) {

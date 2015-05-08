@@ -5,6 +5,7 @@ public class Vector2 {
 	public double x = 0;
 	public double y = 0;
 	
+	//Constructors
 	public Vector2() { }
 	
 	public Vector2(int x, int y) {
@@ -16,6 +17,12 @@ public class Vector2 {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public Vector2(Dimension d) {
+		this.x = d.width;
+		this.y = d.height;
+	}
+	
 	
 	//Basic math
 	public Vector2 add(Vector2 v) {
@@ -42,6 +49,13 @@ public class Vector2 {
 		return new Vector2(this.x/k, this.y/k);
 	}
 	
+	public Vector2 scale(Vector2 v) {
+		return new Vector2(this.x/v.x, this.y/v.y);
+	}
+	
+	public Vector2 multVect(Vector2 v) {
+		return new Vector2(this.x*v.x, this.y*v.y);
+	}
 	
 	
 	//Rounding of vector positions
@@ -56,24 +70,15 @@ public class Vector2 {
 	public Vector2 round() {
 		return new Vector2(Math.round(this.x), Math.round(this.y));
 	}
+
 	
-	
+	//Vector length
 	public double magnitude() {
 		return Math.sqrt(this.dot(this));
 	}
 	
 	public double dot(Vector2 v) {
 		return this.x*v.x + this.y*v.y;
-	}
-	
-	//Angle to Origin
-	public double angle() {
-		return Math.atan2(this.y, this.x);
-	}
-	
-	//Angle to Vector
-	public double angle(Vector2 v) {
-		return Math.atan2(v.y-this.y, v.x-this.x);
 	}
 	
 	public Vector2 normalize() {
@@ -85,7 +90,18 @@ public class Vector2 {
 	}
 	
 	
+	//Angle to Origin
+	public double angle() {
+		return Math.atan2(this.y, this.x);
+	}
 	
+	//Angle to Vector
+	public double angle(Vector2 v) {
+		return Math.atan2(v.y-this.y, v.x-this.x);
+	}
+	
+	
+	//Return values
 	public Dimension dimension() {
 		return new Dimension((int) this.x, (int) this.y);
 	}

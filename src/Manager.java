@@ -9,9 +9,12 @@ import java.awt.event.MouseListener;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 
 import javax.swing.Timer;
+
+import java.util.Random;
 
 public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener {
 	
@@ -55,40 +58,26 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		this.add(projectileContainer);
 		this.add(floorContainer);
 		playerContainer.add(player);
-		//playerContainer.add(e);
+		playerContainer.add(e);
 		
 		//create walls
-		testback a = new testback(new Vector2(0, 0), screen, new Vector2(screen.x, 30));
+		testback a = new testback(this, new Vector2(0, 0), new Vector2(screen.x, 30));
 		a.collidable = true;
 		wallContainer.add(a);
 		
-		testback b = new testback(new Vector2(0, 30), screen, new Vector2(30, screen.y - 90));
+		testback b = new testback(this, new Vector2(0, 30), new Vector2(30, screen.y - 90));
 		b.collidable = true;
 		wallContainer.add(b);
 		
-		testback c = new testback(new Vector2(0, screen.y - 60), screen, new Vector2(screen.x, 30));
+		testback c = new testback(this, new Vector2(0, -30), new Vector2(screen.x, 30));
+		c.scalePosition = new Vector2(1, 0);
 		c.collidable = true;
 		wallContainer.add(c);
 		
-		testback d = new testback(new Vector2(screen.x - 30, 30), screen, new Vector2(30, screen.y - 90));
+		testback d = new testback(this, new Vector2(-30, 30), new Vector2(30, screen.y - 90));
+		d.scalePosition = new Vector2(0, 1);
 		d.collidable = true;
 		wallContainer.add(d);
-		
-		testback pillar1 = new testback(new Vector2(150, 150), screen, new Vector2(80, 30));
-		pillar1.collidable = true;
-		wallContainer.add(pillar1);
-		
-		testback pillar2 = new testback(new Vector2(screen.x - 230, 150), screen, new Vector2(80, 30));
-		pillar2.collidable = true;
-		wallContainer.add(pillar2);
-		
-		testback pillar3 = new testback(new Vector2(150, screen.y - 230), screen, new Vector2(80, 30));
-		pillar3.collidable = false;
-		wallContainer.add(pillar3);
-		
-		testback pillar4 = new testback(new Vector2(screen.x - 230, screen.y - 230), screen, new Vector2(80, 30));
-		pillar4.collidable = true;
-		wallContainer.add(pillar4);
 		
 		addKeyListener(this);
 		addMouseListener(this);
@@ -115,6 +104,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		this.screen = new Vector2(Toolkit.getDefaultToolkit().getScreenSize());
 		
 		//reset size and location
 		playerContainer.setSize(screen.dimension());
@@ -128,17 +118,18 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		for (int i = 0; i < this.playerContainer.getComponentCount(); i++) {
 			Player plr = (Player) this.playerContainer.getComponent(i);
-			
+			plr.updatePosition();
 			Vector2 collision = new Vector2();
 			
 			for (int j = 0; j < this.wallContainer.getComponentCount(); j++) {
 				Object component = (Object) this.wallContainer.getComponent(j);
-				component.screen = this.screen;
+				component.updatePosition();
+				//component.manager. = this.screen;
 				
 				boolean inside = component.inside(plr.getNextPosition(), plr.Size);
 				
 				if (inside) {
-					Vector2 push = component.collide(plr.getNextPosition(), plr.Size, plr.velocity);
+					Vector2 push = component.collide(plr.position, plr.Size, plr.velocity);
 					
 					if (collision.x == 0) {
 						collision.x = push.div(plr.speed).x;
@@ -156,7 +147,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		for (int i = 0; i < this.projectileContainer.getComponentCount(); i++) {
 			Projectile projectile = (Projectile) this.projectileContainer.getComponent(i);
-			
+			projectile.updatePosition();
+			projectile.expiration -= 16;
 			projectile.position = projectile.position.add(projectile.velocity.mult(projectile.speed));
 			
 			if (projectile.expired()) {
@@ -192,7 +184,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				}
 			}
 			
-			for (int j = 0; j < this.projectileContainer.getComponentCount(); j++) {
+			for (int j = 0; j < this.projectileContainer.getComponentCount(); j+=50) {
 				Projectile p = (Projectile) this.projectileContainer.getComponent(j);
 				
 				if (p != projectile && p.collidable && p.inside(projectile.position, projectile.Size)) {
@@ -201,9 +193,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				}
 			}
 		}
-		
-		//player.position = player.position.sub(player.velocity.sub(collision));
-		player.offset = new Vector2();
 		
 		repaint();
 	}
@@ -252,7 +241,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					break;
 			}
 			
-			Projectile p = new Projectile(player, direction, 1, 2000);
+			Projectile p = new Projectile(player, direction, .25, 2000);
 			p.speed = 3;
 			this.projectileContainer.add(p);
 		}
@@ -261,11 +250,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//	81 -> Q
 		//	69 -> E
 		if (code == 81) {
-			for (int i = 0; i < 360; i += 10) {
-				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 4000);
+			for (double i = 0; i < 360; i += 1) {
+				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 2000);
 				p.speed = 5;
 				this.projectileContainer.add(p);
 			}
+		}
+		if (code == 69) {
+			
 		}
 		
 		this.keyPress[e.getKeyCode()] = true;

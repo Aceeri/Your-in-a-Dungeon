@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Player extends Object {
 	
-	public int speed = 2; //keep between 1-5
+	public int speed = 3; //keep between 1-5
 	public double health = 10;
 	public String name;
 	public String type;
@@ -15,14 +15,15 @@ public class Player extends Object {
 	
 	public Manager manager;
 	
+	public Color color = Color.ORANGE;
+	
 	public Player(Manager manager, Vector2 position) {
-		super(position, manager.screen);
+		super(manager, position);
 		
 		this.type = "player";
 		
 		this.manager = manager;
 		this.Size = new Vector2(15, 15);
-		this.offset = new Vector2(175, -75);
 		this.collidable = true;
 		
 		this.setSize(this.Size.dimension());
@@ -30,7 +31,8 @@ public class Player extends Object {
 	}
 	
 	public void step() {
-		this.offset = new Vector2();
+		this.updatePosition();
+		//System.out.println("Player velocity: " + this.velocity + " " + this.collision);
 		this.position = this.position.sub(this.velocity.sub(this.collision));
 		this.collision = new Vector2();
 	}
@@ -41,15 +43,11 @@ public class Player extends Object {
 		g.setColor(Color.GRAY);
 		g.fillRect((int) (this.position.x), (int) (this.position.y), 19, 19);
 		
-		g.setColor(Color.ORANGE);
+		g.setColor(color);
 		g.fillRect((int) (this.position.x + 2), (int) (this.position.y + 2), 15, 15);
 	}
 	
-	public Vector2 getPosition() {
-		return new Vector2(this.position.x - this.offset.x, this.position.y - this.offset.y);
-	}
-	
 	public Vector2 getNextPosition() {
-		return new Vector2(this.position.x - this.offset.x - this.velocity.x, this.position.y - this.offset.y - this.velocity.y);
+		return new Vector2(this.position.x - this.velocity.x, this.position.y - this.velocity.y);
 	}
 }

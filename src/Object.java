@@ -1,29 +1,35 @@
+import java.awt.Toolkit;
+
 import javax.swing.JComponent;
 
 public class Object extends JComponent {
 	
-	public Vector2 screen;
+	public Vector2 scalePosition;
+	public Vector2 offsetPosition;
 	public Vector2 position;
 	public Vector2 offset;
 	public Vector2 velocity;
 	public Vector2 Size;
+	public Vector2 windowSizeOffset;
+	
+	public Manager manager;
 	
 	public boolean collidable = false;
 	public boolean anchored = true;
 	public boolean backgroundObject = false;
 	
-	public Object(Vector2 position, Vector2 screen) {
+	public Object(Manager manager, Vector2 position) {
 		this.position = position;
 		this.offset = new Vector2(0, 0);
 		this.velocity = new Vector2(0, 0);
-		this.screen = screen;
+		this.manager = manager;
 		
 		this.paintLocation();
 	}
 	
 	public void paintLocation() {
 		this.setLocation(0, 0);
-		this.setSize(screen.dimension());
+		this.setSize(manager.screen.dimension());
 	}
 	
 	public boolean inside(Vector2 p2, Vector2 s2) {
@@ -67,9 +73,16 @@ public class Object extends JComponent {
 			direction.x = 1;
 		}
 		
-		System.out.println(direction);
-		
 		return direction;
+	}
+	
+	public void step() {
+		this.updatePosition();
+	}
+	
+	public void updatePosition() throws NullPointerException {
+		this.position = this.scalePosition.multVect(manager.screen).add(this.offsetPosition);
+		System.out.println(this.position);
 	}
 	
 	public Vector2 getNextPosition() {
