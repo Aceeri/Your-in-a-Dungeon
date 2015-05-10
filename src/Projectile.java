@@ -35,10 +35,10 @@ public class Projectile extends Object {
 		paintLocation();
 		this.expiration -= 16;
 		
-		for (int i = 0; i < this.speed; i++) {
+		//for (int i = 0; i < this.speed*4; i++) {
 			if (bounce) {
 				Vector2 collision = checkCollision(new Object[] { parent });
-				
+				//System.out.println(collision);
 				if (Math.abs(collision.x) > 0) {
 					velocity.x = -velocity.x;
 				}
@@ -47,9 +47,9 @@ public class Projectile extends Object {
 					velocity.y = -velocity.y;
 				}
 				
-				offsetPosition = offsetPosition.add(velocity);
+				offsetPosition = offsetPosition.add(velocity.mult(speed));
 			}
-		}
+		//}
 	}
 	
 	public void paintComponent(Graphics g) {

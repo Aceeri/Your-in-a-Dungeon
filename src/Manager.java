@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 
 import java.awt.event.ActionEvent;
@@ -45,7 +46,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Vector2 screen;
 	public Vector2 ratio;
 	
-	public Music background = new Music("C:\\Users\\Aceeri\\Documents\\Again_and_Again.wav");
+	public Music background = new Music("resources/sound/Again_and_Again.wav");
 	public double counter = 0;
 	
 	public Manager(Vector2 screen) {
@@ -87,7 +88,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		b.collidable = true;
 		wallContainer.add(b);
 		
-		testback c = new testback(this, new Vector2(0, -30), new Vector2(screen.x, 30));
+		/*testback c = new testback(this, new Vector2(0, -30), new Vector2(screen.x, 30));
 		c.scalePosition = new Vector2(1, 0);
 		c.collidable = true;
 		wallContainer.add(c);
@@ -95,7 +96,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		testback d = new testback(this, new Vector2(-30, 30), new Vector2(30, screen.y - 30));
 		d.scalePosition = new Vector2(0, 1);
 		d.collidable = true;
-		wallContainer.add(d);
+		wallContainer.add(d);*/
 		
 		testback pillar = new testback(this, new Vector2(325, 200), new Vector2(30, 30));
 		pillar.collidable = true;
@@ -216,7 +217,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			Vector2 direction = new Vector2();
 			switch (code) {
 				case 37:
-					direction = new Vector2(-1, 0);
+					direction = new Vector2(-1, -.8);
 					break;
 				case 38:
 					direction = new Vector2(0, -1);

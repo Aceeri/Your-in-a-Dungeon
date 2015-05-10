@@ -1,6 +1,8 @@
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 
 public class Vector2 {
 	public double x = 0;
@@ -22,6 +24,11 @@ public class Vector2 {
 	public Vector2(Dimension d) {
 		this.x = d.width;
 		this.y = d.height;
+	}
+	
+	public Vector2(Point p) {
+		this.x = p.x;
+		this.y = p.y;
 	}
 	
 	
