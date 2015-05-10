@@ -9,18 +9,23 @@ import java.awt.event.MouseListener;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
-import java.util.Date;
+import java.awt.Toolkit;
+import java.util.ArrayList;
 
 import javax.swing.Timer;
 
-public class Manager extends JPanel implements KeyListener, MouseListener {
+import org.omg.CORBA.SystemException;
+
+import java.util.Random;
+
+public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener {
 	
 	public boolean running = false;
-	public long previousFrame;
-	public double missedFrames = 0;
-	public double framesPerSecond = 60;
+	public boolean info = false;
+	public boolean fullscreen = false;
 	
 	public boolean[] keyPress = new boolean[255];
+	public int lastKeyPress = 0;
 	
 	//highest -> lowest level containers: (highest is displayed above, lowest is displayed below)
 	//	ui -> wall -> player -> projectile -> floor
@@ -30,10 +35,18 @@ public class Manager extends JPanel implements KeyListener, MouseListener {
 	public Container wallContainer;
 	public Container floorContainer;
 	
+	public ArrayList<Vector2[]> vectorContainer;
+	
 	public Timer gameTimer;
 	public Player player;
+	public long lastFrame = System.currentTimeMillis();
+	public long lastFps = 60;
 	
 	public Vector2 screen;
+	public Vector2 ratio;
+	
+	public Music background = new Music("C:\\Users\\Aceeri\\Documents\\Again_and_Again.wav");
+	public double counter = 0;
 	
 	public Manager(Vector2 screen) {
 		this.screen = screen;
@@ -47,9 +60,12 @@ public class Manager extends JPanel implements KeyListener, MouseListener {
 		floorContainer = new Container();
 		
 		player = new Player(this, new Vector2(screen.x/2 - 30, screen.y/2 - 30));
-		player.speed = 3;
+		player.speed = 2;
 		//Enemy e = new Enemy(this, new Vector2(100, 100));
 		
+		background.loop = true;
+		background.setVolume(1);
+		background.play();
 		
 		//add containers to JPanel
 		this.add(uiContainer);
@@ -60,38 +76,47 @@ public class Manager extends JPanel implements KeyListener, MouseListener {
 		playerContainer.add(player);
 		//playerContainer.add(e);
 		
+		vectorContainer = new ArrayList<Vector2[]> ();
+		
 		//create walls
-		testback a = new testback(new Vector2(0, 0), screen, new Vector2(screen.x, 30));
+		testback a = new testback(this, new Vector2(0, 0), new Vector2(screen.x, 30));
 		a.collidable = true;
 		wallContainer.add(a);
 		
-		testback b = new testback(new Vector2(0, 30), screen, new Vector2(30, screen.y - 90));
+		testback b = new testback(this, new Vector2(0, 30), new Vector2(30, screen.y - 90));
 		b.collidable = true;
 		wallContainer.add(b);
 		
-		testback c = new testback(new Vector2(0, screen.y - 60), screen, new Vector2(screen.x, 30));
+		testback c = new testback(this, new Vector2(0, -30), new Vector2(screen.x, 30));
+		c.scalePosition = new Vector2(1, 0);
 		c.collidable = true;
 		wallContainer.add(c);
 		
-		testback d = new testback(new Vector2(screen.x - 30, 30), screen, new Vector2(30, screen.y - 90));
+		testback d = new testback(this, new Vector2(-30, 30), new Vector2(30, screen.y - 30));
+		d.scalePosition = new Vector2(0, 1);
 		d.collidable = true;
 		wallContainer.add(d);
 		
-		testback pillar1 = new testback(new Vector2(150, 150), screen, new Vector2(80, 30));
-		pillar1.collidable = true;
-		wallContainer.add(pillar1);
+		testback pillar = new testback(this, new Vector2(325, 200), new Vector2(30, 30));
+		pillar.collidable = true;
+		pillar.anchored = true;
+		wallContainer.add(pillar);
 		
-		testback pillar2 = new testback(new Vector2(screen.x - 230, 150), screen, new Vector2(80, 30));
-		pillar2.collidable = true;
-		wallContainer.add(pillar2);
+		pillar = new testback(this, new Vector2(355, 200), new Vector2(30, 30));
+		pillar.collidable = true;
+		pillar.anchored = true;
+		wallContainer.add(pillar);
 		
-		testback pillar3 = new testback(new Vector2(150, screen.y - 230), screen, new Vector2(80, 30));
-		pillar3.collidable = false;
-		wallContainer.add(pillar3);
+		pillar = new testback(this, new Vector2(385, 200), new Vector2(30, 30));
+		pillar.collidable = true;
+		pillar.anchored = true;
+		wallContainer.add(pillar);
 		
-		testback pillar4 = new testback(new Vector2(screen.x - 230, screen.y - 230), screen, new Vector2(80, 30));
-		pillar4.collidable = true;
-		wallContainer.add(pillar4);
+		pillar = new testback(this, new Vector2(415, 200), new Vector2(30, 30));
+		pillar.collidable = true;
+		pillar.anchored = true;
+		wallContainer.add(pillar);
+		
 		
 		addKeyListener(this);
 		addMouseListener(this);
@@ -99,154 +124,87 @@ public class Manager extends JPanel implements KeyListener, MouseListener {
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         
-        running = true;
-        Thread gameThread = new Thread() {
-        	public void run() {
-        		previousFrame = System.nanoTime();
-        		while (running) {
-        			if ((System.nanoTime() - previousFrame)/1000000 > 1/framesPerSecond*1000) {
-        				//output missing frames
-        				//System.out.println("missing frames: " + ((System.nanoTime() - previousFrame)/1000000 - 1/framesPerSecond*1000));
-        				missedFrames += ((System.nanoTime() - previousFrame)/1000000 - 1/framesPerSecond*1000)/(1/framesPerSecond*1000);
-        			}
-        			
-		        	previousFrame = System.nanoTime();
-			        step();
-        		}
-        	}
-        };
-        gameThread.start();
+		gameTimer = new Timer(16, this);
+		gameTimer.start();
 	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-	}
-	
-	public boolean Vector2Inside(Vector2 Vector2, Vector2 position, Vector2 size) {
-		if (Vector2.x < position.x + size.x
-			&& Vector2.x > position.x
-			&& Vector2.y < position.y + size.y
-			&& Vector2.y > position.y) {
-				return true;
-		}
-		return false;
-	}
-	
-	public void step() {
-		//reset size and location
-		playerContainer.setSize(screen.dimension());
-		playerContainer.setLocation(0, 0);
-		projectileContainer.setSize(screen.dimension());
-		projectileContainer.setLocation(0, 0);
-		wallContainer.setSize(screen.dimension());
-		wallContainer.setLocation(0, 0);
-		floorContainer.setSize(screen.dimension());
-		floorContainer.setLocation(0, 0);
-		
-		for (int i = 0; i < this.playerContainer.getComponentCount(); i++) {
-			Player plr = (Player) this.playerContainer.getComponent(i);
-			
-			Vector2 collision = new Vector2();
-			
-			for (int j = 0; j < this.wallContainer.getComponentCount(); j++) {
-				Object component = (Object) this.wallContainer.getComponent(j);
-				component.screen = this.screen;
-				
-				boolean inside = component.inside(plr.getNextPosition(), plr.Size);
-				
-				if (inside) {
-					Vector2 push = component.collide(plr.getNextPosition(), plr.Size, plr.velocity);
-					
-					if (collision.x == 0) {
-						collision.x = push.div(plr.speed).x;
-					}
-					
-					if (collision.y == 0) {
-						collision.y = push.div(plr.speed).y;
-					}
-				}
-			}
-			
-			plr.collision = collision;
-			plr.step();
+		for (int i = 0; i < vectorContainer.size(); i++) {
+			new Vector2().drawVector(g, vectorContainer.get(i)[0], vectorContainer.get(i)[1]);
 		}
 		
-		for (int i = 0; i < this.projectileContainer.getComponentCount(); i++) {
-			Projectile projectile = (Projectile) this.projectileContainer.getComponent(i);
-			projectile.position = projectile.position.add(projectile.velocity.mult(projectile.speed));
+		
+		//info display
+		long now = System.currentTimeMillis();
+		
+		if (info) {
+			g.setColor(Color.GREEN);
+			g.drawString("fps:", 5, 15);
+			g.drawString("key press:", 5, 30);
+			g.drawString("window size:", 5, 45);
+			g.drawString("fullscreen:", 5, 60);
+			g.drawString("characters:", 5, 75);
+			g.drawString("projectiles:", 5, 90);
 			
-			if (projectile.expired()) {
-				this.projectileContainer.remove(projectile);
-			}
-			
-			for (int j = 0; j < this.wallContainer.getComponentCount(); j++) {
-				Object component = (Object) this.wallContainer.getComponent(j);
-				boolean inside = component.inside(projectile.position, projectile.Size);
-				
-				if (inside) {
-					if (projectile.bounce) {
-						Vector2 newVelocity = component.collide(projectile.position.sub(projectile.velocity.mult(projectile.speed)), new Vector2(5, 5), projectile.velocity);
-						projectile.velocity = projectile.velocity.add(newVelocity.mult(2));
-					} else {
-						this.projectileContainer.remove(projectile);
-					}
-				}
-			}
-			
-			for (int j = 0; j < this.playerContainer.getComponentCount(); j++) {
-				Player plr = (Player) this.playerContainer.getComponent(j);
-				boolean inside = plr.inside(projectile.position, projectile.Size);
-				
-				if (inside && plr != projectile.parent) {
-					//projectile hit
-					this.projectileContainer.remove(projectile);
-					plr.health -= projectile.damage;
-					
-					if (plr.health <= 0) {
-						this.playerContainer.remove(plr);
+			g.drawString(String.valueOf(1000/(now - lastFrame)), 100, 15);
+			g.drawString(String.valueOf(lastKeyPress), 100, 30);
+			g.drawString(screen.toString(), 100, 45);
+			g.drawString(String.valueOf(fullscreen), 100, 60);
+			g.drawString(String.valueOf(playerContainer.getComponentCount()), 100, 75);
+			g.drawString(String.valueOf(projectileContainer.getComponentCount()), 100, 90);
+		}
+		
+		//g.translate(500, 500);
+		
+		lastFrame = now;
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		this.screen = new Vector2(Toolkit.getDefaultToolkit().getScreenSize());
+		
+		for (int i = 0; i < getComponentCount(); i++) {	
+			if (getComponent(i) instanceof Container) {
+				Container container = (Container) getComponent(i);
+				container.setSize(screen.dimension());
+				container.setLocation(0, 0);
+				for (int j = 0; j < container.getComponentCount(); j++) {
+					Object object = (Object) container.getComponent(j);
+					object.step();
+					if (object instanceof Projectile) {
+						Projectile projectile = (Projectile) object;
+						if (projectile.expired()) {
+							container.remove(object);
+						}
 					}
 				}
 			}
 		}
 		
 		repaint();
-		
-		try {
-			//frame management
-			//	check if there are missing frames
-			//	if there are then wait less time for current frame to end
-			//	if there are more missing frames than the time for this frame then skip over frame
-			Thread.sleep((long) (1/framesPerSecond*1000 < (missedFrames*(1/framesPerSecond*1000)) ? 0 : (1/framesPerSecond*1000) - (missedFrames*(1/framesPerSecond*1000))));
-			if (1/framesPerSecond*1000 < (missedFrames*(1/framesPerSecond*1000))) {
-				missedFrames--;
-			} else {
-				missedFrames = 0;
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int code = e.getKeyCode();
+		lastKeyPress = code;
 		
 		//movement
-		//	68 -> A
-		//	65 -> D
+		//	68 -> D
+		//	65 -> A
 		//  83 -> W
 		//	87 -> S
 		if (code == 68 && !this.keyPress[68]) {
-			player.velocity.x -= player.speed;
+			player.velocity.x += 1;
 		}
 		if (code == 65 && !this.keyPress[65]) {
-			player.velocity.x += player.speed;
+			player.velocity.x -= 1;
 		}
 		if (code == 83 && !this.keyPress[83]) {
-			player.velocity.y -= player.speed;
+			player.velocity.y += 1;
 		}
 		if (code == 87 && !this.keyPress[87]) {
-			player.velocity.y += player.speed;
+			player.velocity.y -= 1;
 		}
 		
 		//attacking
@@ -271,7 +229,7 @@ public class Manager extends JPanel implements KeyListener, MouseListener {
 					break;
 			}
 			
-			Projectile p = new Projectile(player, direction, 1, 2000);
+			Projectile p = new Projectile(player, direction, .25, 2000);
 			p.speed = 3;
 			this.projectileContainer.add(p);
 		}
@@ -280,11 +238,19 @@ public class Manager extends JPanel implements KeyListener, MouseListener {
 		//	81 -> Q
 		//	69 -> E
 		if (code == 81) {
-			for (int i = 0; i < 360; i += 10) {
-				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 4000);
+			for (double i = 0; i < 360; i += 10) {
+				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 2000);
 				p.speed = 5;
 				this.projectileContainer.add(p);
 			}
+		}
+		if (code == 69) {
+			
+		}
+		
+		//toggle info
+		if (code == 67) {
+			info = !info;
 		}
 		
 		this.keyPress[e.getKeyCode()] = true;
@@ -294,16 +260,16 @@ public class Manager extends JPanel implements KeyListener, MouseListener {
 	public void keyReleased(KeyEvent e) {
 		int code = e.getKeyCode();
 		if (code == 68 && this.keyPress[68]) {
-			player.velocity.x += player.speed;
+			player.velocity.x -= 1;
 		}
 		if (code == 65 && this.keyPress[65]) {
-			player.velocity.x -= player.speed;
+			player.velocity.x += 1;
 		}
 		if (code == 83 && this.keyPress[83]) {
-			player.velocity.y += player.speed;
+			player.velocity.y -= 1;
 		}
 		if (code == 87 && this.keyPress[87]) {
-			player.velocity.y -= player.speed;
+			player.velocity.y += 1;
 		}
 		
 		this.keyPress[e.getKeyCode()] = false;

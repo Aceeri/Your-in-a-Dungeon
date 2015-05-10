@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /Enemy.class
 /Main.class
 /Manager.class
@@ -7,3 +8,6 @@
 /Vector2.class
 /testback.class
 /Manager$1.class
+=======
+/Music.class
+>>>>>>> screen-scaling

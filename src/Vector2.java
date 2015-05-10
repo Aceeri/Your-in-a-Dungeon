@@ -1,10 +1,12 @@
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 
 public class Vector2 {
-	
 	public double x = 0;
 	public double y = 0;
 	
+	//Constructors
 	public Vector2() { }
 	
 	public Vector2(int x, int y) {
@@ -16,6 +18,12 @@ public class Vector2 {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public Vector2(Dimension d) {
+		this.x = d.width;
+		this.y = d.height;
+	}
+	
 	
 	//Basic math
 	public Vector2 add(Vector2 v) {
@@ -42,9 +50,16 @@ public class Vector2 {
 		return new Vector2(this.x/k, this.y/k);
 	}
 	
+	public Vector2 ratio(Vector2 v) {
+		return new Vector2(this.x/v.x, this.y/v.y);
+	}
+	
+	public Vector2 scalar(Vector2 v) {
+		return new Vector2(this.x*v.x, this.y*v.y);
+	}
 	
 	
-	//Rounding of vector positions
+	//Rounding/absolute value of vector positions
 	public Vector2 ceil() {
 		return new Vector2(Math.ceil(this.x), Math.ceil(this.y));
 	}
@@ -57,7 +72,12 @@ public class Vector2 {
 		return new Vector2(Math.round(this.x), Math.round(this.y));
 	}
 	
+	public Vector2 abs() {
+		return new Vector2(Math.abs(this.x), Math.abs(this.y));
+	}
+
 	
+	//Vector length
 	public double magnitude() {
 		return Math.sqrt(this.dot(this));
 	}
@@ -66,14 +86,8 @@ public class Vector2 {
 		return this.x*v.x + this.y*v.y;
 	}
 	
-	//Angle to Origin
-	public double angle() {
-		return Math.atan2(this.y, this.x);
-	}
-	
-	//Angle to Vector
-	public double angle(Vector2 v) {
-		return Math.atan2(v.y-this.y, v.x-this.x);
+	public Vector2 cross() {
+		return new Vector2(-this.y, this.x);
 	}
 	
 	public Vector2 normalize() {
@@ -85,13 +99,21 @@ public class Vector2 {
 	}
 	
 	
-	
+	//Return values
 	public Dimension dimension() {
 		return new Dimension((int) this.x, (int) this.y);
 	}
 	
 	public String toString() {
 		return "<" + this.x + ", " + this.y +">";
+	}
+	
+	public void drawVector(Graphics g, Vector2 v1, Vector2 v2) {
+		g.setColor(Color.RED);
+		
+		for (int i = 0; i < v1.distance(v2); i ++) {
+			g.fillRect((int) (v1.x + (v2.x*i/v1.distance(v2))) - 1 , (int) (v1.y + (v2.y*i/v1.distance(v2))) - 1, 3, 3);
+		}
 	}
 	
 }
