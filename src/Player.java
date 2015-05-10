@@ -5,11 +5,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class Player extends Object {
-	
-	public int speed = 3; //keep between 1-5
 	public double health = 10;
 	public String name;
-	public String type;
 	
 	public Vector2 collision = new Vector2();
 	
@@ -20,27 +17,21 @@ public class Player extends Object {
 	public Player(Manager manager, Vector2 position) {
 		super(manager, position);
 		
-		this.type = "player";
-		
 		this.manager = manager;
-		this.Size = new Vector2(15, 15);
-		this.collidable = true;
+		Size = new Vector2(19, 19);
+		collidable = true;
+		anchored = false;
 		
-		this.setSize(this.Size.dimension());
-		this.setLocation(0, 0);
-	}
-	
-	public void step() {
-		this.updatePosition();
-		//System.out.println("Player velocity: " + this.velocity + " " + this.collision);
-		this.position = this.position.sub(this.velocity.sub(this.collision));
-		this.collision = new Vector2();
+		setSize(this.Size.dimension());
+		setLocation(0, 0);
+		
+		type = "player";
+		speed = 1;
 	}
 	
 	public void paintComponent(Graphics g) {
-		this.paintLocation();
-		
 		g.setColor(Color.GRAY);
+		//System.out.println(this.position);
 		g.fillRect((int) (this.position.x), (int) (this.position.y), 19, 19);
 		
 		g.setColor(color);

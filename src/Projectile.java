@@ -8,8 +8,6 @@ public class Projectile extends Object {
 	public double expiration;
 	public Player parent;
 	
-	public double speed = 1;
-	
 	public boolean bounce = true;
 	public Color color = Color.ORANGE;
 	
@@ -21,16 +19,41 @@ public class Projectile extends Object {
 		this.velocity = direction;
 		this.damage = damage;
 		this.expiration = expiration;
+		
+		anchored = false;
+		collidable = false;
+		
+		type = "projectile";
 	}
 	
 	public boolean expired() {
 		return this.expiration <= 0;
 	}
 	
-	public void paintComponent(Graphics g) {
-		super.paintLocation();
+	public void step() {
+		updatePosition();
+		paintLocation();
+		this.expiration -= 16;
 		
+		for (int i = 0; i < this.speed; i++) {
+			if (bounce) {
+				Vector2 collision = checkCollision(new Object[] { parent });
+				
+				if (Math.abs(collision.x) > 0) {
+					velocity.x = -velocity.x;
+				}
+				
+				if (Math.abs(collision.y) > 0) {
+					velocity.y = -velocity.y;
+				}
+				
+				offsetPosition = offsetPosition.add(velocity);
+			}
+		}
+	}
+	
+	public void paintComponent(Graphics g) {
 		g.setColor(Color.orange);
-		g.fillRect((int) this.position.x, (int) this.position.y, 5, 5);
+		g.fillRect((int) position.x, (int) position.y, 5, 5);
 	}
 }

@@ -18,23 +18,9 @@ public class Enemy extends Player {
 		Player nearestPlayer = getNearestPlayer();
 		
 		if (nearestPlayer != null) {
-			double angle = this.position.angle(nearestPlayer.position);
-			/*if (Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))) {
-				if (Math.cos(angle) < 0) {
-					this.velocity = new Vector2(1, 0);
-				} else {
-					this.velocity = new Vector2(-1, 0);
-				}
-			} else {
-				if (Math.sin(angle) < 0) {
-					this.velocity = new Vector2(0, 1);
-				} else {
-					this.velocity = new Vector2(0, -1);
-				}
-			}*/
-			//this.velocity = Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle)) ? new Vector2(1, 0) : new Vector2(0, 1);
-			this.velocity = new Vector2(-Math.cos(angle), -Math.sin(angle)).mult(this.speed);
-			//System.out.println(velocity + " " + this.collision);
+			//double angle = this.position.sub(nearestPlayer.position);
+			this.velocity = this.position.sub(nearestPlayer.position).normalize().mult(this.speed);
+			//this.velocity = new Vector2(-Math.cos(angle), -Math.sin(angle)).mult(this.speed);
 			this.position = this.position.sub(this.velocity.sub(this.collision.mult(this.speed)));
 		}
 	}
