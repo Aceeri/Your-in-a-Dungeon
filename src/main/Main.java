@@ -1,6 +1,12 @@
+package main;
+
+import main.misc.Vector2;
+import main.Manager;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import java.awt.Frame;
 import java.awt.Toolkit;
 
 public class Main {
@@ -11,7 +17,7 @@ public class Main {
 	public static void main(String[] args) throws InterruptedException {
 		
 		Vector2 screen;
-		Vector2 defaultScreen = new Vector2(800, 600);
+		Vector2 defaultScreen = new Vector2(1440, 900);
 		Vector2 fullScreen = new Vector2(Toolkit.getDefaultToolkit().getScreenSize());
 		
 		window = new JFrame();
@@ -20,13 +26,14 @@ public class Main {
 		//fullscreen mode:
 		//window.setExtendedState(Frame.MAXIMIZED_BOTH);
 		//screen = fullScreen;
-		//window.setUndecorated(true);
+		window.setUndecorated(true);
 		
 		window.pack();
 		
 		//windowed mode:
 		window.setSize(defaultScreen.dimension());
 		screen = defaultScreen;
+		//System.out.println(screen);
 		
 		Manager t = new Manager(new Vector2(window.getContentPane().getSize()));
 		

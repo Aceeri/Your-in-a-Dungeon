@@ -1,3 +1,5 @@
+package main.misc;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -56,7 +58,6 @@ public class Music {
 	
 	public void stop() {
 		clip.stop();
-		clip.drain();
 		clip.flush();
 	}
 	
@@ -75,12 +76,10 @@ public class Music {
 	}
 	
 	public void mute() {
-		mute = true;
-		muteControl.setValue(mute);
+		muteControl.setValue(true);
 	}
 	
 	public void unmute() {
-		mute = false;
-		muteControl.setValue(mute);
+		muteControl.setValue(false);
 	}
 }
