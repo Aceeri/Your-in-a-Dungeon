@@ -50,15 +50,7 @@ public class Vector2 {
 		return new Vector2(this.x*k, this.y*k);
 	}
 	
-	public Vector2 div(double k) {
-		return new Vector2(this.x/k, this.y/k);
-	}
-	
-	public Vector2 div(int k) {
-		return new Vector2(this.x/k, this.y/k);
-	}
-	
-	public Vector2 ratio(Vector2 v) {
+	public Vector2 div(Vector2 v) {
 		return new Vector2(this.x/v.x, this.y/v.y);
 	}
 	
@@ -99,7 +91,7 @@ public class Vector2 {
 	}
 	
 	public Vector2 normalize() {
-		return this.div(this.magnitude());
+		return this.scalar(1/this.magnitude());
 	}
 	
 	public double distance(Vector2 v) {

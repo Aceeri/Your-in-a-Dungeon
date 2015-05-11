@@ -44,7 +44,7 @@ public class Object extends JComponent {
 	}
 	
 	public void paintComponent(Graphics g) {
-		g.drawImage(image, (int) position.x, (int) position.y, (int) Size.x, (int) Size.y, null);
+		manager.canvas.getGraphics().drawImage(image, (int) position.x, (int) position.y, (int) Size.x, (int) Size.y, null);
 	}
 	
 	public void setImage() {
@@ -129,11 +129,11 @@ public class Object extends JComponent {
 		Vector2 p1 = position;
 		Vector2 s1 = Size;
 		
-		Vector2 c1 = p1.add(s1.div(2));
-		Vector2 c2 = p2.add(s2.div(2));
+		Vector2 c1 = p1.add(s1.scalar(1/2));
+		Vector2 c2 = p2.add(s2.scalar(1/2));
 		Vector2 cd = c1.sub(c2);
 		
-		Vector2 ratio = s2.ratio(s1);
+		Vector2 ratio = s2.div(s1);
 		
 		if (p1.x < p2.x + s2.x 
 				&& p1.x + s1.x > p2.x 
