@@ -301,8 +301,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			Vector2 currentScreen = new Vector2(window.getContentPane().getSize());
 			ratio = currentScreen.div(defaultScreen);
 			screen = screen.mult(ratio);
-			System.out.println(screen + " " + ratio);
-			System.out.println("resized");
 		}
 	}
 
