@@ -200,7 +200,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//attacking
 		//	37 -> left
 		//	38 -> up
-		//	39 -> right
+		//	39 -> rightu
 		//	40 -> down
 		if (code >= 37 && code <= 40) {
 			Vector2 direction = new Vector2();
