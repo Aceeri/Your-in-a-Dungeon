@@ -4,8 +4,6 @@ import main.misc.Vector2;
 import main.Manager;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import java.awt.Frame;
 import java.awt.Toolkit;
 

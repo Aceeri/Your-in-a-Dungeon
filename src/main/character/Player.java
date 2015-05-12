@@ -3,10 +3,6 @@ package main.character;
 import main.misc.Vector2;
 import main.Manager;
 
-
-import java.awt.Graphics;
-import java.awt.Color;
-
 public class Player extends main.object.Object {
 	public double health = 10;
 	public String name;
