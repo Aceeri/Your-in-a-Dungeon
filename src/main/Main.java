@@ -12,37 +12,48 @@ import java.awt.Toolkit;
 public class Main {
 	
 	public static JFrame window;
-	public static JPanel frame;
+	public static Manager manager;
+	
+	public static Vector2 screen = new Vector2(1440, 900);
+	public static Vector2 defaultScreen = new Vector2(1440, 900);
+	public static Vector2 fullScreen = new Vector2(Toolkit.getDefaultToolkit().getScreenSize());
 	
 	public static void main(String[] args) throws InterruptedException {
+		manager = new Manager(window);
 		
-		Vector2 screen;
-		Vector2 defaultScreen = new Vector2(1440, 900);
-		Vector2 fullScreen = new Vector2(Toolkit.getDefaultToolkit().getScreenSize());
-		
+		//setWindowed();
+		setFullscreen();
+	}
+	
+	public static void setFullscreen() {
 		window = new JFrame();
-		window.setTitle("why are you looking up here");
-		
-		//fullscreen mode:
-		//window.setExtendedState(Frame.MAXIMIZED_BOTH);
-		//screen = fullScreen;
+		window.setTitle("You're in a Dungeon");
 		window.setUndecorated(true);
-		
 		window.pack();
-		
-		//windowed mode:
-		window.setSize(defaultScreen.dimension());
-		screen = defaultScreen;
-		//System.out.println(screen);
-		
-		Manager t = new Manager(new Vector2(window.getContentPane().getSize()));
-		
-		t.fullscreen = (screen == fullScreen);
-		t.ratio = defaultScreen.ratio(screen);
-
-		window.add(t);
+		window.setExtendedState(Frame.MAXIMIZED_BOTH);
+		window.add(manager);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
+		
+		manager.fullscreen = true;
+		manager.window = window;
+	}
+	
+	public static void setWindowed(Vector2 screen) {
+		window = new JFrame();
+		window.setTitle("You're in a Dungeon");
+		window.pack();
+		window.setSize(screen.dimension());
+		window.add(manager);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setVisible(true);
+		
+		manager.fullscreen = false;
+		manager.window = window;
+	}
+	
+	public static void setWindowed() {
+		setWindowed(screen);
 	}
 	
 	/*private static boolean intersects(Vector2 o1, Vector2 d1, Vector2 o2, Vector2 d2) {

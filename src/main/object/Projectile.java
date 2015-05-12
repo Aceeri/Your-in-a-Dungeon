@@ -16,7 +16,7 @@ public class Projectile extends Object {
 	public Color color = Color.ORANGE;
 	
 	public Projectile(Player parent, Vector2 direction, double damage, double expiration) {
-		super(parent.manager, parent.position.add(parent.Size.div(2)));
+		super(parent.manager, parent.position.add(parent.Size.scalar(.5)).sub(new Vector2(2.5, 2.5)));
 		
 		this.Size = new Vector2(5, 5);
 		this.parent = parent;
@@ -28,9 +28,6 @@ public class Projectile extends Object {
 		collidable = false;
 		
 		type = "projectile";
-		//path = "resources/image/test.png";
-		
-		//setImage();
 	}
 	
 	public boolean expired() {
@@ -58,8 +55,8 @@ public class Projectile extends Object {
 	}
 	
 	public void paintComponent(Graphics g) {
-		g.setColor(color);
-		g.fillRect((int) position.x, (int) position.y, 5, 5);
-		//g.drawImage(image, (int) position.x, (int) position.y, null);
+		Graphics c = manager.canvas.getGraphics();
+		c.setColor(color);
+		c.fillRect((int) position.x, (int) position.y, 5, 5);
 	}
 }

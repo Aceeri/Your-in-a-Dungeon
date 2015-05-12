@@ -8,21 +8,28 @@ import main.object.wall.*;
 import main.object.floor.*;
 import main.object.Object;
 import main.object.Projectile;
-
 import main.ui.UserInterface;
+
+
+
+
 
 //default java imports
 import javax.swing.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 
@@ -32,11 +39,13 @@ import org.omg.CORBA.SystemException;
 
 import java.util.Random;
 
-public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener {
+public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener {
 	
 	public boolean running = false;
 	public boolean info = false;
 	public boolean fullscreen = false;
+	
+	public JFrame window;
 	
 	public boolean[] keyPress = new boolean[255];
 	public int lastKeyPress = 0;
@@ -56,15 +65,19 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public long lastFrame = System.currentTimeMillis();
 	public long lastFps = 60;
 	
-	public Vector2 screen;
-	public Vector2 ratio;
+	public Vector2 defaultScreen = new Vector2(1440, 900);
+	public Vector2 screen = new Vector2(1440, 900);
+	public Vector2 ratio = new Vector2(1, 1);
+	
+	public BufferedImage canvas;
+	public UserInterface ui;
 	
 	public Music backgroundMusic = new Music("resources/sound/Again_and_Again.wav");
-	public UserInterface ui;
-	public double counter = 0;
 	
-	public Manager(Vector2 screen) {
-		this.screen = screen;
+	public Manager(JFrame window) {
+		this.window = window;
+		//this.screen = screen;
+		canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_ARGB);
 		
 		this.setBackground(Color.BLACK);
 		
@@ -110,6 +123,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		addKeyListener(this);
 		addMouseListener(this);
+		addComponentListener(this);
 		setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         requestFocus();
@@ -120,6 +134,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public void paintComponent(Graphics g) throws java.lang.ArithmeticException {
 		super.paintComponent(g);
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, (int) screen.x, (int) screen.y);
+		g.drawImage((Image) canvas, 0, 0, (int) screen.x, (int) screen.y, null);
+		
 		for (int i = 0; i < vectorContainer.size(); i++) {
 			new Vector2().drawVector(g, vectorContainer.get(i)[0], vectorContainer.get(i)[1]);
 		}
@@ -140,8 +158,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		this.screen = new Vector2(Toolkit.getDefaultToolkit().getScreenSize());
-		
 		for (int i = 0; i < getComponentCount(); i++) {	
 			if (getComponent(i) instanceof Container) {
 				Container container = (Container) getComponent(i);
@@ -255,36 +271,39 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	@Override
-	public void keyTyped(KeyEvent arg0) {
-		
+	public void keyTyped(KeyEvent arg0) { }
+
+	@Override
+	public void mouseClicked(MouseEvent e) { }
+
+	@Override
+	public void mouseEntered(MouseEvent e) { }
+
+	@Override
+	public void mouseExited(MouseEvent e) { }
+
+	@Override
+	public void mousePressed(MouseEvent e) { }
+
+	@Override
+	public void mouseReleased(MouseEvent e) { }
+
+	@Override
+	public void componentHidden(ComponentEvent arg0) { }
+
+	@Override
+	public void componentMoved(ComponentEvent arg0) { }
+
+	@Override
+	public void componentResized(ComponentEvent arg0) {
+		if (window != null) {
+			screen = screen.div(ratio);
+			Vector2 currentScreen = new Vector2(window.getContentPane().getSize());
+			ratio = currentScreen.div(defaultScreen);
+			screen = screen.mult(ratio);
+		}
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void componentShown(ComponentEvent arg0) { }
 }

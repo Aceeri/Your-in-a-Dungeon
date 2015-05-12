@@ -30,22 +30,24 @@ public class UserInterface extends main.object.Object {
 	}
 	
 	public void paintComponent(Graphics g) {
+		Graphics c = manager.canvas.getGraphics();
+		
 		int currentY = 15;
-		g.setColor(Color.GREEN);
+		c.setColor(Color.GREEN);
 		for (int i = 0; i < displayString.size(); i++) {
-			g.drawString(displayString.get(i)[0], 5, currentY);
+			c.drawString(displayString.get(i)[0], 5, currentY);
 			
 			if (displayString.get(i).length <= 2) {
-				g.drawString(displayString.get(i)[1], 100, currentY);
+				c.drawString(displayString.get(i)[1], 100, currentY);
 				currentY += 15;
 			} else {
-				g.drawString("{ ", 90, currentY);
+				c.drawString("{ ", 90, currentY);
 				currentY += 15;
 				for (int j = 1; j < displayString.get(i).length; j++) {
-					g.drawString(displayString.get(i)[j], 100, currentY);
+					c.drawString(displayString.get(i)[j], 100, currentY);
 					currentY += 15;
 				}
-				g.drawString("} ", 90, currentY);
+				c.drawString("} ", 90, currentY);
 				currentY += 15;
 			}
 		}
