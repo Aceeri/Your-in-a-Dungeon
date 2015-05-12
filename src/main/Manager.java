@@ -30,14 +30,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 
 import javax.swing.Timer;
-
-import org.omg.CORBA.SystemException;
-
-import java.util.Random;
 
 public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener {
 	
