@@ -37,7 +37,7 @@ public class Projectile extends Object {
 	public void step() {
 		updatePosition();
 		paintLocation();
-		this.expiration -= 16;
+		expiration -= 16;
 		
 		if (bounce) {
 			Vector2 collision = checkCollision(new Object[] { parent });

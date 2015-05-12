@@ -10,7 +10,7 @@ public class Background extends main.object.Object {
 		Size = manager.screen;
 		
 		type = "floor";
-		path = "resources/image/background.png";
+		path = "resources/image/background2.jpg";
 		
 		setImage();
 	}

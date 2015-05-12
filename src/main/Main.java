@@ -21,8 +21,8 @@ public class Main {
 	public static void main(String[] args) throws InterruptedException {
 		manager = new Manager(window);
 		
-		//setWindowed();
-		setFullscreen();
+		setWindowed();
+		//setFullscreen();
 	}
 	
 	public static void setFullscreen() {
@@ -43,7 +43,9 @@ public class Main {
 		window = new JFrame();
 		window.setTitle("You're in a Dungeon");
 		window.pack();
-		window.setSize(screen.dimension());
+		window.setLocation(screen.scalar(.1).point());
+		window.setSize(screen.scalar(.85).dimension());
+		window.setExtendedState(Frame.MAXIMIZED_BOTH);
 		window.add(manager);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);

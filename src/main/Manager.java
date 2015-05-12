@@ -111,7 +111,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		uiContainer.add(ui);
 		ui.addString(new String[] { "fps" });
 		ui.addString(new String[] { "key press" });
-		//ui.addString(new String[] { "window size" });
+		ui.addString(new String[] { "window size" });
 		ui.addString(new String[] { "fullscreen" });
 		ui.addString(new String[] { "characters" });
 		ui.addString(new String[] { "projectiles" });
@@ -149,7 +149,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			ui.updateString(new String[] { "fps", String.valueOf(1000/(now - lastFrame)) });
 		}
 		ui.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
-		//ui.updateString(new String[] { "window size", screen.toString() });
+		ui.updateString(new String[] { "window size", screen.toString() });
 		ui.updateString(new String[] { "fullscreen", String.valueOf(fullscreen) });
 		ui.updateString(new String[] { "characters", String.valueOf(playerContainer.getComponentCount()) });
 		ui.updateString(new String[] { "projectiles", String.valueOf(projectileContainer.getComponentCount()) });
@@ -211,7 +211,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			Vector2 direction = new Vector2();
 			switch (code) {
 				case 37:
-					direction = new Vector2(-1, -.8);
+					direction = new Vector2(-1, 0);
 					break;
 				case 38:
 					direction = new Vector2(0, -1);
@@ -224,8 +224,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					break;
 			}
 			
-			Projectile p = new Projectile(player, direction, .25, 2000);
-			p.speed = 3;
+			Projectile p = new Projectile(player, direction, .25, 1000);
+			p.speed = 10;
 			this.projectileContainer.add(p);
 		}
 		
@@ -234,7 +234,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//	69 -> E
 		if (code == 81) {
 			for (double i = 0; i < 360; i += 10) {
-				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 2000);
+				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 500);
 				p.speed = 5;
 				this.projectileContainer.add(p);
 			}

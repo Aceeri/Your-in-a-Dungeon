@@ -104,6 +104,10 @@ public class Vector2 {
 		return new Dimension((int) this.x, (int) this.y);
 	}
 	
+	public Point point() {
+		return new Point((int) this.x, (int) this.y);
+	}
+	
 	public String toString() {
 		return "<" + this.x + ", " + this.y +">";
 	}
