@@ -32,11 +32,10 @@ public class Object extends JComponent {
 	protected String path = "resources/image/missing.png";
 	protected BufferedImage image;
 	
-	public Object(Manager manager, Vector2 position) {
+	public Object(Vector2 position) {
 		offsetPosition = position;
 		offset = new Vector2(0, 0);
 		velocity = new Vector2(0, 0);
-		this.manager = manager;
 		
 		Size = new Vector2(0, 0);
 		
@@ -55,7 +54,7 @@ public class Object extends JComponent {
 	
 	public void paintLocation() {
 		setLocation(0, 0);
-		setSize(manager.screen.dimension());
+		setSize(manager == null ? new Vector2().dimension() : manager.screen.dimension());
 	}
 	
 	//rectangle inside
@@ -158,12 +157,12 @@ public class Object extends JComponent {
 	
 	//default per-frame function
 	public void step() {
-		this.paintLocation();
+		paintLocation();
 			
 		if (!anchored) {
-			for (int i = 0; i < this.speed; i++) {
-				Vector2 collision = this.collidable ? this.checkCollision() : new Vector2(0, 0); //if collidable then get collided, else ignore
-				this.offsetPosition = this.offsetPosition.add(this.velocity.add(collision));
+			for (int i = 0; i < speed; i++) {
+				Vector2 collision = collidable ? checkCollision() : new Vector2(0, 0); //if collidable then get collided, else ignore
+				offsetPosition = offsetPosition.add(velocity.add(collision));
 			}
 		}
 		
@@ -171,7 +170,13 @@ public class Object extends JComponent {
 	}
 	
 	public void updatePosition() {
-		this.position = this.scalePosition.mult(manager.screen).add(this.offsetPosition).round();
+		try {
+			position = scalePosition.mult(manager.screen).add(offsetPosition).round();
+		} catch (java.lang.NullPointerException e) {
+			System.out.println("missing manager: " + this);
+			manager = (Manager) getParent().getParent();
+			position = scalePosition.mult(manager.screen).add(offsetPosition).round();
+		}
 	}
 	
 	public Vector2 getNextPosition() {
@@ -186,7 +191,7 @@ public class Object extends JComponent {
 		Vector2 collision = new Vector2();
 		
 		for (int i = 0; i < manager.getComponentCount(); i++) {
-			if (manager.getComponent(i) instanceof Container) {
+			if (manager.getComponent(i) instanceof Container && manager.getComponent(i) != manager.projectileContainer) {
 				Container container = (Container) manager.getComponent(i);
 				for (int j = 0; j < container.getComponentCount(); j++) {
 					if (container.getComponent(j) instanceof Object) {

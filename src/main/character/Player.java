@@ -7,10 +7,9 @@ public class Player extends main.object.Object {
 	public double health = 10;
 	public String name;
 	
-	public Player(Manager manager, Vector2 position) {
-		super(manager, position);
+	public Player(Vector2 position) {
+		super(position);
 		
-		this.manager = manager;
 		Size = new Vector2(20, 20);
 		collidable = true;
 		anchored = false;

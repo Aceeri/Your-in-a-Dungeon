@@ -8,16 +8,16 @@ import java.awt.Color;
 
 public class testback extends main.object.Object {
 	
-	public testback(Manager manager, Vector2 position) {
-		super(manager, position);
+	public testback(Vector2 position) {
+		super(position);
 		this.Size = new Vector2(30, 30);
 		
 		this.collidable = true;
 		this.type = "wall";
 	}
 	
-	public testback(Manager manager, Vector2 position, Vector2 size) {
-		super(manager, position);
+	public testback(Vector2 position, Vector2 size) {
+		super(position);
 		this.Size = new Vector2(size.x, size.y);
 		
 		this.collidable = true;
