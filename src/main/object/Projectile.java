@@ -16,7 +16,7 @@ public class Projectile extends Object {
 	public Color color = Color.ORANGE;
 	
 	public Projectile(Player parent, Vector2 direction, double damage, double expiration) {
-		super(parent.manager, parent.position.add(parent.Size.scalar(.5)).sub(new Vector2(2.5, 2.5)));
+		super(parent.position.add(parent.Size.scalar(.5)).sub(new Vector2(2.5, 2.5)));
 		
 		this.Size = new Vector2(5, 5);
 		this.parent = parent;
@@ -31,7 +31,7 @@ public class Projectile extends Object {
 	}
 	
 	public boolean expired() {
-		return this.expiration <= 0;
+		return expiration <= 0;
 	}
 	
 	public void step() {

@@ -14,6 +14,10 @@ import main.ui.UserInterface;
 
 
 
+
+
+
+
 //default java imports
 import javax.swing.*;
 
@@ -21,12 +25,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -34,7 +41,7 @@ import java.util.ArrayList;
 
 import javax.swing.Timer;
 
-public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener {
+public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener, ContainerListener {
 	
 	public boolean running = false;
 	public boolean info = false;
@@ -74,7 +81,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//this.screen = screen;
 		canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_ARGB);
 		
-		this.setBackground(Color.BLACK);
+		setBackground(Color.BLACK);
 		
 		uiContainer = new Container();
 		playerContainer = new Container();
@@ -82,27 +89,34 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		wallContainer = new Container();
 		floorContainer = new Container();
 		
-		player = new Player(this, new Vector2(screen.x/2 - 30, screen.y/2 - 30));
+		uiContainer.addContainerListener(this);
+		playerContainer.addContainerListener(this);
+		projectileContainer.addContainerListener(this);
+		wallContainer.addContainerListener(this);
+		floorContainer.addContainerListener(this);
+		
+		player = new Player(new Vector2(screen.x/2 - 30, screen.y/2 - 30));
 		player.speed = 3;
-		//Enemy e = new Enemy(this, new Vector2(100, 100));
+		//Enemy e = new Enemy(new Vector2(100, 100));
 		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
 		backgroundMusic.play();
 		
-		Background bg = new Background(this);
+		Background bg = new Background(screen);
 		floorContainer.add(bg);
 		
 		//add containers to JPanel
-		this.add(uiContainer);
-		this.add(wallContainer);
-		this.add(playerContainer);
-		this.add(projectileContainer);
-		this.add(floorContainer);
+		add(uiContainer);
+		add(wallContainer);
+		add(playerContainer);
+		add(projectileContainer);
+		add(floorContainer);
+		//addContainerListener(uiContainer);
 		playerContainer.add(player);
 		//playerContainer.add(e);
 		
-		ui = new UserInterface(this);
+		ui = new UserInterface();
 		uiContainer.add(ui);
 		ui.addString(new String[] { "fps" });
 		ui.addString(new String[] { "key press" });
@@ -114,6 +128,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		vectorContainer = new ArrayList<Vector2[]> ();
 		
 		//create walls
+		
 		
 		
 		addKeyListener(this);
@@ -200,7 +215,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//attacking
 		//	37 -> left
 		//	38 -> up
-		//	39 -> rightu
+		//	39 -> right
 		//	40 -> down
 		if (code >= 37 && code <= 40) {
 			Vector2 direction = new Vector2();
@@ -284,13 +299,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public void mouseReleased(MouseEvent e) { }
 
 	@Override
-	public void componentHidden(ComponentEvent arg0) { }
+	public void componentHidden(ComponentEvent e) { }
 
 	@Override
-	public void componentMoved(ComponentEvent arg0) { }
+	public void componentMoved(ComponentEvent e) { }
 
 	@Override
-	public void componentResized(ComponentEvent arg0) {
+	public void componentResized(ComponentEvent e) {
 		if (window != null) {
 			screen = screen.div(ratio);
 			Vector2 currentScreen = new Vector2(window.getContentPane().getSize());
@@ -300,5 +315,16 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 
 	@Override
-	public void componentShown(ComponentEvent arg0) { }
+	public void componentShown(ComponentEvent e) { }
+
+	@Override
+	public void componentAdded(ContainerEvent e) {
+		if (e.getChild() instanceof Object) {
+			Object addedObject = (Object) e.getChild();
+			addedObject.manager = this;
+		}
+	}
+
+	@Override
+	public void componentRemoved(ContainerEvent e) { }
 }

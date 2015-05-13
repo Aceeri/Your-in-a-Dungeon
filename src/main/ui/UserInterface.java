@@ -13,8 +13,8 @@ public class UserInterface extends main.object.Object {
 	private ArrayList<String[]> displayString = new ArrayList<String[]> ();
 	public boolean display = false;
 	
-	public UserInterface(Manager manager) {
-		super(manager, new Vector2());
+	public UserInterface() {
+		super(new Vector2());
 	}
 	
 	public void addString(String[] info) {

@@ -9,17 +9,18 @@ import java.awt.Graphics;
 
 public class Enemy extends Player {
 	
-	public Enemy(Manager manager, Vector2 position) {
-		super(manager, position);
+	public Enemy(Vector2 position) {
+		super(position);
 		
 		this.type = "enemy";
 		
 		System.out.println(this.getLocation() + " " + this.getSize());
 		System.out.println(this.position + " " + this.Size);
-		System.out.println("Nearest Player: " + this.getNearestPlayer());
+		//System.out.println("Nearest Player: " + this.getNearestPlayer());
 	}
 	
 	public void step() {
+		//super.step();
 		Player nearestPlayer = getNearestPlayer();
 		
 		if (nearestPlayer != null) {
@@ -31,8 +32,6 @@ public class Enemy extends Player {
 	}
 	
 	public void paintComponent(Graphics g) {
-		this.paintLocation();
-		
 		g.setColor(Color.GRAY);
 		g.fillRect((int) (this.position.x), (int) (this.position.y), 19, 19);
 		
@@ -43,9 +42,10 @@ public class Enemy extends Player {
 	public Player getNearestPlayer() {
 		Player current = null;
 		double distance = -1;
+		
 		for (int i = 0; i < manager.playerContainer.getComponentCount(); i++) {
 			Player plr = (Player) manager.playerContainer.getComponent(i);
-			double toPlayer = this.position.distance(plr.position);
+			double toPlayer = position.distance(plr.position);
 			if (plr.type == "player" && (this.position.distance(plr.position) < distance || distance == -1)) {
 				distance = toPlayer;
 				current = plr;
