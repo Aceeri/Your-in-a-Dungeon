@@ -95,8 +95,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		wallContainer.addContainerListener(this);
 		floorContainer.addContainerListener(this);
 		
-		player = new Player(new Vector2(screen.x/2 - 30, screen.y/2 - 30));
-		player.speed = 3;
+		player = new Battlemage(new Vector2(screen.x/2 - 30, screen.y/2 - 30));
+		//player = new Player(new Vector2(screen.x/2 - 30, screen.y/2 - 30));
 		//Enemy e = new Enemy(new Vector2(100, 100));
 		
 		backgroundMusic.loop = true;
@@ -187,7 +187,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		}
 		
 		int code = (keyPress[37] ? 37 : keyPress[38] ? 38 : keyPress[39] ? 39 : keyPress[40] ? 40 : 0);
-		if (code != 0 && player.cooldown <= 0) {
+		if (code != 0) {
 			Vector2 direction = new Vector2();
 			switch (code) {
 				case 37:
@@ -203,11 +203,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					direction = new Vector2(0, 1);
 					break;
 			}
-			
-			Projectile p = new Projectile(player, direction, .25, 1000);
-			p.speed = 10;
-			projectileContainer.add(p);
-			player.cooldown += player.cooldownTime;
+			player.attack(direction);
 		}
 		
 		repaint();
@@ -246,14 +242,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//	81 -> Q
 		//	69 -> E
 		if (code == 81) {
-			for (double i = 0; i < 360; i += 10) {
-				Projectile p = new Projectile(player, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 1, 500);
-				p.speed = 5;
-				this.projectileContainer.add(p);
-			}
+			player.ability1();
 		}
 		if (code == 69) {
-			
+			player.ability2();
 		}
 		
 		//toggle info

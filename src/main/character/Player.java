@@ -7,14 +7,16 @@ import main.Manager;
 public class Player extends main.object.Object {
 	
 	public double health = 10;
+	public double damage = 3; //damage normal attack does
+	public double range = 500; //range in pixels
+	public double attackspeed = 1000; //how long before next attack is ready (milliseconds)
+	public double projectilespeed = 10; //how fast the projectiles move
+	public double ability1speed = 3000; //time before abilities are ready (milliseconds);
+	public double ability2speed = 3000;
 	
 	public double cooldown = 0;
-	public double ability1Cooldown = 0;
-	public double ability2Cooldown = 0;
-	
-	public double cooldownTime = 1000;
-	public double ability1Time = 1000;
-	public double ability2Time = 1000;
+	public double ability1 = 0;
+	public double ability2 = 0;
 	
 	public Player(Vector2 position) {
 		super(position);
@@ -36,8 +38,16 @@ public class Player extends main.object.Object {
 		super.step();
 		
 		cooldown = cooldown > 0 ? cooldown - 16 : 0;
-		ability1Cooldown = ability1Cooldown > 0 ? ability1Cooldown - 16 : 0;
-		ability2Cooldown = ability2Cooldown > 0 ? ability2Cooldown - 16 : 0;
+		ability1 = ability1 > 0 ? ability1 - 16 : 0;
+		ability2 = ability2 > 0 ? ability2 - 16 : 0;
+	}
+	
+	public void attack(Vector2 direction) {
+		if (cooldown <= 0) {
+			Projectile p = new Projectile(this, direction, damage, range, projectilespeed);
+			manager.projectileContainer.add(p);
+			cooldown += attackspeed;
+		}
 	}
 	
 	//override these with new abilities
