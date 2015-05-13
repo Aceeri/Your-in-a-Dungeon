@@ -186,6 +186,30 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			}
 		}
 		
+		int code = (keyPress[37] ? 37 : keyPress[38] ? 38 : keyPress[39] ? 39 : keyPress[40] ? 40 : 0);
+		if (code != 0 && player.cooldown <= 0) {
+			Vector2 direction = new Vector2();
+			switch (code) {
+				case 37:
+					direction = new Vector2(-1, 0);
+					break;
+					case 38:
+					direction = new Vector2(0, -1);
+					break;
+				case 39:
+					direction = new Vector2(1, 0);
+					break;
+				case 40:
+					direction = new Vector2(0, 1);
+					break;
+			}
+			
+			Projectile p = new Projectile(player, direction, .25, 1000);
+			p.speed = 10;
+			projectileContainer.add(p);
+			player.cooldown += player.cooldownTime;
+		}
+		
 		repaint();
 	}
 	
@@ -217,27 +241,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//	38 -> up
 		//	39 -> right
 		//	40 -> down
-		if (code >= 37 && code <= 40) {
-			Vector2 direction = new Vector2();
-			switch (code) {
-				case 37:
-					direction = new Vector2(-1, 0);
-					break;
-				case 38:
-					direction = new Vector2(0, -1);
-					break;
-				case 39:
-					direction = new Vector2(1, 0);
-					break;
-				case 40:
-					direction = new Vector2(0, 1);
-					break;
-			}
-			
-			Projectile p = new Projectile(player, direction, .25, 1000);
-			p.speed = 10;
-			this.projectileContainer.add(p);
-		}
 		
 		//abilities
 		//	81 -> Q
