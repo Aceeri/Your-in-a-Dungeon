@@ -16,7 +16,7 @@ public class Player extends main.object.Object {
 	public double ability1Time = 1000;
 	public double ability2Time = 1000;
 	
-	public Player(Class c, Vector2 position) {
+	public Player(Vector2 position) {
 		super(position);
 		
 		Size = new Vector2(20, 20);
