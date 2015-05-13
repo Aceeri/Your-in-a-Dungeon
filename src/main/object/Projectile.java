@@ -15,14 +15,15 @@ public class Projectile extends Object {
 	public boolean bounce = true;
 	public Color color = Color.ORANGE;
 	
-	public Projectile(Player parent, Vector2 direction, double damage, double expiration) {
+	public Projectile(Player parent, Vector2 direction, double damage, double range, double speed) {
 		super(parent.position.add(parent.Size.scalar(.5)).sub(new Vector2(2.5, 2.5)));
 		
 		this.Size = new Vector2(5, 5);
 		this.parent = parent;
 		this.velocity = direction;
 		this.damage = damage;
-		this.expiration = expiration;
+		this.expiration = range;
+		this.speed = speed;
 		
 		anchored = false;
 		collidable = false;
@@ -37,7 +38,7 @@ public class Projectile extends Object {
 	public void step() {
 		updatePosition();
 		paintLocation();
-		expiration -= 16;
+		expiration -= speed;
 		
 		if (bounce) {
 			Vector2 collision = checkCollision(new Object[] { parent });
