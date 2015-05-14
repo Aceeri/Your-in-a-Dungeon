@@ -25,10 +25,15 @@ public class Projectile extends Object {
 		this.expiration = range;
 		this.speed = speed;
 		
+		/*rotation = Math.tan(direction.y/direction.x)*180/Math.PI;
+		System.out.println(rotation + " " + direction.y/direction.x);*/
+		
 		anchored = false;
 		collidable = false;
 		
 		type = "projectile";
+		
+		//setImage();
 	}
 	
 	public boolean expired() {
@@ -43,7 +48,6 @@ public class Projectile extends Object {
 		Vector2 collision = checkCollision(new Object[] { parent }, delta);
 		//BOUNCING IS SIN
 		//HEATHENS SHALTH PERISH BEFORE EXPIRATION
-		//FUCK YOU ALL
 		//CD PROJEKKT RED BEST GAME STUDIO
 		//why are you reading these comments
 		

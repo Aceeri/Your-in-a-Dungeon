@@ -21,6 +21,9 @@ import main.ui.UserInterface;
 
 
 
+
+
+
 //default java imports
 import javax.swing.*;
 
@@ -35,6 +38,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.Color;
@@ -162,35 +166,39 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public void paintComponent(Graphics g) throws java.lang.ArithmeticException {
 		super.paintComponent(g);
 		AffineTransform at = new AffineTransform();
-		at.translate(screen.x/2, screen.y/2);
+		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
+		
+		//supar rotut
+		/*at.translate(canvas.getWidth()/2, canvas.getHeight()/2);
 		at.rotate(angle*Math.PI/180);
-		at.translate(-screen.x/2, -screen.y/2);
-		angle += 1;
-		//Image img = (Image) canvas;
+		at.translate(-canvas.getWidth()/2, -canvas.getHeight()/2);
+		angle += 1;*/
+		
+		player.rotation -= 1;
+		
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawRenderedImage(canvas, at);
-		if (currentTween.equals("r")) {
+		
+		//supar seizur
+		/*if (currentTween.equals("r")) {
 			cr += 5*tween;
-			if (cr >= 255) {
+			if ((tween == 1 && cr >= 255) || (tween == -1 && cr <= 0)) {
 				currentTween = "g";
 			}
 		} else if (currentTween.equals("g")) {
 			cg += 5*tween;
-			if (cg >= 255) {
+			if ((tween == 1 && cg >= 255) || (tween == -1 && cg <= 0)) {
 				currentTween = "b";
 			}
 		} else if (currentTween.equals("b")) {
 			cb += 5*tween;
-			if (cb >= 255) {
-				cr = 0;
-				cg = 0;
-				cb = 0;
+			if ((tween == 1 && cb >= 255) || (tween == -1 && cb <= 0)) {
+				tween = -tween;
 				currentTween = "r";
 			}
 		}
-		//System.out.println(tween);
-		g2.setColor(new Color(cr, cg, cb, 100));
-		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
+		g2.setColor(new Color(cr, cg, cb, 150));
+		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);*/
 		
 		for (int i = 0; i < vectorContainer.size(); i++) {
 			new Vector2().drawVector(g, vectorContainer.get(i)[0], vectorContainer.get(i)[1]);

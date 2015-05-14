@@ -5,7 +5,9 @@ import main.Manager;
 
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ public class Object extends JComponent {
 	public Vector2 offset;
 	public Vector2 velocity;
 	public Vector2 Size;
+	
+	public double rotation = 0; //rotation (in degrees)
 	
 	public double speed = 0;
 	public String type = "object";
@@ -46,7 +50,20 @@ public class Object extends JComponent {
 	}
 	
 	public void paintComponent(Graphics g) {
-		manager.canvas.getGraphics().drawImage(image, (int) position.x, (int) position.y, (int) Size.x, (int) Size.y, null);
+		Graphics2D g2 = (Graphics2D) manager.canvas.getGraphics();
+		
+		//positioning and size
+		AffineTransform objectTransform = new AffineTransform();
+		objectTransform.translate(position.x, position.y);
+		objectTransform.scale(Size.x/image.getWidth(), Size.y/image.getHeight());
+		
+		//rotation
+		objectTransform.translate(image.getWidth()/2, image.getHeight()/2);
+		objectTransform.rotate(rotation*Math.PI/180);
+		objectTransform.translate(-image.getWidth()/2, -image.getHeight()/2);
+		
+		g2.drawRenderedImage(image, objectTransform);
+		//g2.drawRenderedImage(image, (int) position.x, (int) position.y, (int) Size.x, (int) Size.y, null);
 	}
 	
 	public void setImage() {
