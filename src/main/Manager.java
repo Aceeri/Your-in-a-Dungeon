@@ -101,7 +101,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
-		backgroundMusic.play();
+		//backgroundMusic.play();
 		
 		Background bg = new Background(screen);
 		floorContainer.add(bg);
@@ -124,12 +124,16 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "fullscreen" });
 		ui.addString(new String[] { "characters" });
 		ui.addString(new String[] { "projectiles" });
+		ui.addString(new String[] { "collisions" });
 		
 		vectorContainer = new ArrayList<Vector2[]> ();
 		
 		//create walls
+		testback t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
+		wallContainer.add(t1);
 		
-		
+		testback t2 = new testback(new Vector2(200, 200), new Vector2(500, 50));
+		wallContainer.add(t2);
 		
 		addKeyListener(this);
 		addMouseListener(this);

@@ -40,7 +40,7 @@ public class Projectile extends Object {
 		paintLocation();
 		expiration -= speed;
 		
-		if (bounce) {
+		/*if (bounce) {
 			Vector2 collision = checkCollision(new Object[] { parent });
 			
 			if (Math.abs(collision.x) > 0) {
@@ -52,7 +52,7 @@ public class Projectile extends Object {
 			}
 			
 			offsetPosition = offsetPosition.add(velocity.scalar(this.speed));
-		}
+		}*/
 	}
 	
 	public void paintComponent(Graphics g) {

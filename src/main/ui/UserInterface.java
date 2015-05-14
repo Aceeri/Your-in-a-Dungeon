@@ -38,7 +38,9 @@ public class UserInterface extends main.object.Object {
 			g.drawString(displayString.get(i)[0], 5, currentY);
 			
 			if (displayString.get(i).length <= 2) {
-				g.drawString(displayString.get(i)[1], 100, currentY);
+				if (displayString.get(i).length > 1) {
+					g.drawString(displayString.get(i)[1], 100, currentY);
+				}
 				currentY += 15;
 			} else {
 				//c.drawString("{ ", 90, currentY);
