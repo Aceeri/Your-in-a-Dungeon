@@ -53,6 +53,7 @@ public class Projectile extends Object {
 			
 			offsetPosition = offsetPosition.add(velocity.scalar(this.speed));
 		}*/
+		offsetPosition = offsetPosition.add(velocity.scalar(this.speed));
 	}
 	
 	public void paintComponent(Graphics g) {

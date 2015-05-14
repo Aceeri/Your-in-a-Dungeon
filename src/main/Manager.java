@@ -132,7 +132,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		testback t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
 		wallContainer.add(t1);
 		
-		testback t2 = new testback(new Vector2(200, 200), new Vector2(500, 50));
+		testback t2 = new testback(new Vector2(250, 200), new Vector2(500, 50));
 		wallContainer.add(t2);
 		
 		addKeyListener(this);

@@ -177,6 +177,7 @@ public class Object extends JComponent {
 			return new float[] { entryTime, normalx, normaly };
 		}
 	}
+	
 	public Vector2 side(Vector2 o2, Vector2 d2) {
 		double dx = (position.x + Size.x/2) - (o2.x + d2.x/2);
 		double dy = (position.y + Size.y/2) - (o2.y + d2.y/2);
@@ -210,7 +211,7 @@ public class Object extends JComponent {
 	}
 	
 	public Vector2 checkCollision(Object[] ignoreList) {
-		ArrayList<float[]> collisions = new ArrayList<float[]>();
+		//ArrayList<float[]> collisions = new ArrayList<float[]>();
 		Vector2 totalCollision = new Vector2();
 		
 		for (int i = 0; i < manager.getComponentCount(); i++) {
@@ -219,17 +220,22 @@ public class Object extends JComponent {
 				for (int j = 0; j < container.getComponentCount(); j++) {
 					if (container.getComponent(j) instanceof Object) {
 						Object object = (Object) container.getComponent(j);
-						boolean ignore = false;
-						for (int k = 0; k < ignoreList.length; k++) {
-							if (ignoreList[k] == object) {
-								ignore = true;
-								break;
+						if (this != object && object.collidable) {
+							boolean ignore = false;
+							for (int k = 0; k < ignoreList.length; k++) {
+								if (ignoreList[k] == object) {
+									ignore = true;
+									break;
+								}
+							}
+							
+							if (!ignore && object.inside(position.add(velocity.scalar(speed)), Size)) {
+								Vector2 normal = object.side(position, Size);
+								totalCollision = totalCollision.sub(normal);
 							}
 						}
 						
-						System.out.println(this + " " + object.side(position, Size));
-						
-						
+						//System.out.println(this + " " + object.side(position, Size));*/
 						
 						/*
 						 * Swept AABB collision
@@ -252,7 +258,7 @@ public class Object extends JComponent {
 			}
 		}
 		
-		String[] updateString = new String[collisions.size() + 1];
+		/*String[] updateString = new String[collisions.size() + 1];
 		updateString[0] = "collisions";
 		float total = 0;
 		for (int i = 0; i < collisions.size(); i++) {
@@ -262,7 +268,7 @@ public class Object extends JComponent {
 		
 		if (total != 0) {
 			manager.ui.updateString(updateString);
-		}
+		}*/
 		
 		return totalCollision;
 	}
@@ -275,7 +281,7 @@ public class Object extends JComponent {
 //			if (velocity.magnitude() > 0) {
 				Vector2 offsetVector = checkCollision();
 				if (offsetVector.magnitude() > 0) {
-					System.out.println(velocity + " " + offsetVector);
+					//System.out.println(velocity + " " + offsetVector);
 				}
 				offsetPosition = offsetPosition.add(velocity.add(offsetVector).scalar(speed));
 //			}
