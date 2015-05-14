@@ -18,6 +18,9 @@ import main.ui.UserInterface;
 
 
 
+
+
+
 //default java imports
 import javax.swing.*;
 
@@ -31,11 +34,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.ArrayList;
 
@@ -74,6 +80,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public BufferedImage canvas;
 	public UserInterface ui;
+	public String currentTween = "r";
+	public int tween = 1;
+	public int cr = 0;
+	public int cg = 0;
+	public int cb = 0;
+	public int angle = 0;
 	
 	public Music backgroundMusic = new Music("resources/sound/Again_and_Again.wav");
 	
@@ -149,9 +161,36 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public void paintComponent(Graphics g) throws java.lang.ArithmeticException {
 		super.paintComponent(g);
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, (int) screen.x, (int) screen.y);
-		g.drawImage((Image) canvas, 0, 0, (int) screen.x, (int) screen.y, null);
+		AffineTransform at = new AffineTransform();
+		at.translate(screen.x/2, screen.y/2);
+		at.rotate(angle*Math.PI/180);
+		at.translate(-screen.x/2, -screen.y/2);
+		angle += 1;
+		//Image img = (Image) canvas;
+		Graphics2D g2 = (Graphics2D) g;
+		g2.drawRenderedImage(canvas, at);
+		if (currentTween.equals("r")) {
+			cr += 5*tween;
+			if (cr >= 255) {
+				currentTween = "g";
+			}
+		} else if (currentTween.equals("g")) {
+			cg += 5*tween;
+			if (cg >= 255) {
+				currentTween = "b";
+			}
+		} else if (currentTween.equals("b")) {
+			cb += 5*tween;
+			if (cb >= 255) {
+				cr = 0;
+				cg = 0;
+				cb = 0;
+				currentTween = "r";
+			}
+		}
+		//System.out.println(tween);
+		g2.setColor(new Color(cr, cg, cb, 100));
+		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
 		
 		for (int i = 0; i < vectorContainer.size(); i++) {
 			new Vector2().drawVector(g, vectorContainer.get(i)[0], vectorContainer.get(i)[1]);

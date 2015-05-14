@@ -40,7 +40,13 @@ public class Projectile extends Object {
 		paintLocation();
 		expiration -= speed;
 		
-		Vector2 collision = checkCollision(new Object[] { parent });
+		Vector2 collision = checkCollision(new Object[] { parent }, delta);
+		//BOUNCING IS SIN
+		//HEATHENS SHALTH PERISH BEFORE EXPIRATION
+		//FUCK YOU ALL
+		//CD PROJEKKT RED BEST GAME STUDIO
+		//why are you reading these comments
+		
 		if (Math.abs(collision.x) + Math.abs(collision.y) > 0) {
 			expiration = 0;
 		}

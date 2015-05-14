@@ -13,7 +13,7 @@ public class Battlemage extends Player {
 		damage = 5;
 		range = 600;
 		attackspeed = 750;
-		projectilespeed = 15;
+		projectilespeed = 6;
 		
 		ability1speed = 5000;
 		ability2speed = 5000;
@@ -25,7 +25,6 @@ public class Battlemage extends Player {
 			//circle of projectiles
 			for (double i = 0; i < 360; i += 10) {
 				Projectile p = new Projectile(this, new Vector2(Math.cos(i*Math.PI/180), Math.sin(i*Math.PI/180)), 3, 500, 5);
-				p.speed = 5;
 				manager.projectileContainer.add(p);
 			}
 			

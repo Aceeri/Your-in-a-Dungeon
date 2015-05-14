@@ -210,7 +210,7 @@ public class Object extends JComponent {
 		return direction;
 	}
 	
-	public Vector2 checkCollision(Object[] ignoreList) {
+	public Vector2 checkCollision(Object[] ignoreList, double delta) {
 		//ArrayList<float[]> collisions = new ArrayList<float[]>();
 		Vector2 totalCollision = new Vector2();
 		
@@ -229,7 +229,7 @@ public class Object extends JComponent {
 								}
 							}
 							
-							if (!ignore && object.inside(position.add(velocity.scalar(speed)), Size)) {
+							if (!ignore && object.inside(position.add(velocity.scalar(speed*delta*manager.fixedFps)), Size)) {
 								Vector2 normal = object.side(position, Size);
 								totalCollision = totalCollision.sub(normal);
 							}
@@ -268,7 +268,7 @@ public class Object extends JComponent {
 		paintLocation();
 		
 		if (!anchored && collidable) {
-			offsetPosition = offsetPosition.add(velocity.add(checkCollision()).scalar(speed*delta*manager.fixedFps));
+			offsetPosition = offsetPosition.add(velocity.add(checkCollision(delta)).scalar(speed*delta*manager.fixedFps));
 		}
 		
 		updatePosition();
@@ -327,8 +327,8 @@ public class Object extends JComponent {
 		return collision;
 	}*/
 	
-	public Vector2 checkCollision() {
-		return checkCollision(new Object[] { });
+	public Vector2 checkCollision(double delta) {
+		return checkCollision(new Object[] { }, delta);
 	}
 	
 	/*private boolean intersects(Vector2 o1, Vector2 d1, Vector2 o2, Vector2 d2) {
