@@ -258,33 +258,17 @@ public class Object extends JComponent {
 			}
 		}
 		
-		/*String[] updateString = new String[collisions.size() + 1];
-		updateString[0] = "collisions";
-		float total = 0;
-		for (int i = 0; i < collisions.size(); i++) {
-			total += collisions.get(i)[1] + collisions.get(i)[2];
-			updateString[i + 1] = collisions.get(i)[0] + " " + collisions.get(i)[1] + " " + collisions.get(i)[2];
-		}
-		
-		if (total != 0) {
-			manager.ui.updateString(updateString);
-		}*/
+		//manager.ui.updateString(new String[] { "collisions", totalCollision.toString() });
 		
 		return totalCollision;
 	}
 	
 	//default per-frame function
-	public void step() {
+	public void step(double delta) {
 		paintLocation();
 		
 		if (!anchored && collidable) {
-//			if (velocity.magnitude() > 0) {
-				Vector2 offsetVector = checkCollision();
-				if (offsetVector.magnitude() > 0) {
-					//System.out.println(velocity + " " + offsetVector);
-				}
-				offsetPosition = offsetPosition.add(velocity.add(offsetVector).scalar(speed));
-//			}
+			offsetPosition = offsetPosition.add(velocity.add(checkCollision()).scalar(speed*delta*manager.fixedFps));
 		}
 		
 		updatePosition();

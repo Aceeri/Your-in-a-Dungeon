@@ -35,25 +35,17 @@ public class Projectile extends Object {
 		return expiration <= 0;
 	}
 	
-	public void step() {
+	public void step(double delta) {
 		updatePosition();
 		paintLocation();
 		expiration -= speed;
 		
-		/*if (bounce) {
-			Vector2 collision = checkCollision(new Object[] { parent });
-			
-			if (Math.abs(collision.x) > 0) {
-				velocity.x = -velocity.x;
-			}
-			
-			if (Math.abs(collision.y) > 0) {
-				velocity.y = -velocity.y;
-			}
-			
-			offsetPosition = offsetPosition.add(velocity.scalar(this.speed));
-		}*/
-		offsetPosition = offsetPosition.add(velocity.scalar(this.speed));
+		Vector2 collision = checkCollision(new Object[] { parent });
+		if (Math.abs(collision.x) + Math.abs(collision.y) > 0) {
+			expiration = 0;
+		}
+		
+		offsetPosition = offsetPosition.add(velocity.scalar(speed*delta*manager.fixedFps));
 	}
 	
 	public void paintComponent(Graphics g) {

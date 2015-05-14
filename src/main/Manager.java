@@ -64,8 +64,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public Timer gameTimer;
 	public Player player;
-	public long lastFrame = System.currentTimeMillis();
+	public long lastFrame = System.nanoTime();//System.currentTimeMillis();
 	public long lastFps = 60;
+	public double fixedFps = 60.0;
 	
 	public Vector2 defaultScreen = new Vector2(1440, 900);
 	public Vector2 screen = new Vector2(1440, 900);
@@ -132,8 +133,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		testback t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
 		wallContainer.add(t1);
 		
-		testback t2 = new testback(new Vector2(250, 200), new Vector2(500, 50));
-		wallContainer.add(t2);
+		/*testback t2 = new testback(new Vector2(250, 200), new Vector2(500, 50));
+		wallContainer.add(t2);*/
 		
 		addKeyListener(this);
 		addMouseListener(this);
@@ -142,7 +143,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         
-		gameTimer = new Timer(16, this);
+		gameTimer = new Timer(0, this);
 		gameTimer.start();
 	}
 	
@@ -156,11 +157,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			new Vector2().drawVector(g, vectorContainer.get(i)[0], vectorContainer.get(i)[1]);
 		}
 		
-		long now = System.currentTimeMillis();
+		//long now = System.currentTimeMillis();
 		
+		long now = System.nanoTime();
 		//info display
 		if ((now - lastFrame) != 0) {
-			ui.updateString(new String[] { "fps", String.valueOf(1000/(now - lastFrame)) });
+			//ui.updateString(new String[] { "fps", String.valueOf(1000/(now - lastFrame)) });
 		}
 		ui.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
 		ui.updateString(new String[] { "window size", screen.toString() });
@@ -168,10 +170,18 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.updateString(new String[] { "characters", String.valueOf(playerContainer.getComponentCount()) });
 		ui.updateString(new String[] { "projectiles", String.valueOf(projectileContainer.getComponentCount()) });
 		
-		lastFrame = now;
+		//lastFrame = now;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		long now = System.nanoTime();
+		double delta = ((System.nanoTime()) - lastFrame) / 1000000;
+		delta = delta/1000;
+		lastFrame = now;
+		
+		//System.out.println(delta);
+		ui.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
+		
 		for (int i = 0; i < getComponentCount(); i++) {	
 			if (getComponent(i) instanceof Container) {
 				Container container = (Container) getComponent(i);
@@ -179,7 +189,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				container.setLocation(0, 0);
 				for (int j = 0; j < container.getComponentCount(); j++) {
 					Object object = (Object) container.getComponent(j);
-					object.step();
+					object.step(delta);
 					if (object instanceof Projectile) {
 						Projectile projectile = (Projectile) object;
 						if (projectile.expired()) {
@@ -223,16 +233,16 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//	65 -> A
 		//  83 -> W
 		//	87 -> S
-		if (code == 68 && !this.keyPress[68]) {
+		if (code == 68 && !keyPress[68]) {
 			player.velocity.x += 1;
 		}
-		if (code == 65 && !this.keyPress[65]) {
+		if (code == 65 && !keyPress[65]) {
 			player.velocity.x -= 1;
 		}
-		if (code == 83 && !this.keyPress[83]) {
+		if (code == 83 && !keyPress[83]) {
 			player.velocity.y += 1;
 		}
-		if (code == 87 && !this.keyPress[87]) {
+		if (code == 87 && !keyPress[87]) {
 			player.velocity.y -= 1;
 		}
 		
@@ -257,26 +267,26 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			ui.display = !ui.display;
 		}
 		
-		this.keyPress[e.getKeyCode()] = true;
+		keyPress[e.getKeyCode()] = true;
 	}
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
 		int code = e.getKeyCode();
-		if (code == 68 && this.keyPress[68]) {
+		if (code == 68 && keyPress[68]) {
 			player.velocity.x -= 1;
 		}
-		if (code == 65 && this.keyPress[65]) {
+		if (code == 65 && keyPress[65]) {
 			player.velocity.x += 1;
 		}
-		if (code == 83 && this.keyPress[83]) {
+		if (code == 83 && keyPress[83]) {
 			player.velocity.y -= 1;
 		}
-		if (code == 87 && this.keyPress[87]) {
+		if (code == 87 && keyPress[87]) {
 			player.velocity.y += 1;
 		}
 		
-		this.keyPress[e.getKeyCode()] = false;
+		keyPress[e.getKeyCode()] = false;
 	}
 
 	@Override
