@@ -28,6 +28,7 @@ public class Main {
 		window.setTitle("You're in a Dungeon");
 		window.setUndecorated(true);
 		window.pack();
+		window.setMinimumSize(new Vector2(400, 300).dimension());
 		window.setExtendedState(Frame.MAXIMIZED_BOTH);
 		window.add(manager);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -42,6 +43,7 @@ public class Main {
 		window.setTitle("You're in a Dungeon");
 		window.pack();
 		window.setLocation(screen.scalar(.1).point());
+		window.setMinimumSize(new Vector2(400, 300).dimension());
 		window.setSize(screen.scalar(.85).dimension());
 		window.setExtendedState(Frame.MAXIMIZED_BOTH);
 		window.add(manager);

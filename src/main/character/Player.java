@@ -34,12 +34,12 @@ public class Player extends main.object.Object {
 		setImage();
 	}
 	
-	public void step() {
-		super.step();
+	public void step(double delta) {
+		super.step(delta);
 		
-		cooldown = cooldown > 0 ? cooldown - 16 : 0;
-		ability1 = ability1 > 0 ? ability1 - 16 : 0;
-		ability2 = ability2 > 0 ? ability2 - 16 : 0;
+		cooldown = cooldown > 0 ? cooldown - delta*1000 : 0;
+		ability1 = ability1 > 0 ? ability1 - delta*1000 : 0;
+		ability2 = ability2 > 0 ? ability2 - delta*1000 : 0;
 	}
 	
 	public void attack(Vector2 direction) {

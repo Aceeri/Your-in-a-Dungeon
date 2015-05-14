@@ -25,34 +25,37 @@ public class Projectile extends Object {
 		this.expiration = range;
 		this.speed = speed;
 		
+		/*rotation = Math.tan(direction.y/direction.x)*180/Math.PI;
+		System.out.println(rotation + " " + direction.y/direction.x);*/
+		
 		anchored = false;
 		collidable = false;
 		
 		type = "projectile";
+		
+		//setImage();
 	}
 	
 	public boolean expired() {
 		return expiration <= 0;
 	}
 	
-	public void step() {
+	public void step(double delta) {
 		updatePosition();
 		paintLocation();
 		expiration -= speed;
 		
-		if (bounce) {
-			Vector2 collision = checkCollision(new Object[] { parent });
-			
-			if (Math.abs(collision.x) > 0) {
-				velocity.x = -velocity.x;
-			}
-			
-			if (Math.abs(collision.y) > 0) {
-				velocity.y = -velocity.y;
-			}
-			
-			offsetPosition = offsetPosition.add(velocity.scalar(this.speed));
+		Vector2 collision = checkCollision(new Object[] { parent }, delta);
+		//BOUNCING IS SIN
+		//HEATHENS SHALTH PERISH BEFORE EXPIRATION
+		//CD PROJEKKT RED BEST GAME STUDIO
+		//why are you reading these comments
+		
+		if (Math.abs(collision.x) + Math.abs(collision.y) > 0) {
+			expiration = 0;
 		}
+		
+		offsetPosition = offsetPosition.add(velocity.scalar(speed*delta*manager.fixedFps));
 	}
 	
 	public void paintComponent(Graphics g) {
