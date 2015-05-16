@@ -24,6 +24,8 @@ public class Main {
 	}
 	
 	public static void setFullscreen() {
+		JFrame holder = window;
+		
 		window = new JFrame();
 		window.setTitle("You're in a Dungeon");
 		window.setUndecorated(true);
@@ -36,9 +38,15 @@ public class Main {
 		
 		manager.fullscreen = true;
 		manager.window = window;
+		
+		if (holder != null) {
+			holder.dispose(); // disposes of old window
+		}
 	}
 	
 	public static void setWindowed(Vector2 screen) {
+		JFrame holder = window;
+		
 		window = new JFrame();
 		window.setTitle("You're in a Dungeon");
 		window.pack();
@@ -52,6 +60,10 @@ public class Main {
 		
 		manager.fullscreen = false;
 		manager.window = window;
+		
+		if (holder != null) {
+			holder.dispose(); // disposes of old window
+		}
 	}
 	
 	public static void setWindowed() {
