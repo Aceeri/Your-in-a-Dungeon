@@ -9,50 +9,39 @@ import main.Manager;
 import main.object.Object;
 import main.misc.Vector2;
 
-class Node { 
-	public Vector2 position;
-	public int x;
-	public int y;
-	public double f;
-	public double h;
-	public double g;
-	public double gTotal = 0;
-	
-	public Node parent;
-	
-	public Node(Vector2 p, Vector2 gP, double h, double g) {
-		position = p;
-		x = (int) gP.x;
-		y = (int) gP.y;
-		f = h + g;
-	}
-}
-
 public class Pathfinder {
 	private Manager manager;
-	private Node[][] nodeMap;
 	
 	public Pathfinder(Manager m) {
 		manager = m;
 	}
 	
-	public boolean intersectingBox(Vector2 position, Vector2 size) {
+	public boolean intersectingBox(Vector2 position, double size) {
 		for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
 			Object object = (Object) manager.wallContainer.getComponent(i);
-			if (object.inside(position, size)) {
+			if (object.inside(position, new Vector2(size, size))) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public Vector2[][] route(Vector2 from, Vector2 to, double nodeSize) {
-		Vector2[][] test = new Vector2[nodeMap.length][nodeMap[0].length];
-		Node startNode = nodeMap[(int) (Math.round(from.x/nodeSize))][(int) (Math.round(from.y/nodeSize))];
-		
-		
-		
+	public ArrayList<Node> route(Vector2 from, Vector2 to, double nodeSize) {
 		Node[][] nodeMap = createMap(from, to, nodeSize);
+		Node startNode = nodeMap[(int) (Math.round(from.x/nodeSize))][(int) (Math.round(from.y/nodeSize))];
+		Node endNode = nodeMap[(int) (Math.round(to.x/nodeSize))][(int) (Math.round(to.y/nodeSize))];
+		endNode.color = Color.YELLOW;
+		
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		for (int i = 0; i < nodeMap.length; i++) {
+			for (int j = 0; j < nodeMap[0].length; j++) {
+				nodes.add(nodeMap[i][j]);
+			}
+		}
+		
+		if (startNode == endNode) {
+			return nodes;
+		}
 		
 		ArrayList<Node> closedSet = new ArrayList<Node>();
 		ArrayList<Node> openSet = new ArrayList<Node>();
@@ -61,50 +50,81 @@ public class Pathfinder {
 		// Add starting position to open set
 		openSet.add(startNode);
 		
+		int counter = 0;
 		while (!openSet.isEmpty()) {
+			counter++;
 			Node currentNode = openSet.get(0);
 			
 			// Get node with lowest fScore
 			for (int i = 0; i < openSet.size(); i++) {
 				Node node = openSet.get(i);
-				if (node.f < currentNode.f) {
+				if (Math.abs(node.f) <= Math.abs(currentNode.f)) {
 					currentNode = node;
 				}
 			}
 			
+			currentNode.color = Color.GREEN;
 			openSet.remove(currentNode);
 			closedSet.add(currentNode);
+			navigatedSet.add(currentNode);
 			
 			Node[] surrounding = new Node[] {
 					nodeMap[currentNode.x - 1][currentNode.y],
 					nodeMap[currentNode.x + 1][currentNode.y],
-					nodeMap[currentNode.y - 1][currentNode.y],
-					nodeMap[currentNode.y + 1][currentNode.y],
+					nodeMap[currentNode.x][currentNode.y - 1],
+					nodeMap[currentNode.x][currentNode.y + 1],
 					
-					nodeMap[currentNode.x - 1][currentNode.y + 1],
-					nodeMap[currentNode.x + 1][currentNode.y + 1],
 					nodeMap[currentNode.x - 1][currentNode.y - 1],
-					nodeMap[currentNode.x + 1][currentNode.y - 1]
+					nodeMap[currentNode.x + 1][currentNode.y - 1],
+					nodeMap[currentNode.x - 1][currentNode.y + 1],
+					nodeMap[currentNode.x + 1][currentNode.y + 1]
 			};
 			
-			for (int i = 0; i < surrounding.length; i++) {
-				surrounding[i].parent = currentNode;
-				
-				if (!closedSet.contains(surrounding[i]) && intersectingBox(surrounding[i].position.sub(new Vector2(nodeSize/2, nodeSize/2)), new Vector2(nodeSize, nodeSize))) {
-					closedSet.add(surrounding[i]);
-				} else if (!closedSet.contains(surrounding[i]) && !openSet.contains(surrounding[i])) {
-					surrounding[i].gTotal = currentNode.gTotal + surrounding[i].h;
-					openSet.add(surrounding[i]);
+			if (currentNode == endNode) {
+				endNode.color = Color.YELLOW;
+				ArrayList<Node> path = new ArrayList<Node>();
+				path.add(endNode);
+				currentNode = endNode;
+				int tries = 0;
+				while (true) {
+					tries++;
+					if (tries > 100) {
+						return path;
+					}
+					
+					currentNode = currentNode.parent;
+					path.add(currentNode);
+					currentNode.color = Color.YELLOW;
+					
+					if (currentNode.equals(startNode)) {
+						return path;
+					}
 				}
+			}
+			
+			for (int i = 0; i < surrounding.length; i++) {
+				if (!closedSet.contains(surrounding[i])
+						&& surrounding[i].x == 0
+						|| surrounding[i].y == 1
+						|| surrounding[i].x == nodeMap.length - 1
+						|| surrounding[i].y == nodeMap[0].length - 1
+						|| intersectingBox(surrounding[i].position, nodeSize)) {
+					closedSet.add(surrounding[i]);
+					surrounding[i].color = Color.BLUE;
+				} else if (!closedSet.contains(surrounding[i]) && !openSet.contains(surrounding[i])) {
+					surrounding[i].parent = currentNode;
+					openSet.add(surrounding[i]);
+					surrounding[i].color = Color.CYAN;
+				}
+			}
+			
+			
+			if (counter > 200) {
+				break;
 			}
 		}
 		
-		for (int i = 0; i < nodeMap.length; i++) {
-			for (int j = 0; j < nodeMap[0].length; j++) {
-				test[i][j] = nodeMap[i][j].position;
-			}
-		}
-		return test;
+		return nodes;
 	}
 	
 	public Node[][] createMap(Vector2 from, Vector2 to, double nodeSize) {
@@ -118,9 +138,8 @@ public class Pathfinder {
 		
 		for (int i = 0; i < mapSize.x; i ++) {
 			for (int j = 0; j < mapSize.y; j ++) {
-				double g = Math.sqrt(((i - startX)*nodeSize*(i - startX)*nodeSize) + ((j - startY)*nodeSize*(j - startY)*nodeSize));
-				double h = (i - endX)*nodeSize + (j - endY)*nodeSize;
-				nodeMap[i][j] = new Node(new Vector2(i*nodeSize, j*nodeSize), new Vector2(i, j), h, g);
+				double h = Math.abs(endX - i) + Math.abs(endY - j);
+				nodeMap[i][j] = new Node(new Vector2(i*nodeSize, j*nodeSize), new Vector2(i, j), h);
 			}
 		}
 		

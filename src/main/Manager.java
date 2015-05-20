@@ -137,7 +137,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "characters" });
 		ui.addString(new String[] { "projectiles" });
 		ui.addString(new String[] { "nodes" });
-		//ui.addString(new String[] {)
 		ui.addString(new String[] { "collisions" });
 		
 		vectorContainer = new ArrayList<Vector2[]> ();
@@ -146,8 +145,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
 		wallContainer.add(t1);
 		
-		/*testback t2 = new testback(new Vector2(250, 200), new Vector2(500, 50));
-		wallContainer.add(t2);*/
+		t1 = new testback(new Vector2(200, 200), new Vector2(500, 50));
+		wallContainer.add(t1);
+		
+		t1 = new testback(new Vector2(300, 300), new Vector2(50, 800));
+		wallContainer.add(t1);
 		
 		addKeyListener(this);
 		addMouseListener(this);
@@ -167,14 +169,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//new Vector2(50, 100).drawVector(canvas, new Vector2(500, 400));
 		Graphics c = canvas.getGraphics();
 		
-		/*Vector2[][] positions = pathfinder.route(new Vector2(50, 50), new Vector2(500, 500), 30);
-		c.setColor(Color.RED);
-		//System.out.println(positions.length);
-		for (int i = 0; i < positions.length; i++) {
-			for (int j = 0; j < positions[0].length; j++) {
-				c.fillRect((int) positions[i][j].x, (int) positions[i][j].y, 5, 5);
-			}
-		}*/
+		ArrayList<Node> nodes = pathfinder.route(new Vector2(100, 500), player.position, 30);
+		for (int i = 0; i < nodes.size(); i++) {
+			c.setColor(nodes.get(i).color);
+			c.drawString(String.valueOf(Math.abs(nodes.get(i).f)), (int) nodes.get(i).position.x, (int) nodes.get(i).position.y);
+			//c.fillRect((int) nodes[i][j].position.x, (int) nodes[i][j].position.y, 5, 5);
+		}
 		
 		/*counter++;
 		//System.out.println(counter);
