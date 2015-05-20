@@ -111,11 +111,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		pathfinder = new Pathfinder(this);
 		
-		player = new Player(new Vector2(0, 0));
+		player = new Battlemage(new Vector2(0, 0));
 		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
-		backgroundMusic.play();
+		//backgroundMusic.play();
 		
 		Background bg = new Background(screen);
 		floorContainer.add(bg);
@@ -167,14 +167,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		//new Vector2(50, 100).drawVector(canvas, new Vector2(500, 400));
 		Graphics c = canvas.getGraphics();
 		
-		Vector2[][] positions = pathfinder.route(new Vector2(50, 50), new Vector2(500, 500), 30);
+		/*Vector2[][] positions = pathfinder.route(new Vector2(50, 50), new Vector2(500, 500), 30);
 		c.setColor(Color.RED);
 		//System.out.println(positions.length);
 		for (int i = 0; i < positions.length; i++) {
 			for (int j = 0; j < positions[0].length; j++) {
 				c.fillRect((int) positions[i][j].x, (int) positions[i][j].y, 5, 5);
 			}
-		}
+		}*/
 		
 		/*counter++;
 		//System.out.println(counter);

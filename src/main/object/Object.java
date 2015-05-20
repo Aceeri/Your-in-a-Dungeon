@@ -178,7 +178,6 @@ public class Object extends JComponent {
 	public void updatePosition() {
 		try {
 			position = scalePosition.mult(manager.defaultScreen).add(offsetPosition).round();
-			//System.out.println(position + " " + scalePosition + " " + offsetPosition);
 		} catch (java.lang.NullPointerException e) {
 			System.out.println("missing manager: " + this);
 			manager = (Manager) getParent().getParent();

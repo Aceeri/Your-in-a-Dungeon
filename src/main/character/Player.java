@@ -27,8 +27,8 @@ public class Player extends main.object.Object {
 		
 		setSize(this.Size.dimension());
 		setLocation(0, 0);
-		scalePosition = new Vector2(1, 0);
 		
+		speed = 3;
 		type = "player";
 		path = "resources/image/player.png";
 		
