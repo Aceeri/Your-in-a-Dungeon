@@ -1,12 +1,13 @@
 package main.object.wall;
 
 import main.misc.Vector2;
+import main.object.Object;
 import main.Manager;
 
 import java.awt.Graphics;
 import java.awt.Color;
 
-public class testback extends main.object.Object {
+public class testback extends Object {
 	
 	public testback(Vector2 position) {
 		super(position);
@@ -14,6 +15,7 @@ public class testback extends main.object.Object {
 		
 		collidable = true;
 		anchored = true;
+		nodes = true;
 		type = "wall";
 	}
 	
@@ -23,10 +25,12 @@ public class testback extends main.object.Object {
 		
 		collidable = true;
 		anchored = true;
+		nodes = true;
 		type = "wall";
 	}
 	
 	public void paintComponent(Graphics g) {
+		
 		Graphics c = manager.canvas.getGraphics();
 		
 		c.setColor(Color.GRAY);

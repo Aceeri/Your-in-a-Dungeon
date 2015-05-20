@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 public class Vector2 {
 	public double x = 0;
@@ -112,11 +113,20 @@ public class Vector2 {
 		return "<" + this.x + ", " + this.y +">";
 	}
 	
-	public void drawVector(Graphics g, Vector2 v1, Vector2 v2) {
-		g.setColor(Color.RED);
+	public boolean equals(Vector2 v) {
+		if (v == this || (v.x == x && v.y == y)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void drawVector(BufferedImage canvas, Vector2 to) {
+		Graphics g = canvas.getGraphics();
+		g.setColor(Color.CYAN);
 		
-		for (int i = 0; i < v1.distance(v2); i ++) {
-			g.fillRect((int) (v1.x + (v2.x*i/v1.distance(v2))) - 1 , (int) (v1.y + (v2.y*i/v1.distance(v2))) - 1, 3, 3);
+		Vector2 slope = to.sub(this).normalize();
+		for (int i = 0; i < distance(to); i++) {
+			g.fillRect((int) (x + slope.x*i), (int) (y + slope.y*i), 2, 2);
 		}
 	}
 	

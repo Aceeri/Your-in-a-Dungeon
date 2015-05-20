@@ -11,19 +11,6 @@ import main.object.Projectile;
 import main.ui.UserInterface;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //default java imports
 import javax.swing.*;
 
@@ -47,6 +34,7 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 
 import javax.swing.Timer;
@@ -72,6 +60,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public ArrayList<Vector2[]> vectorContainer;
 	
+	public Pathfinder pathfinder;
+	
 	public Timer gameTimer;
 	public Player player;
 	public long lastFrame = System.nanoTime();//System.currentTimeMillis();
@@ -81,6 +71,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Vector2 defaultScreen = new Vector2(1440, 900);
 	public Vector2 screen = new Vector2(1440, 900);
 	public Vector2 ratio = new Vector2(1, 1);
+	public Vector2 absoluteScreen = new Vector2(1440, 900);
 	
 	public BufferedImage canvas;
 	public UserInterface ui;
@@ -91,11 +82,17 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int cb = 0;
 	public int angle = 0;
 	
+	public testback t1;
+	
 	public Music backgroundMusic = new Music("resources/sound/Again_and_Again.wav");
+	public Vector2[] route;
+	public boolean first = true;
+	
+	public int counter = 0;
 	
 	public Manager(JFrame window) {
 		this.window = window;
-		//this.screen = screen;
+		
 		canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_ARGB);
 		
 		setBackground(Color.BLACK);
@@ -112,13 +109,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		wallContainer.addContainerListener(this);
 		floorContainer.addContainerListener(this);
 		
-		player = new Battlemage(new Vector2(screen.x/2 - 30, screen.y/2 - 30));
-		//player = new Player(new Vector2(screen.x/2 - 30, screen.y/2 - 30));
-		//Enemy e = new Enemy(new Vector2(100, 100));
+		pathfinder = new Pathfinder(this);
+		
+		player = new Player(new Vector2(0, 0));
 		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
-		//backgroundMusic.play();
+		backgroundMusic.play();
 		
 		Background bg = new Background(screen);
 		floorContainer.add(bg);
@@ -129,9 +126,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		add(playerContainer);
 		add(projectileContainer);
 		add(floorContainer);
-		//addContainerListener(uiContainer);
 		playerContainer.add(player);
-		//playerContainer.add(e);
 		
 		ui = new UserInterface();
 		uiContainer.add(ui);
@@ -141,12 +136,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "fullscreen" });
 		ui.addString(new String[] { "characters" });
 		ui.addString(new String[] { "projectiles" });
+		ui.addString(new String[] { "nodes" });
+		//ui.addString(new String[] {)
 		ui.addString(new String[] { "collisions" });
 		
 		vectorContainer = new ArrayList<Vector2[]> ();
 		
 		//create walls
-		testback t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
+		t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
 		wallContainer.add(t1);
 		
 		/*testback t2 = new testback(new Vector2(250, 200), new Vector2(500, 50));
@@ -167,6 +164,45 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		super.paintComponent(g);
 		AffineTransform at = new AffineTransform();
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
+		//new Vector2(50, 100).drawVector(canvas, new Vector2(500, 400));
+		Graphics c = canvas.getGraphics();
+		
+		Vector2[][] positions = pathfinder.route(new Vector2(50, 50), new Vector2(500, 500), 30);
+		c.setColor(Color.RED);
+		//System.out.println(positions.length);
+		for (int i = 0; i < positions.length; i++) {
+			for (int j = 0; j < positions[0].length; j++) {
+				c.fillRect((int) positions[i][j].x, (int) positions[i][j].y, 5, 5);
+			}
+		}
+		
+		/*counter++;
+		//System.out.println(counter);
+		if (counter % 500 == 0) {
+			wallContainer.add(new testback(new Vector2(500, 500), new Vector2(30, 30)));
+		}*/
+		
+		/*if (first) {
+			route = pathfinder.route(g, new Vector2(50, 400), new Vector2(500, 400), new Vector2(30, 30));
+			first = false;
+		}
+		
+		if (route != null) {
+			for (int i = 0; i + 1 < route.length; i++) {
+				route[i].drawVector(canvas, route[i + 1]);
+			}
+		}*/
+		
+		//System.out.println(t1.position + " " + t1.Size);
+		
+		/*Vector2 intersection = new Vector2(0, 100);
+		Vector2 intersection2 = new Vector2(300, 400);*/
+		
+		/*System.out.println("intersects: " + t1.intersects(intersection, intersection2));
+		System.out.println(t1.position + " " + t1.position.add(new Vector2(0, t1.Size.y)));
+		System.out.println(intersection + " " + intersection2);
+		intersection.drawVector(canvas, intersection2);
+		t1.position.drawVector(canvas, t1.position.add(new Vector2(0, t1.Size.y)));*/
 		
 		//supar rotut
 		/*at.translate(canvas.getWidth()/2, canvas.getHeight()/2);
@@ -175,6 +211,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		angle += 1;*/
 		
 		player.rotation -= 1;
+		
+		//pathfinder.displayNodes(canvas);
 		
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawRenderedImage(canvas, at);
@@ -200,9 +238,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		g2.setColor(new Color(cr, cg, cb, 150));
 		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);*/
 		
-		for (int i = 0; i < vectorContainer.size(); i++) {
+		/*for (int i = 0; i < vectorContainer.size(); i++) {
 			new Vector2().drawVector(g, vectorContainer.get(i)[0], vectorContainer.get(i)[1]);
-		}
+		}*/
 		
 		//long now = System.currentTimeMillis();
 		
@@ -216,6 +254,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.updateString(new String[] { "fullscreen", String.valueOf(fullscreen) });
 		ui.updateString(new String[] { "characters", String.valueOf(playerContainer.getComponentCount()) });
 		ui.updateString(new String[] { "projectiles", String.valueOf(projectileContainer.getComponentCount()) });
+		//ui.updateString(new String[] { "nodes", String.valueOf(pathfinder.nodeLength()) });
+		//ui.updateString(pathfinder.nodeList());
 		
 		//lastFrame = now;
 	}
@@ -234,6 +274,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				Container container = (Container) getComponent(i);
 				container.setSize(screen.dimension());
 				container.setLocation(0, 0);
+				
 				for (int j = 0; j < container.getComponentCount(); j++) {
 					Object object = (Object) container.getComponent(j);
 					object.step(delta);
@@ -269,6 +310,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		repaint();
 	}
+
 	
 	@Override
 	public void keyPressed(KeyEvent e) {

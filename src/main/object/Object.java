@@ -24,7 +24,7 @@ public class Object extends JComponent {
 	public Vector2 velocity;
 	public Vector2 Size;
 	
-	public double rotation = 0; //rotation (in degrees)
+	public double rotation = 0; // rotation (in degrees)
 	
 	public double speed = 0;
 	public String type = "object";
@@ -33,6 +33,7 @@ public class Object extends JComponent {
 	
 	public boolean collidable = false;
 	public boolean anchored = false;
+	public boolean nodes = false;
 	
 	protected String path = "resources/image/missing.png";
 	protected BufferedImage image;
@@ -105,96 +106,6 @@ public class Object extends JComponent {
 		return false;
 	}
 	
-	public float[] SweptAABB(Object o2) {
-		float normalx, normaly;
-		
-		float b1x = (float) position.x;
-		float b1y = (float) position.y;
-		float b1w = (float) Size.x;
-		float b1h = (float) Size.y;
-		
-		float b2x = (float) o2.position.x;
-		float b2y = (float) o2.position.y;
-		float b2w = (float) o2.Size.x;
-		float b2h = (float) o2.Size.y;
-		
-		float xInvEntry, yInvEntry;
-	    float xInvExit, yInvExit;
-	    
-	    if (velocity.x > 0.0f)
-	    {
-	        xInvEntry = b2x - (b1x + b1w);
-	        xInvExit = (b2x + b2w) - b1x;
-	    }
-	    else 
-	    {
-	        xInvEntry = (b2x + b2w) - b1x;
-	        xInvExit = b2x - (b1x + b1w);
-	    }
-	
-	    if (velocity.y > 0.0f)
-	    {
-	        yInvEntry = b2y - (b1y + b1h);
-	        yInvExit = (b2y + b2h) - b1y;
-	    }
-	    else
-	    {
-	        yInvEntry = (b2y + b2h) - b1y;
-	        yInvExit = b2y - (b1y + b1h);
-	    }
-	    
-	    // find time of collision and time of leaving for each axis (if statement is to prevent divide by zero)
-	    float xEntry, yEntry;
-	    float xExit, yExit;
-	    
-	    if (velocity.x == 0.0f) {
-	        xEntry = -Float.POSITIVE_INFINITY;
-	        xExit = Float.POSITIVE_INFINITY;
-	    } else {
-	        xEntry = xInvEntry / (float) (velocity.x * speed);
-	        xExit = xInvExit / (float) (velocity.x * speed);
-	    }
-
-	    if (velocity.y == 0.0f) {
-	        yEntry = -Float.POSITIVE_INFINITY;
-	        yExit = Float.POSITIVE_INFINITY;
-	    } else {
-	        yEntry = yInvEntry / (float) (velocity.y * speed);
-	        yExit = yInvExit / (float) (velocity.y * speed);
-	    }
-	    
-	    // find the earliest/latest times of collision
-	    float entryTime = Math.max(xEntry, yEntry);
-	    float exitTime = Math.min(xExit, yExit);
-	    
-		// if there was no collision
-		if (entryTime > exitTime || xEntry < 0 && yEntry < 0 || xEntry > 1 || yEntry > 1) {
-		    return new float[] { 1, 0, 0 };
-		} else {
-			//if there was a collision, calculate normal of collided surface
-			if (xEntry > yEntry) {
-				if (xInvEntry < 0.0f) {
-				    normalx = 1;
-				    normaly = 0;
-				} else {
-				    normalx = -1;
-				    normaly = 0;
-				}
-			} else {
-				if (yInvEntry < 0) {
-				    normalx = 0;
-				    normaly = 1;
-				} else {
-				    normalx = 0;
-				    normaly = -1;
-				}
-			}
-			
-			// return the time of collision
-			return new float[] { entryTime, normalx, normaly };
-		}
-	}
-	
 	public Vector2 side(Vector2 o2, Vector2 d2) {
 		double dx = (position.x + Size.x/2) - (o2.x + d2.x/2);
 		double dy = (position.y + Size.y/2) - (o2.y + d2.y/2);
@@ -203,32 +114,26 @@ public class Object extends JComponent {
 		double crossWidth = width*dy;
 		double crossHeight = height*dx;
 
-		Vector2 direction = new Vector2();
 		if (Math.abs(dx) <= width && Math.abs(dy) <= height) {
 			if (crossWidth > crossHeight) {
-				if (crossWidth > -crossHeight) {
-					direction.y = 1;
-					//System.out.println("bottom");
-				} else {
-					direction.x = -1;
-					//System.out.println("left");
+				if (crossWidth > -crossHeight) { //bottom
+					return new Vector2(0, 1);
+				} else { //left
+					return new Vector2(-1, 0);
 				}
 			} else {
-				if (crossWidth > -crossHeight) {
-					direction.x = 1;
-					//System.out.println("right");
-				} else {
-					direction.y = -1;
-					//System.out.println("top");
+				if (crossWidth > -crossHeight) { //right
+					return new Vector2(1, 0);
+				} else { //top
+					return new Vector2(0, -1);
 				}
 			}
 		}
 		
-		return direction;
+		return new Vector2();
 	}
 	
 	public Vector2 checkCollision(Object[] ignoreList, double delta) {
-		//ArrayList<float[]> collisions = new ArrayList<float[]>();
 		Vector2 totalCollision = new Vector2();
 		
 		for (int i = 0; i < manager.getComponentCount(); i++) {
@@ -251,31 +156,10 @@ public class Object extends JComponent {
 								totalCollision = totalCollision.sub(normal);
 							}
 						}
-						
-						//System.out.println(this + " " + object.side(position, Size));*/
-						
-						/*
-						 * Swept AABB collision
-						 */
-						/*Vector2 bpPosition = new Vector2(velocity.x > 0 ? position.x : position.x + Size.x, velocity.y > 0 ? position.y : position.y + Size.y);
-						Vector2 bpSize = new Vector2(velocity.x*speed + (velocity.x > 0 ? Size.x : -Size.x), velocity.y*speed + (velocity.y > 0 ? Size.y : -Size.y));
-						//Vector2 bpSize = velocity.scalar(speed).add(Size);
-						System.out.println(velocity + " : " + bpPosition + " || " + bpSize);
-						//Vector2 bpSize = new Vector2(position.x + Size.x + velocity.x*speed, position.y + Size.y + velocity.x*speed);
-						
-						if (!ignore && this != object && object.collidable && object.inside(bpPosition, bpSize)) {
-							float[] test = SweptAABB(object);
-							collisions.add(test);
-							
-							totalCollision = totalCollision.add(new Vector2(test[1], test[2]));
-							//totalCollision = totalCollision.sub(new Vector2(velocity.x*(1 - test[0]), velocity.y*(1 - test[0])));
-						}*/
 					}
 				}
 			}
 		}
-		
-		//manager.ui.updateString(new String[] { "collisions", totalCollision.toString() });
 		
 		return totalCollision;
 	}
@@ -293,77 +177,38 @@ public class Object extends JComponent {
 	
 	public void updatePosition() {
 		try {
-			position = scalePosition.mult(manager.screen).add(offsetPosition).round();
+			position = scalePosition.mult(manager.defaultScreen).add(offsetPosition).round();
+			//System.out.println(position + " " + scalePosition + " " + offsetPosition);
 		} catch (java.lang.NullPointerException e) {
 			System.out.println("missing manager: " + this);
 			manager = (Manager) getParent().getParent();
-			position = scalePosition.mult(manager.screen).add(offsetPosition).round();
+			position = scalePosition.mult(manager.defaultScreen).add(offsetPosition).round();
 		}
 	}
-	
-	public Vector2 getNextPosition() {
-		return position.add(velocity.scalar(speed));
-	}
-	
-	public Vector2 getNextPosition(Vector2 velocity) {
-		return position.add(velocity);
-	}
-	
-	/*public Vector2 checkCollision(Object[] ignoreList) {
-		Vector2 collision = new Vector2();
-		
-		for (int i = 0; i < manager.getComponentCount(); i++) {
-			if (manager.getComponent(i) instanceof Container && manager.getComponent(i) != manager.projectileContainer) {
-				Container container = (Container) manager.getComponent(i);
-				for (int j = 0; j < container.getComponentCount(); j++) {
-					if (container.getComponent(j) instanceof Object) {
-						Object object = (Object) container.getComponent(j);
-						boolean ignore = false;
-						for (int k = 0; k < ignoreList.length; k++) {
-							if (ignoreList[k] == object) {
-								ignore = true;
-								break;
-							}
-						}
-						if (!ignore && this != object && object.collidable && !this.anchored) {
-							Vector2 objectCollision = object.side(this.position.add(this.velocity), this.Size);
-							
-							if (Math.abs(objectCollision.x) > 0) {
-								collision.x = -objectCollision.x;
-							}
-							
-							if (Math.abs(objectCollision.y) > 0) {
-								collision.y = -objectCollision.y;
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return collision;
-	}*/
 	
 	public Vector2 checkCollision(double delta) {
 		return checkCollision(new Object[] { }, delta);
 	}
 	
-	/*private boolean intersects(Vector2 o1, Vector2 d1, Vector2 o2, Vector2 d2) {
+	private boolean intersects(Vector2 o1, Vector2 d1, Vector2 o2, Vector2 d2) {
 		double u = ((o2.x-o1.x)*d1.y-(o2.y-o1.y)*d1.x)/(d2.y*d1.x-d2.x*d1.y);
-		if (0 <= u && u <= 1) {
+		if (0 <=u && u <= 1) {
 			double v = (o2.x-o1.x+u*d2.x)*d1.x+(o2.y-o1.y+u*d2.y)*d1.y;
-			return (0 <= v && v <= 1);
+			return 0 <= v && v<= d1.x*d1.x+d1.y*d1.y;
 		}
 		return false;
 	}
 	
-	public boolean rectIntersect(Vector2 o2, Vector2 d2) {
-		if (intersects(position, new Vector2(Size.x, 0), o2, d2)
-				|| intersects(position, new Vector2(0, Size.y), o2, d2)
-				|| intersects(position.add(Size), new Vector2(-Size.x, 0), o2, d2)
-				|| intersects(position.add(Size), new Vector2(0, -Size.y), o2, d2)) {
+	public boolean intersects(Vector2 o2, Vector2 d2) {
+		//checks if vector intersects sides of rectangle, or if they are inside the rectangle
+		if (intersects(position, position.add(new Vector2(Size.x, 0)), o2, d2)
+				|| intersects(position, position.add(new Vector2(0, Size.y)), o2, d2)
+				|| intersects(position.add(Size), position.add(new Vector2(-Size.x, 0)), o2, d2)
+				|| intersects(position.add(Size), position.add(new Vector2(0, -Size.y)), o2, d2)
+				|| inside(o2)
+				|| inside(d2)) {
 			return true;
 		}
 		return false;
-	}*/
+	}
 }
