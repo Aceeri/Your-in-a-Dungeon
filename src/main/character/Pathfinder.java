@@ -1,8 +1,6 @@
 package main.character;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import main.Manager;
@@ -26,13 +24,7 @@ public class Pathfinder {
 		return false;
 	}
 	
-	public Node closestUnblockedNode(Vector2 position) {
-		Node closest = null;
-		
-		return null;
-	}
-	
-	public ArrayList<Node> route(Vector2 from, Vector2 to, double nodeSize) {
+	public Node[] route(Vector2 from, Vector2 to, double nodeSize) {
 		Node[][] nodeMap = createMap(from, to, nodeSize);
 		
 		Node startNode = null;
@@ -63,7 +55,7 @@ public class Pathfinder {
 		}
 		
 		if (startNode == endNode) {
-			return nodes;
+			return new Node[] { };
 		}
 		
 		ArrayList<Node> closedSet = new ArrayList<Node>();
@@ -91,17 +83,22 @@ public class Pathfinder {
 			closedSet.add(currentNode);
 			navigatedSet.add(currentNode);
 			
-			Node[] surrounding = new Node[] {
-					nodeMap[currentNode.x - 1][currentNode.y],
-					nodeMap[currentNode.x + 1][currentNode.y],
-					nodeMap[currentNode.x][currentNode.y - 1],
-					nodeMap[currentNode.x][currentNode.y + 1],
-					
-					nodeMap[currentNode.x - 1][currentNode.y - 1],
-					nodeMap[currentNode.x + 1][currentNode.y - 1],
-					nodeMap[currentNode.x - 1][currentNode.y + 1],
-					nodeMap[currentNode.x + 1][currentNode.y + 1]
-			};
+			Node[] surrounding;
+			try {
+				surrounding = new Node[] {
+						nodeMap[currentNode.x - 1][currentNode.y],
+						nodeMap[currentNode.x + 1][currentNode.y],
+						nodeMap[currentNode.x][currentNode.y - 1],
+						nodeMap[currentNode.x][currentNode.y + 1],
+						
+						nodeMap[currentNode.x - 1][currentNode.y - 1],
+						nodeMap[currentNode.x + 1][currentNode.y - 1],
+						nodeMap[currentNode.x - 1][currentNode.y + 1],
+						nodeMap[currentNode.x + 1][currentNode.y + 1]
+				};
+			} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+				return new Node[] { };
+			}
 			
 			if (currentNode == endNode) {
 				endNode.color = Color.YELLOW;
@@ -112,7 +109,7 @@ public class Pathfinder {
 				while (true) {
 					tries++;
 					if (tries > 100) {
-						return path;
+						return new Node[] { };
 					}
 					
 					currentNode = currentNode.parent;
@@ -120,7 +117,11 @@ public class Pathfinder {
 					currentNode.color = Color.YELLOW;
 					
 					if (currentNode.equals(startNode)) {
-						return path;
+						Node[] sortedPath = new Node[path.size()];
+						for (int i = 0; i < path.size(); i++) {
+							sortedPath[i] = path.get(path.size() - i - 1);
+						}
+						return sortedPath;
 					}
 				}
 			}
@@ -147,7 +148,7 @@ public class Pathfinder {
 			}
 		}
 		
-		return nodes;
+		return new Node[] { };
 	}
 	
 	public Node[][] createMap(Vector2 from, Vector2 to, double nodeSize) {

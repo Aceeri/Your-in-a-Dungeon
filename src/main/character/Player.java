@@ -33,6 +33,7 @@ public class Player extends main.object.Object {
 		path = "resources/image/player.png";
 		
 		setImage();
+		System.out.println(toString());
 	}
 	
 	public void step(double delta) {
@@ -55,4 +56,8 @@ public class Player extends main.object.Object {
 	public void ability1() { }
 	
 	public void ability2() { }
+	
+	public String toString() {
+		return getClass() + " " + position + ", " + Size;
+	}
 }

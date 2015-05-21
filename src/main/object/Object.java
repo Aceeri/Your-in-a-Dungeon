@@ -6,11 +6,9 @@ import main.Manager;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -207,6 +205,16 @@ public class Object extends JComponent {
 				|| inside(o2)
 				|| inside(d2)) {
 			return true;
+		}
+		return false;
+	}
+	
+	public boolean intersectsAnyWall(Vector2 o2, Vector2 d2) {
+		for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
+			Object wall = (Object) manager.wallContainer.getComponent(i);
+			if (wall.intersects(o2, d2)) {
+				return true;
+			}
 		}
 		return false;
 	}

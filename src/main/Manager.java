@@ -25,16 +25,11 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
 import java.util.ArrayList;
 
 import javax.swing.Timer;
@@ -58,15 +53,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Container wallContainer;
 	public Container floorContainer;
 	
-	public ArrayList<Vector2[]> vectorContainer;
-	
 	public Pathfinder pathfinder;
 	
 	public Timer gameTimer;
 	public Player player;
-	public long lastFrame = System.nanoTime();//System.currentTimeMillis();
+	public long lastFrame = System.nanoTime();
 	public long lastFps = 60;
 	public double fixedFps = 60.0;
+	public boolean displayEnemyMovements = true;
 	
 	public Vector2 defaultScreen = new Vector2(1440, 900);
 	public Vector2 screen = new Vector2(1440, 900);
@@ -82,13 +76,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int cb = 0;
 	public int angle = 0;
 	
-	public testback t1;
-	
 	public Music backgroundMusic = new Music("resources/sound/Again_and_Again.wav");
-	public Vector2[] route;
-	public boolean first = true;
-	
-	public int counter = 0;
 	
 	public Manager(JFrame window) {
 		this.window = window;
@@ -111,11 +99,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		pathfinder = new Pathfinder(this);
 		
-		player = new Battlemage(new Vector2(0, 0));
+		player = new Battlemage(new Vector2(500, 500));
 		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
-		//backgroundMusic.play();
+		backgroundMusic.play();
 		
 		Background bg = new Background(screen);
 		floorContainer.add(bg);
@@ -127,9 +115,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		add(projectileContainer);
 		add(floorContainer);
 		playerContainer.add(player);
+		playerContainer.add(new Enemy(new Vector2(100, 500)));
+		playerContainer.add(new Enemy(new Vector2(400, 100)));
+		playerContainer.add(new Enemy(new Vector2(700, 600)));
 		
 		ui = new UserInterface();
 		uiContainer.add(ui);
+		
+		//info user interface
 		ui.addString(new String[] { "fps" });
 		ui.addString(new String[] { "key press" });
 		ui.addString(new String[] { "window size" });
@@ -139,10 +132,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "nodes" });
 		ui.addString(new String[] { "collisions" });
 		
-		vectorContainer = new ArrayList<Vector2[]> ();
-		
 		//create walls
-		t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
+		testback t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
 		wallContainer.add(t1);
 		
 		t1 = new testback(new Vector2(200, 200), new Vector2(500, 50));
@@ -166,34 +157,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		super.paintComponent(g);
 		AffineTransform at = new AffineTransform();
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
-		//new Vector2(50, 100).drawVector(canvas, new Vector2(500, 400));
+		
 		Graphics c = canvas.getGraphics();
-		
-		ArrayList<Node> nodes = pathfinder.route(new Vector2(100, 500), player.position, 30);
-		for (int i = 0; i < nodes.size(); i++) {
-			c.setColor(nodes.get(i).color);
-			c.drawString(String.valueOf(Math.abs(nodes.get(i).f)), (int) nodes.get(i).position.x, (int) nodes.get(i).position.y);
-			//c.fillRect((int) nodes[i][j].position.x, (int) nodes[i][j].position.y, 5, 5);
-		}
-		
-		/*counter++;
-		//System.out.println(counter);
-		if (counter % 500 == 0) {
-			wallContainer.add(new testback(new Vector2(500, 500), new Vector2(30, 30)));
-		}*/
-		
-		/*if (first) {
-			route = pathfinder.route(g, new Vector2(50, 400), new Vector2(500, 400), new Vector2(30, 30));
-			first = false;
-		}
-		
-		if (route != null) {
-			for (int i = 0; i + 1 < route.length; i++) {
-				route[i].drawVector(canvas, route[i + 1]);
-			}
-		}*/
-		
-		//System.out.println(t1.position + " " + t1.Size);
 		
 		/*Vector2 intersection = new Vector2(0, 100);
 		Vector2 intersection2 = new Vector2(300, 400);*/
@@ -246,18 +211,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		long now = System.nanoTime();
 		//info display
-		if ((now - lastFrame) != 0) {
-			//ui.updateString(new String[] { "fps", String.valueOf(1000/(now - lastFrame)) });
-		}
 		ui.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
 		ui.updateString(new String[] { "window size", screen.toString() });
 		ui.updateString(new String[] { "fullscreen", String.valueOf(fullscreen) });
 		ui.updateString(new String[] { "characters", String.valueOf(playerContainer.getComponentCount()) });
 		ui.updateString(new String[] { "projectiles", String.valueOf(projectileContainer.getComponentCount()) });
-		//ui.updateString(new String[] { "nodes", String.valueOf(pathfinder.nodeLength()) });
-		//ui.updateString(pathfinder.nodeList());
-		
-		//lastFrame = now;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -266,7 +224,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		delta = delta/1000;
 		lastFrame = now;
 		
-		//System.out.println(delta);
 		ui.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
 		
 		for (int i = 0; i < getComponentCount(); i++) {	
@@ -278,10 +235,18 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				for (int j = 0; j < container.getComponentCount(); j++) {
 					Object object = (Object) container.getComponent(j);
 					object.step(delta);
+					//System.out.println(object.getClass());
 					if (object instanceof Projectile) {
 						Projectile projectile = (Projectile) object;
 						if (projectile.expired()) {
 							container.remove(object);
+						}
+					}
+					
+					if (displayEnemyMovements) {
+						if (object instanceof Enemy) {
+							Enemy enemy = (Enemy) object;
+							enemy.drawPath(canvas);
 						}
 					}
 				}

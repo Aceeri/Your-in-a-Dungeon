@@ -5,34 +5,35 @@ import main.Manager;
 
 import java.awt.Color;
 import java.awt.Graphics;
-
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Enemy extends Player {
+	private Node[] path;
 	
 	public Enemy(Vector2 position) {
 		super(position);
 		
-		this.type = "enemy";
-		
-		System.out.println(this.getLocation() + " " + this.getSize());
-		System.out.println(this.position + " " + this.Size);
-		//System.out.println("Nearest Player: " + this.getNearestPlayer());
+		type = "enemy";
 	}
 	
-	public void step() {
+	public void step(double delta) {
+		super.step(delta);
+		
 		Player nearestPlayer = getNearestPlayer();
-		
 		if (nearestPlayer != null) {
-			
+			if (!intersectsAnyWall(position.add(Size.scalar(1/2)), nearestPlayer.position.add(nearestPlayer.Size.scalar(1/2)))) {
+				velocity = nearestPlayer.position.sub(position).normalize();
+			} else {
+				path = manager.pathfinder.route(position.add(Size.scalar(1/2)), nearestPlayer.position.add(nearestPlayer.Size.scalar(1/2)), 30);
+				
+				if (path.length > 0) {
+					velocity = path[1].position.sub(position).normalize();
+					
+					System.out.println("enemy velocity: " + velocity);
+				}
+			}
 		}
-	}
-	
-	public void paintComponent(Graphics g) {
-		g.setColor(Color.GRAY);
-		g.fillRect((int) (this.position.x), (int) (this.position.y), 19, 19);
-		
-		g.setColor(Color.CYAN);
-		g.fillRect((int) (this.position.x + 2), (int) (this.position.y + 2), 15, 15);
 	}
 	
 	public Player getNearestPlayer() {
@@ -42,7 +43,7 @@ public class Enemy extends Player {
 		for (int i = 0; i < manager.playerContainer.getComponentCount(); i++) {
 			Player plr = (Player) manager.playerContainer.getComponent(i);
 			double toPlayer = position.distance(plr.position);
-			if (plr.type == "player" && (this.position.distance(plr.position) < distance || distance == -1)) {
+			if (plr.type == "player" && (position.distance(plr.position) < distance || distance == -1)) {
 				distance = toPlayer;
 				current = plr;
 			}
@@ -55,12 +56,22 @@ public class Enemy extends Player {
 		double distance = -1;
 		for (int i = 0; i < manager.playerContainer.getComponentCount(); i++) {
 			Player plr = (Player) manager.playerContainer.getComponent(i);
-			double toPlayer = this.position.distance(plr.position);
+			double toPlayer = position.distance(plr.position);
 			if (plr.type == "player" && (toPlayer < distance || distance == -1)) {
 				distance = toPlayer;
 			}
 		}
 		
 		return distance;
+	}
+	
+	public void drawPath(BufferedImage canvas) {
+		Graphics c = canvas.getGraphics();
+		
+		if (path != null && path.length > 0) {
+			for (int i = 0; i + 1 < path.length; i++) {
+				path[i].position.drawVector(canvas, path[i + 1].position);
+			}
+		}
 	}
 }

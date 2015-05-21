@@ -12,8 +12,8 @@ public class Main {
 	public static JFrame window;
 	public static Manager manager;
 	
-	public static Vector2 screen = new Vector2(1440, 900);
-	public static Vector2 defaultScreen = new Vector2(1440, 900);
+	public static Vector2 screen = new Vector2(1920, 1080);
+	public static Vector2 defaultScreen = new Vector2(1920, 1080);
 	public static Vector2 fullScreen = new Vector2(Toolkit.getDefaultToolkit().getScreenSize());
 	
 	public static void main(String[] args) throws InterruptedException {
