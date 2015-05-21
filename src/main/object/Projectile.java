@@ -6,6 +6,7 @@ import main.character.*;
 import java.awt.Color;
 import java.awt.Graphics;
 
+@SuppressWarnings("serial")
 public class Projectile extends Object {
 	
 	private double damage;
@@ -46,10 +47,6 @@ public class Projectile extends Object {
 		expiration -= speed;
 		
 		Vector2 collision = checkCollision(new Object[] { parent }, delta);
-		//BOUNCING IS SIN
-		//HEATHENS SHALTH PERISH BEFORE EXPIRATION
-		//CD PROJEKKT RED BEST GAME STUDIO
-		//why are you reading these comments
 		
 		if (Math.abs(collision.x) + Math.abs(collision.y) > 0) {
 			expiration = 0;

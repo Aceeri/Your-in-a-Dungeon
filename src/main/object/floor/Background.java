@@ -1,8 +1,8 @@
 package main.object.floor;
 
 import main.misc.Vector2;
-import main.Manager;
 
+@SuppressWarnings("serial")
 public class Background extends main.object.Object {
 	
 	public Background(Vector2 s) {

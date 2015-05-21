@@ -4,11 +4,18 @@ package main;
 import main.misc.Vector2;
 import main.misc.Music;
 import main.character.*;
+import main.character.classes.Battlemage;
 import main.object.wall.*;
 import main.object.floor.*;
 import main.object.Object;
 import main.object.Projectile;
 import main.ui.UserInterface;
+
+
+
+
+
+
 
 
 //default java imports
@@ -30,17 +37,17 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 
 import javax.swing.Timer;
 
+@SuppressWarnings("serial")
 public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener, ContainerListener {
 	
 	public boolean running = false;
 	public boolean info = false;
 	public boolean fullscreen = false;
 	
-	public JFrame window;
+	public Window window;
 	
 	public boolean[] keyPress = new boolean[255];
 	public int lastKeyPress = 0;
@@ -58,14 +65,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Timer gameTimer;
 	public Player player;
 	public long lastFrame = System.nanoTime();
-	public long lastFps = 60;
 	public double fixedFps = 60.0;
-	public boolean displayEnemyMovements = true;
+	public boolean displayEnemyMovements = false;
 	
-	public Vector2 defaultScreen = new Vector2(1440, 900);
-	public Vector2 screen = new Vector2(1440, 900);
+	public Vector2 defaultScreen = new Vector2(1920, 1080);
+	public Vector2 screen = new Vector2(1920, 1080);
 	public Vector2 ratio = new Vector2(1, 1);
-	public Vector2 absoluteScreen = new Vector2(1440, 900);
 	
 	public BufferedImage canvas;
 	public UserInterface ui;
@@ -78,10 +83,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public Music backgroundMusic = new Music("resources/sound/Again_and_Again.wav");
 	
-	public Manager(JFrame window) {
+	public Manager(Window window) {
 		this.window = window;
 		
-		canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_ARGB);
+		canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_RGB);
 		
 		setBackground(Color.BLACK);
 		
@@ -103,7 +108,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
-		backgroundMusic.play();
+		//backgroundMusic.play();
 		
 		Background bg = new Background(screen);
 		floorContainer.add(bg);
@@ -129,8 +134,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "fullscreen" });
 		ui.addString(new String[] { "characters" });
 		ui.addString(new String[] { "projectiles" });
-		ui.addString(new String[] { "nodes" });
-		ui.addString(new String[] { "collisions" });
 		
 		//create walls
 		testback t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
@@ -158,26 +161,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		AffineTransform at = new AffineTransform();
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
 		
-		Graphics c = canvas.getGraphics();
-		
-		/*Vector2 intersection = new Vector2(0, 100);
-		Vector2 intersection2 = new Vector2(300, 400);*/
-		
-		/*System.out.println("intersects: " + t1.intersects(intersection, intersection2));
-		System.out.println(t1.position + " " + t1.position.add(new Vector2(0, t1.Size.y)));
-		System.out.println(intersection + " " + intersection2);
-		intersection.drawVector(canvas, intersection2);
-		t1.position.drawVector(canvas, t1.position.add(new Vector2(0, t1.Size.y)));*/
-		
 		//supar rotut
 		/*at.translate(canvas.getWidth()/2, canvas.getHeight()/2);
 		at.rotate(angle*Math.PI/180);
 		at.translate(-canvas.getWidth()/2, -canvas.getHeight()/2);
 		angle += 1;*/
 		
-		player.rotation -= 1;
-		
-		//pathfinder.displayNodes(canvas);
+		//player.rotation -= 1;
 		
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawRenderedImage(canvas, at);
@@ -203,13 +193,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		g2.setColor(new Color(cr, cg, cb, 150));
 		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);*/
 		
-		/*for (int i = 0; i < vectorContainer.size(); i++) {
-			new Vector2().drawVector(g, vectorContainer.get(i)[0], vectorContainer.get(i)[1]);
-		}*/
-		
-		//long now = System.currentTimeMillis();
-		
-		long now = System.nanoTime();
 		//info display
 		ui.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
 		ui.updateString(new String[] { "window size", screen.toString() });
@@ -235,7 +218,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				for (int j = 0; j < container.getComponentCount(); j++) {
 					Object object = (Object) container.getComponent(j);
 					object.step(delta);
-					//System.out.println(object.getClass());
 					if (object instanceof Projectile) {
 						Projectile projectile = (Projectile) object;
 						if (projectile.expired()) {
@@ -260,7 +242,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				case 37:
 					direction = new Vector2(-1, 0);
 					break;
-					case 38:
+				case 38:
 					direction = new Vector2(0, -1);
 					break;
 				case 39:
@@ -282,43 +264,63 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		int code = e.getKeyCode();
 		lastKeyPress = code;
 		
-		//movement
-		//	68 -> D
-		//	65 -> A
-		//  83 -> W
-		//	87 -> S
-		if (code == 68 && !keyPress[68]) {
-			player.velocity.x += 1;
-		}
-		if (code == 65 && !keyPress[65]) {
-			player.velocity.x -= 1;
-		}
-		if (code == 83 && !keyPress[83]) {
-			player.velocity.y += 1;
-		}
-		if (code == 87 && !keyPress[87]) {
-			player.velocity.y -= 1;
-		}
-		
-		//attacking
-		//	37 -> left
-		//	38 -> up
-		//	39 -> right
-		//	40 -> down
-		
-		//abilities
-		//	81 -> Q
-		//	69 -> E
-		if (code == 81) {
-			player.ability1();
-		}
-		if (code == 69) {
-			player.ability2();
+		if (!keyPress[code]) {
+			switch (code) {
+				//movement
+				//	68 -> D
+				//	65 -> A
+				//  83 -> W
+				//	87 -> S
+				case 68:
+					player.velocity.x += 1;
+					break;
+				case 65:
+					player.velocity.x -= 1;
+					break;
+				case 83:
+					player.velocity.y += 1;
+					break;
+				case 87:
+					player.velocity.y -= 1;
+					break;
+			}
 		}
 		
-		//toggle info
-		if (code == 67) {
-			ui.display = !ui.display;
+		switch(code) {
+			//attacking
+			//	37 -> left
+			//	38 -> up
+			//	39 -> right
+			//	40 -> down
+				
+			//abilities
+			//	81 -> Q
+			//	69 -> E
+			case 81:
+				player.ability1();
+				break;
+			case 69:
+				player.ability2();
+				break;
+			
+			//toggle info
+			case 67:
+				ui.display = !ui.display;
+				break;
+			
+			//toggle pathfinding drawing
+			case 86:
+				displayEnemyMovements = !displayEnemyMovements;
+				break;
+				
+			//toggle fullscreen
+			case 122:
+				if (window.fullscreen) {
+					window.setWindowed(screen);
+				} else {
+					window.setFullscreen();
+				}
+				break;
 		}
 		
 		keyPress[e.getKeyCode()] = true;
@@ -327,17 +329,21 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	@Override
 	public void keyReleased(KeyEvent e) {
 		int code = e.getKeyCode();
-		if (code == 68 && keyPress[68]) {
-			player.velocity.x -= 1;
-		}
-		if (code == 65 && keyPress[65]) {
-			player.velocity.x += 1;
-		}
-		if (code == 83 && keyPress[83]) {
-			player.velocity.y -= 1;
-		}
-		if (code == 87 && keyPress[87]) {
-			player.velocity.y += 1;
+		if (keyPress[code]) {
+			switch (code) {
+				case 68:
+					player.velocity.x -= 1;
+					break;
+				case 65:
+					player.velocity.x += 1;
+					break;
+				case 83:
+					player.velocity.y -= 1;
+					break;
+				case 87:
+					player.velocity.y += 1;
+					break;
+			}
 		}
 		
 		keyPress[e.getKeyCode()] = false;
@@ -371,7 +377,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public void componentResized(ComponentEvent e) {
 		if (window != null) {
 			screen = screen.div(ratio);
-			Vector2 currentScreen = new Vector2(window.getContentPane().getSize());
+			Vector2 currentScreen = new Vector2(window.frame.getContentPane().getSize());
 			ratio = currentScreen.div(defaultScreen);
 			screen = screen.mult(ratio);
 		}

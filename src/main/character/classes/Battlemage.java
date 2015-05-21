@@ -1,8 +1,10 @@
-package main.character;
+package main.character.classes;
 
+import main.character.Player;
 import main.misc.Vector2;
 import main.object.Projectile;
 
+@SuppressWarnings("serial")
 public class Battlemage extends Player {
 
 	public Battlemage(Vector2 position) {

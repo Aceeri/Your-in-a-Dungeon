@@ -152,8 +152,6 @@ public class Pathfinder {
 	}
 	
 	public Node[][] createMap(Vector2 from, Vector2 to, double nodeSize) {
-		int startX = (int) (Math.round(from.x/nodeSize));
-		int startY = (int) (Math.round(from.y/nodeSize));
 		int endX = (int) (Math.round(to.x/nodeSize));
 		int endY = (int) (Math.round(to.y/nodeSize));
 		

@@ -1,13 +1,13 @@
 package main.ui;
 
 import main.misc.Vector2;
-import main.Manager;
 
 import java.awt.Color;
 import java.awt.MouseInfo;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+@SuppressWarnings("serial")
 public class UserInterface extends main.object.Object {
 	
 	private ArrayList<String[]> displayString = new ArrayList<String[]> ();
@@ -32,25 +32,23 @@ public class UserInterface extends main.object.Object {
 	public void paintComponent(Graphics g) {
 		//Graphics c = manager.canvas.getGraphics();
 		
-		int currentY = 15;
-		g.setColor(Color.GREEN);
-		for (int i = 0; i < displayString.size(); i++) {
-			g.drawString(displayString.get(i)[0], 5, currentY);
-			
-			if (displayString.get(i).length <= 2) {
-				if (displayString.get(i).length > 1) {
-					g.drawString(displayString.get(i)[1], 100, currentY);
-				}
-				currentY += 15;
-			} else {
-				//c.drawString("{ ", 90, currentY);
-				//currentY += 15;
-				for (int j = 1; j < displayString.get(i).length; j++) {
-					g.drawString(displayString.get(i)[j], 100, currentY);
+		if (display) {
+			int currentY = 15;
+			g.setColor(Color.GREEN);
+			for (int i = 0; i < displayString.size(); i++) {
+				g.drawString(displayString.get(i)[0], 5, currentY);
+				
+				if (displayString.get(i).length <= 2) {
+					if (displayString.get(i).length > 1) {
+						g.drawString(displayString.get(i)[1], 100, currentY);
+					}
 					currentY += 15;
+				} else {
+					for (int j = 1; j < displayString.get(i).length; j++) {
+						g.drawString(displayString.get(i)[j], 100, currentY);
+						currentY += 15;
+					}
 				}
-				//c.drawString("} ", 90, currentY);
-				//currentY += 15;
 			}
 		}
 	}

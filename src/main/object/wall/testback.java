@@ -2,11 +2,11 @@ package main.object.wall;
 
 import main.misc.Vector2;
 import main.object.Object;
-import main.Manager;
 
 import java.awt.Graphics;
 import java.awt.Color;
 
+@SuppressWarnings("serial")
 public class testback extends Object {
 	
 	public testback(Vector2 position) {

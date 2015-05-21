@@ -13,6 +13,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
+@SuppressWarnings("serial")
 public class Object extends JComponent {
 	
 	public Vector2 scalePosition = new Vector2(0, 0);

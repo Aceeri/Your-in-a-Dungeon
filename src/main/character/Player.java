@@ -2,8 +2,8 @@ package main.character;
 
 import main.misc.Vector2;
 import main.object.Projectile;
-import main.Manager;
 
+@SuppressWarnings("serial")
 public class Player extends main.object.Object {
 	
 	public double health = 10;
@@ -58,6 +58,6 @@ public class Player extends main.object.Object {
 	public void ability2() { }
 	
 	public String toString() {
-		return getClass() + " " + position + ", " + Size;
+		return getClass() + "";
 	}
 }
