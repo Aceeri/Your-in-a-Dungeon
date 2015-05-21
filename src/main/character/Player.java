@@ -21,7 +21,7 @@ public class Player extends main.object.Object {
 	public Player(Vector2 position) {
 		super(position);
 		
-		Size = new Vector2(20, 20);
+		Size = new Vector2(30, 30);
 		collidable = true;
 		anchored = false;
 		

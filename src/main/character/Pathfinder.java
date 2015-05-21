@@ -26,10 +26,33 @@ public class Pathfinder {
 		return false;
 	}
 	
+	public Node closestUnblockedNode(Vector2 position) {
+		Node closest = null;
+		
+		return null;
+	}
+	
 	public ArrayList<Node> route(Vector2 from, Vector2 to, double nodeSize) {
 		Node[][] nodeMap = createMap(from, to, nodeSize);
-		Node startNode = nodeMap[(int) (Math.round(from.x/nodeSize))][(int) (Math.round(from.y/nodeSize))];
-		Node endNode = nodeMap[(int) (Math.round(to.x/nodeSize))][(int) (Math.round(to.y/nodeSize))];
+		
+		Node startNode = null;
+		double startDistance = -1;
+		Node endNode = null;
+		double endDistance = -1;
+		for (int i = 0; i < nodeMap.length; i++) {
+			for (int j = 0; j < nodeMap[0].length; j++) {
+				Node node = nodeMap[i][j];
+				if (startDistance == -1 || (from.distance(node.position) < startDistance && !intersectingBox(node.position, nodeSize))) {
+					startNode = node;
+					startDistance = from.distance(node.position);
+				}
+				
+				if (endDistance == -1 || (to.distance(node.position) < endDistance && !intersectingBox(node.position, nodeSize))) {
+					endNode = node;
+					endDistance = to.distance(node.position);
+				}
+			}
+		}
 		endNode.color = Color.YELLOW;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
@@ -105,7 +128,7 @@ public class Pathfinder {
 			for (int i = 0; i < surrounding.length; i++) {
 				if (!closedSet.contains(surrounding[i])
 						&& surrounding[i].x == 0
-						|| surrounding[i].y == 1
+						|| surrounding[i].y == 0
 						|| surrounding[i].x == nodeMap.length - 1
 						|| surrounding[i].y == nodeMap[0].length - 1
 						|| intersectingBox(surrounding[i].position, nodeSize)) {
