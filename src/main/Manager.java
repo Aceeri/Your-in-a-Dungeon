@@ -321,6 +321,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					window.setFullscreen();
 				}
 				break;
+				
+			case 45:
+				fixedFps -= 20;
+				break;
+			case 61:
+				fixedFps += 20;
+				break;
 		}
 		
 		keyPress[e.getKeyCode()] = true;
