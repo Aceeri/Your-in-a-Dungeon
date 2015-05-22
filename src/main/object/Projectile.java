@@ -4,6 +4,7 @@ import main.misc.Vector2;
 import main.character.*;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Graphics;
 
 @SuppressWarnings("serial")
@@ -41,16 +42,46 @@ public class Projectile extends Object {
 		return expiration <= 0;
 	}
 	
+	public Vector2 checkCollision(Object[] ignoreList, double delta) {
+		for (int i = 0; i < manager.getComponentCount(); i++) {
+			if (manager.getComponent(i) instanceof Container && manager.getComponent(i) != manager.projectileContainer) {
+				Container container = (Container) manager.getComponent(i);
+				for (int j = 0; j < container.getComponentCount(); j++) {
+					if (container.getComponent(j) instanceof Object) {
+						Object object = (Object) container.getComponent(j);
+						if (this != object && object.collidable) {
+							boolean ignore = false;
+							for (int k = 0; k < ignoreList.length; k++) {
+								if (ignoreList[k] == object) {
+									ignore = true;
+									break;
+								}
+							}
+							
+							if (!ignore && object.inside(position.add(velocity.scalar(speed*delta*manager.fixedFps)), Size)) {
+								if (object instanceof Player) {
+									Player plr = (Player) object;
+									plr.health -= damage;
+									System.out.println(plr.health);
+								}
+								
+								expiration = 0;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return new Vector2();
+	}
+	
 	public void step(double delta) {
 		updatePosition();
 		paintLocation();
-		expiration -= speed;
+		expiration -= speed*delta*manager.fixedFps;
 		
-		Vector2 collision = checkCollision(new Object[] { parent }, delta);
-		
-		if (Math.abs(collision.x) + Math.abs(collision.y) > 0) {
-			expiration = 0;
-		}
+		checkCollision(new Object[] { parent }, delta);
 		
 		offsetPosition = offsetPosition.add(velocity.scalar(speed*delta*manager.fixedFps));
 	}

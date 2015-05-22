@@ -63,7 +63,6 @@ public class Object extends JComponent {
 		objectTransform.translate(-image.getWidth()/2, -image.getHeight()/2);
 		
 		g2.drawRenderedImage(image, objectTransform);
-		//g2.drawRenderedImage(image, (int) position.x, (int) position.y, (int) Size.x, (int) Size.y, null);
 	}
 	
 	public void setImage() {

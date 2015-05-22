@@ -46,6 +46,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public boolean running = false;
 	public boolean info = false;
 	public boolean fullscreen = false;
+	public boolean paused = false;
+	public int[] secret = new int[] { 38, 38, 40, 40, 37, 39, 37, 39 };
+	public int currentSecret = 0;
+	public boolean wub = false;
 	
 	public Window window;
 	
@@ -86,7 +90,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Manager(Window window) {
 		this.window = window;
 		
-		canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_RGB);
+		canvas = new BufferedImage((int) defaultScreen.x, (int) defaultScreen.y, BufferedImage.TYPE_INT_RGB);
 		
 		setBackground(Color.BLACK);
 		
@@ -120,9 +124,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		add(projectileContainer);
 		add(floorContainer);
 		playerContainer.add(player);
-		playerContainer.add(new Enemy(new Vector2(100, 500)));
-		playerContainer.add(new Enemy(new Vector2(400, 100)));
-		playerContainer.add(new Enemy(new Vector2(700, 600)));
+		playerContainer.add(new Enemy(new Vector2(0, 0)));
 		
 		ui = new UserInterface();
 		uiContainer.add(ui);
@@ -162,36 +164,40 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
 		
 		//supar rotut
-		/*at.translate(canvas.getWidth()/2, canvas.getHeight()/2);
-		at.rotate(angle*Math.PI/180);
-		at.translate(-canvas.getWidth()/2, -canvas.getHeight()/2);
-		angle += 1;*/
-		
-		//player.rotation -= 1;
+		if (wub) {
+			at.translate(canvas.getWidth()/2, canvas.getHeight()/2);
+			at.rotate(angle*Math.PI/180);
+			at.translate(-canvas.getWidth()/2, -canvas.getHeight()/2);
+			angle += 1;
+		}
 		
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawRenderedImage(canvas, at);
+		g2.setColor(Color.WHITE);
+		g2.drawString("dont press up, up, down, down, left, right, left, right", 0, 10);
 		
 		//supar seizur
-		/*if (currentTween.equals("r")) {
-			cr += 5*tween;
-			if ((tween == 1 && cr >= 255) || (tween == -1 && cr <= 0)) {
-				currentTween = "g";
+		if (wub) {
+			if (currentTween.equals("r")) {
+				cr += 5*tween;
+				if ((tween == 1 && cr >= 255) || (tween == -1 && cr <= 0)) {
+					currentTween = "g";
+				}
+			} else if (currentTween.equals("g")) {
+				cg += 5*tween;
+				if ((tween == 1 && cg >= 255) || (tween == -1 && cg <= 0)) {
+					currentTween = "b";
+				}
+			} else if (currentTween.equals("b")) {
+				cb += 5*tween;
+				if ((tween == 1 && cb >= 255) || (tween == -1 && cb <= 0)) {
+					tween = -tween;
+					currentTween = "r";
+				}
 			}
-		} else if (currentTween.equals("g")) {
-			cg += 5*tween;
-			if ((tween == 1 && cg >= 255) || (tween == -1 && cg <= 0)) {
-				currentTween = "b";
-			}
-		} else if (currentTween.equals("b")) {
-			cb += 5*tween;
-			if ((tween == 1 && cb >= 255) || (tween == -1 && cb <= 0)) {
-				tween = -tween;
-				currentTween = "r";
-			}
+			g2.setColor(new Color(cr, cg, cb, 150));
+			g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
 		}
-		g2.setColor(new Color(cr, cg, cb, 150));
-		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);*/
 		
 		//info display
 		ui.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
@@ -225,6 +231,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 						}
 					}
 					
+					if (object instanceof Player) {
+						Player plr = (Player) object;
+						if (plr.health <= 0) {
+							playerContainer.remove(plr);
+						}
+					}
+					
 					if (displayEnemyMovements) {
 						if (object instanceof Enemy) {
 							Enemy enemy = (Enemy) object;
@@ -252,7 +265,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					direction = new Vector2(0, 1);
 					break;
 			}
-			player.attack(direction);
+			
+			if (!paused) {
+				player.attack(direction);
+			}
 		}
 		
 		repaint();
@@ -263,6 +279,17 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public void keyPressed(KeyEvent e) {
 		int code = e.getKeyCode();
 		lastKeyPress = code;
+		
+		if (secret[currentSecret] == code) {
+			currentSecret++;
+			if (currentSecret == secret.length) {
+				currentSecret = 0;
+				wub = !wub;
+				angle = 0;
+			}
+		} else {
+			currentSecret = 0;
+		}
 		
 		if (!keyPress[code]) {
 			switch (code) {
@@ -302,7 +329,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			case 69:
 				player.ability2();
 				break;
-			
+				
 			//toggle info
 			case 67:
 				ui.display = !ui.display;
@@ -321,12 +348,15 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					window.setFullscreen();
 				}
 				break;
-				
-			case 45:
-				fixedFps -= 20;
-				break;
-			case 61:
-				fixedFps += 20;
+			
+			//pause
+			case 80:
+				if (paused) {
+					fixedFps = 60;
+				} else {
+					fixedFps = 0;
+				}
+				paused = !paused;
 				break;
 		}
 		

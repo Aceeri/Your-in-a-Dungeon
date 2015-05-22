@@ -6,12 +6,16 @@ import main.object.Projectile;
 
 @SuppressWarnings("serial")
 public class Battlemage extends Player {
+	
+	private boolean timeSlowed = false;
+	private double timeExpiration = 0;
 
 	public Battlemage(Vector2 position) {
 		super(position);
 		
 		health = 15;
-		speed = 5; //don't fucking go over 8
+		maxHealth = 15;
+		speed = 10; //don't fucking go over 8
 		damage = 5;
 		range = 800;
 		attackspeed = 500;
@@ -19,6 +23,17 @@ public class Battlemage extends Player {
 		
 		ability1speed = 5000;
 		ability2speed = 5000;
+	}
+	
+	public void step(double delta) {
+		super.step(delta);
+		if (timeSlowed) {
+			timeExpiration -= delta*1000;
+			if (timeExpiration <= 0) {
+				manager.fixedFps += 30;
+				timeSlowed = false;
+			}
+		}
 	}
 	
 	//ability overrides
@@ -36,8 +51,10 @@ public class Battlemage extends Player {
 	
 	public void ability2() {
 		if (ability2 <= 0) {
-			//blink (shortrange teleport)
-			offsetPosition = offsetPosition.add(velocity.scalar(150));
+			//TIME POTATO
+			timeSlowed = true;
+			timeExpiration = 4000;
+			manager.fixedFps -= 30;
 			
 			ability2 += ability2speed;
 		}
