@@ -26,8 +26,8 @@ public class Player extends main.object.Object {
 	
 	public Player(Vector2 position) {
 		super(position);
+		Size = new Vector2(50, 30);
 		
-		Size = new Vector2(60, 60);
 		collidable = true;
 		anchored = false;
 		
@@ -36,20 +36,10 @@ public class Player extends main.object.Object {
 		
 		speed = 3;
 		type = "player";
-		path = "resources/image/player.png";
+		path = "resources/image/test.png";
 		
 		setImage();
 		System.out.println(toString());
-	}
-	
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		
-		Graphics c = manager.canvas.getGraphics();
-		c.setColor(Color.GRAY);
-		c.fillRect((int) position.x, (int) position.y - 10, (int) Size.x, 5);
-		c.setColor(Color.GREEN);
-		c.fillRect((int) position.x, (int) position.y - 10, (int) (Size.x * health/maxHealth), 5);
 	}
 	
 	public void step(double delta) {

@@ -14,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		window = new Window();
 		manager = new Manager(window);
-		window.setManager(manager);
+		window.manager = manager;
 		
 		window.setWindowed(screen);
 	}

@@ -12,12 +12,6 @@ import main.object.Projectile;
 import main.ui.UserInterface;
 
 
-
-
-
-
-
-
 //default java imports
 import javax.swing.*;
 
@@ -35,8 +29,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.swing.Timer;
 
@@ -85,12 +86,19 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int cb = 0;
 	public int angle = 0;
 	
-	public Music backgroundMusic = new Music("resources/sound/Again_and_Again.wav");
+	public Music backgroundMusic = new Music("resources\\sound\\Again_and_Again.wav");
+	public Font font;
 	
 	public Manager(Window window) {
 		this.window = window;
 		
 		canvas = new BufferedImage((int) defaultScreen.x, (int) defaultScreen.y, BufferedImage.TYPE_INT_RGB);
+		try {
+			InputStream myStream = new BufferedInputStream(new FileInputStream("resources\\pixelfont.ttf"));
+			font = Font.createFont(Font.TRUETYPE_FONT, myStream).deriveFont(24f);
+		} catch (IOException | FontFormatException e) {
+			e.printStackTrace();
+		}
 		
 		setBackground(Color.BLACK);
 		
@@ -119,12 +127,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		//add containers to JPanel
 		add(uiContainer);
-		add(wallContainer);
 		add(playerContainer);
+		add(wallContainer);
 		add(projectileContainer);
 		add(floorContainer);
 		playerContainer.add(player);
-		playerContainer.add(new Enemy(new Vector2(0, 0)));
+		playerContainer.add(new Enemy(new Vector2(50, 50)));
 		
 		ui = new UserInterface();
 		uiContainer.add(ui);
@@ -173,8 +181,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawRenderedImage(canvas, at);
-		g2.setColor(Color.WHITE);
-		g2.drawString("dont press up, up, down, down, left, right, left, right", 0, 10);
 		
 		//supar seizur
 		if (wub) {
@@ -215,6 +221,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		ui.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
 		
+		ArrayList<Player> characters = new ArrayList<Player>();
+		
 		for (int i = 0; i < getComponentCount(); i++) {	
 			if (getComponent(i) instanceof Container) {
 				Container container = (Container) getComponent(i);
@@ -224,6 +232,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				for (int j = 0; j < container.getComponentCount(); j++) {
 					Object object = (Object) container.getComponent(j);
 					object.step(delta);
+					
+					
 					if (object instanceof Projectile) {
 						Projectile projectile = (Projectile) object;
 						if (projectile.expired()) {
@@ -233,6 +243,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					
 					if (object instanceof Player) {
 						Player plr = (Player) object;
+						characters.add(plr);
 						if (plr.health <= 0) {
 							playerContainer.remove(plr);
 						}
@@ -246,6 +257,20 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					}
 				}
 			}
+		}
+		
+		// Sort character list according to y position to assign z order
+		for (int i = 0; i + 1 < characters.size(); i++) {
+			if (characters.get(i).position.y < characters.get(i + 1).position.y) {
+				Player temp = characters.get(i);
+				characters.set(i, characters.get(i + 1));
+				characters.set(i + 1, temp);
+				i = 0;
+			}
+		}
+		
+		for (int i = 0; i < characters.size(); i++) {
+			playerContainer.setComponentZOrder(characters.get(i), i);
 		}
 		
 		int code = (keyPress[37] ? 37 : keyPress[38] ? 38 : keyPress[39] ? 39 : keyPress[40] ? 40 : 0);

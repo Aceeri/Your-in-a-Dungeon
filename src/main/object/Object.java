@@ -16,35 +16,25 @@ import javax.swing.JComponent;
 @SuppressWarnings("serial")
 public class Object extends JComponent {
 	
-	public Vector2 scalePosition = new Vector2(0, 0);
+	public Vector2 scalePosition = new Vector2(0, 0); // Dependent on screen size (e.g. (1, 0) will be displayed at the right of the screen)
 	public Vector2 offsetPosition = new Vector2(0, 0);
-	public Vector2 position = new Vector2(0, 0);
-	public Vector2 offset;
-	public Vector2 velocity;
-	public Vector2 Size;
+	public Vector2 position = new Vector2(0, 0); // Totaled position of scale and offset
+	public Vector2 Size = new Vector2(0, 0);
+	public Vector2 velocity = new Vector2(0, 0); // How much the object moves every 1 delta
 	
-	public double rotation = 0; // rotation (in degrees)
-	
+	public double rotation = 0; // Displayed rotation (in degrees)
 	public double speed = 0;
 	public String type = "object";
 	
-	public Manager manager;
-	
 	public boolean collidable = false;
 	public boolean anchored = false;
-	public boolean nodes = false;
 	
-	protected String path = "resources/image/missing.png";
+	public Manager manager;
+	protected String path = "resources\\image\\missing.png";
 	protected BufferedImage image;
 	
-	public int callCount = 0;
-	
-	public Object(Vector2 position) {
-		offsetPosition = position;
-		offset = new Vector2(0, 0);
-		velocity = new Vector2(0, 0);
-		
-		Size = new Vector2(0, 0);
+	public Object(Vector2 p) {
+		offsetPosition = p;
 		
 		paintLocation();
 	}
@@ -54,8 +44,7 @@ public class Object extends JComponent {
 		
 		//positioning and size
 		AffineTransform objectTransform = new AffineTransform();
-		objectTransform.translate(position.x, position.y);
-		objectTransform.scale(Size.x/image.getWidth(), Size.y/image.getHeight());
+		objectTransform.translate(position.x, position.y - (image.getHeight() - Size.y));
 		
 		//rotation
 		objectTransform.translate(image.getWidth()/2, image.getHeight()/2);
