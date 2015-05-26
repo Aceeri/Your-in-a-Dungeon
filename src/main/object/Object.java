@@ -35,6 +35,7 @@ public class Object extends JComponent {
 	
 	public boolean collidable = false;
 	public boolean anchored = false;
+	public boolean stretch = false;
 	
 	public Manager manager;
 	protected String path = "resources\\image\\missing.png";
@@ -54,16 +55,18 @@ public class Object extends JComponent {
 		
 		double posX = position.x;
 		double posY = position.y;
-		if (imageX == "center") {
-			posX = position.x + (Size.x - image.getWidth()*scale)/2;
-		} else if (imageX == "right") {
-			posX = position.x + Size.x - image.getWidth()*scale;
-		}
-		
-		if (imageY == "center") {
-			posY = position.y + (Size.y - image.getHeight()*scale)/2;
-		} else if (imageY == "bottom") {
-			posY = position.y + Size.y - image.getHeight()*scale;
+		if (!stretch) {
+			if (imageX == "center") {
+				posX = position.x + (Size.x - image.getWidth()*scale)/2;
+			} else if (imageX == "right") {
+				posX = position.x + Size.x - image.getWidth()*scale;
+			}
+			
+			if (imageY == "center") {
+				posY = position.y + (Size.y - image.getHeight()*scale)/2;
+			} else if (imageY == "bottom") {
+				posY = position.y + Size.y - image.getHeight()*scale;
+			}
 		}
 		objectTransform.translate(posX, posY);
 		
@@ -73,14 +76,25 @@ public class Object extends JComponent {
 		objectTransform.rotate(rotation*Math.PI/180);
 		objectTransform.translate(-image.getWidth()*scale/2, -image.getHeight()*scale/2);
 		
+		if (stretch) {
+			objectTransform.scale(Size.x/image.getWidth(), Size.y/image.getHeight());
+		}
+		
 		g2.setColor(Color.BLUE);
 		g2.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
+		
 		g2.drawRenderedImage(image, objectTransform);
 	}
 	
 	public void setImage() {
 		try {
-			image = ImageIO.read(new File(path));
+			File file = new File(path);
+			if (file.exists()) {
+				image = ImageIO.read(file);
+			} else {
+				image = ImageIO.read(new File("resources\\image\\missing.png"));
+				stretch = true;
+			}
 		} catch (java.io.IOException e) { }
 	}
 	

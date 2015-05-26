@@ -85,15 +85,18 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int cg = 0;
 	public int cb = 0;
 	public int angle = 0;
-	public double currentScale = 1;
+	public int counter = 0;
 	
 	public Music backgroundMusic = new Music("resources\\sound\\Again_and_Again.wav");
+	public Background bg;
 	public Font font;
 	
 	public Manager(Window window) {
 		this.window = window;
 		
 		canvas = new BufferedImage((int) defaultScreen.x, (int) defaultScreen.y, BufferedImage.TYPE_INT_RGB);
+		
+		// create default font
 		try {
 			InputStream myStream = new BufferedInputStream(new FileInputStream("resources\\pixelfont.ttf"));
 			font = Font.createFont(Font.TRUETYPE_FONT, myStream).deriveFont(24f);
@@ -121,9 +124,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
-		//backgroundMusic.play();
+		backgroundMusic.play();
 		
-		Background bg = new Background(screen);
+		bg = new Background(defaultScreen);
 		floorContainer.add(bg);
 		
 		//add containers to JPanel
@@ -133,7 +136,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		add(projectileContainer);
 		add(floorContainer);
 		playerContainer.add(player);
-		playerContainer.add(new Enemy(new Vector2(50, 50)));
+		playerContainer.add(new Enemy(new Vector2(100, 100)));
 		
 		ui = new UserInterface();
 		uiContainer.add(ui);
@@ -168,14 +171,17 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void paintComponent(Graphics g) throws java.lang.ArithmeticException {
-		
 		super.paintComponent(g);
+		
+		counter++;
+		if (counter % 100 == 0) {
+			floorContainer.remove(bg);
+			bg = new Background(defaultScreen);
+			floorContainer.add(bg);
+		}
 		
 		AffineTransform at = new AffineTransform();
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
-		
-		player.scale = currentScale += .001;
-		//System.out.println(player.scale);
 		
 		//supar rotut
 		if (wub) {
