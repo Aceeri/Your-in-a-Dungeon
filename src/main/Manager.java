@@ -85,6 +85,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int cg = 0;
 	public int cb = 0;
 	public int angle = 0;
+	public double currentScale = 1;
 	
 	public Music backgroundMusic = new Music("resources\\sound\\Again_and_Again.wav");
 	public Font font;
@@ -167,9 +168,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void paintComponent(Graphics g) throws java.lang.ArithmeticException {
+		
 		super.paintComponent(g);
+		
 		AffineTransform at = new AffineTransform();
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
+		
+		player.scale = currentScale += .001;
+		//System.out.println(player.scale);
 		
 		//supar rotut
 		if (wub) {

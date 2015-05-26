@@ -1,8 +1,5 @@
 package main.character;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
 import main.misc.Vector2;
 import main.object.Projectile;
 
@@ -11,11 +8,11 @@ public class Player extends main.object.Object {
 	
 	public double health = 10;
 	public double maxHealth = 10;
-	public double damage = 3; //damage normal attack does
-	public double range = 500; //range in pixels
-	public double attackspeed = 1000; //how long before next attack is ready (milliseconds)
-	public double projectilespeed = 10; //how fast the projectiles move
-	public double ability1speed = 3000; //time before abilities are ready (milliseconds);
+	public double damage = 3; // damage normal attack does
+	public double range = 500; // range in pixels
+	public double attackspeed = 1000; // how long before next attack is ready (milliseconds)
+	public double projectilespeed = 10; // how fast the projectiles move
+	public double ability1speed = 3000; // time before abilities are ready (milliseconds);
 	public double ability2speed = 3000;
 	
 	public String name = "hooman";
@@ -26,10 +23,12 @@ public class Player extends main.object.Object {
 	
 	public Player(Vector2 position) {
 		super(position);
-		Size = new Vector2(50, 30);
+		Size = new Vector2(50, 50);
 		
 		collidable = true;
 		anchored = false;
+		imageX = "center";
+		imageY = "bottom";
 		
 		setSize(this.Size.dimension());
 		setLocation(0, 0);

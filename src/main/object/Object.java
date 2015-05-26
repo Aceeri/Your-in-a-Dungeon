@@ -3,6 +3,7 @@ package main.object;
 import main.misc.Vector2;
 import main.Manager;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,14 +17,20 @@ import javax.swing.JComponent;
 @SuppressWarnings("serial")
 public class Object extends JComponent {
 	
-	public Vector2 scalePosition = new Vector2(0, 0); // Dependent on screen size (e.g. (1, 0) will be displayed at the right of the screen)
+	public Vector2 scalePosition = new Vector2(0, 0); // dependent on screen size (e.g. (1, 0) will be displayed at the right of the screen)
 	public Vector2 offsetPosition = new Vector2(0, 0);
-	public Vector2 position = new Vector2(0, 0); // Totaled position of scale and offset
+	public Vector2 position = new Vector2(0, 0); // totaled position of scale and offset
 	public Vector2 Size = new Vector2(0, 0);
-	public Vector2 velocity = new Vector2(0, 0); // How much the object moves every 1 delta
+	public Vector2 velocity = new Vector2(0, 0); // how much the object moves every 1 delta
 	
-	public double rotation = 0; // Displayed rotation (in degrees)
+	public double rotation = 0; // displayed rotation (in degrees)
 	public double speed = 0;
+	public double scale = 1; // scale of object's image
+	
+	// where the image is drawn from
+	public String imageX = "left"; // "left", "right", "center"
+	public String imageY = "top"; // "top", "bottom", "center"
+	
 	public String type = "object";
 	
 	public boolean collidable = false;
@@ -44,13 +51,30 @@ public class Object extends JComponent {
 		
 		//positioning and size
 		AffineTransform objectTransform = new AffineTransform();
-		objectTransform.translate(position.x, position.y - (image.getHeight() - Size.y));
+		
+		double posX = position.x;
+		double posY = position.y;
+		if (imageX == "center") {
+			posX = position.x + (Size.x - image.getWidth()*scale)/2;
+		} else if (imageX == "right") {
+			posX = position.x + Size.x - image.getWidth()*scale;
+		}
+		
+		if (imageY == "center") {
+			posY = position.y + (Size.y - image.getHeight()*scale)/2;
+		} else if (imageY == "bottom") {
+			posY = position.y + Size.y - image.getHeight()*scale;
+		}
+		objectTransform.translate(posX, posY);
 		
 		//rotation
-		objectTransform.translate(image.getWidth()/2, image.getHeight()/2);
+		objectTransform.scale(scale, scale);
+		objectTransform.translate(image.getWidth()*scale/2, image.getHeight()*scale/2);
 		objectTransform.rotate(rotation*Math.PI/180);
-		objectTransform.translate(-image.getWidth()/2, -image.getHeight()/2);
+		objectTransform.translate(-image.getWidth()*scale/2, -image.getHeight()*scale/2);
 		
+		g2.setColor(Color.BLUE);
+		g2.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
 		g2.drawRenderedImage(image, objectTransform);
 	}
 	
