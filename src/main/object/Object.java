@@ -36,6 +36,8 @@ public class Object extends JComponent {
 	public boolean collidable = false;
 	public boolean anchored = false;
 	public boolean stretch = false;
+	public boolean tile = false;
+	public Vector2 tileSize;
 	
 	public Manager manager;
 	protected String path = "resources\\image\\missing.png";
@@ -43,7 +45,6 @@ public class Object extends JComponent {
 	
 	public Object(Vector2 p) {
 		offsetPosition = p;
-		
 		paintLocation();
 	}
 	

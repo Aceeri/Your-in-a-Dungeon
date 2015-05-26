@@ -87,8 +87,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int angle = 0;
 	public int counter = 0;
 	
-	public Music backgroundMusic = new Music("resources\\sound\\Again_and_Again.wav");
+	public Music backgroundMusic = new Music("resources\\sound\\Garrison.wav");
 	public Background bg;
+	public Wall w1;
 	public Font font;
 	
 	public Manager(Window window) {
@@ -150,14 +151,15 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "projectiles" });
 		
 		//create walls
-		testback t1 = new testback(new Vector2(200, 200), new Vector2(50, 500));
-		wallContainer.add(t1);
+		w1 = new Wall(new Vector2(125, 0), new Vector2(700, 200));
+		wallContainer.add(w1);
 		
-		t1 = new testback(new Vector2(200, 200), new Vector2(500, 50));
-		wallContainer.add(t1);
+		w1 = new Wall(new Vector2(1095, 0), new Vector2(700, 200));
+		wallContainer.add(w1);
 		
-		t1 = new testback(new Vector2(300, 300), new Vector2(50, 800));
-		wallContainer.add(t1);
+		//w1 = new Wall(new Vector2(0, 175), new Vector2(175, 525));
+		//w1.rotation = -90;
+		//wallContainer.add(w1);
 		
 		addKeyListener(this);
 		addMouseListener(this);
@@ -172,13 +174,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public void paintComponent(Graphics g) throws java.lang.ArithmeticException {
 		super.paintComponent(g);
-		
-		counter++;
-		if (counter % 100 == 0) {
-			floorContainer.remove(bg);
-			bg = new Background(defaultScreen);
-			floorContainer.add(bg);
-		}
 		
 		AffineTransform at = new AffineTransform();
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
