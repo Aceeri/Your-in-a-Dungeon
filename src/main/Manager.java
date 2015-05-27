@@ -190,6 +190,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		Wall corner = new Wall("corner", new Vector2());
 		wallContainer.add(corner);
 		
+		corner = new Wall("corner", new Vector2(0, 880));
+		corner.rotation = 270;
+		wallContainer.add(corner);
+		
+		corner = new Wall("corner", new Vector2(1720, 880));
+		corner.rotation = 180;
+		wallContainer.add(corner);
+		
 		addKeyListener(this);
 		addMouseListener(this);
 		addComponentListener(this);
