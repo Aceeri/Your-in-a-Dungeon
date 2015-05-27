@@ -20,6 +20,8 @@ public class Object extends JComponent {
 	public Vector2 scalePosition = new Vector2(0, 0); // dependent on screen size (e.g. (1, 0) will be displayed at the right of the screen)
 	public Vector2 offsetPosition = new Vector2(0, 0);
 	public Vector2 position = new Vector2(0, 0); // totaled position of scale and offset
+	public Vector2 scaleSize = new Vector2(0, 0);
+	public Vector2 offsetSize = new Vector2(0, 0);
 	public Vector2 Size = new Vector2(0, 0);
 	public Vector2 velocity = new Vector2(0, 0); // how much the object moves every 1 delta
 	
@@ -28,8 +30,8 @@ public class Object extends JComponent {
 	public double scale = 1; // scale of object's image
 	
 	// where the image is drawn from
-	public String imageX = "left"; // "left", "right", "center"
-	public String imageY = "top"; // "top", "bottom", "center"
+	public String imageX; // "left", "right", "center"
+	public String imageY; // "top", "bottom", "center"
 	
 	public String type = "object";
 	
@@ -54,6 +56,8 @@ public class Object extends JComponent {
 		//positioning and size
 		AffineTransform objectTransform = new AffineTransform();
 		
+		
+		
 		double posX = position.x;
 		double posY = position.y;
 		if (!stretch) {
@@ -73,16 +77,15 @@ public class Object extends JComponent {
 		
 		//rotation
 		objectTransform.scale(scale, scale);
-		objectTransform.translate(image.getWidth()*scale/2, image.getHeight()*scale/2);
+		
+		objectTransform.translate(Size.x*scale/2, Size.y*scale/2);
 		objectTransform.rotate(rotation*Math.PI/180);
-		objectTransform.translate(-image.getWidth()*scale/2, -image.getHeight()*scale/2);
+		objectTransform.translate(-Size.x*scale/2, -Size.y*scale/2);
+		
 		
 		if (stretch) {
 			objectTransform.scale(Size.x/image.getWidth(), Size.y/image.getHeight());
 		}
-		
-		g2.setColor(Color.BLUE);
-		g2.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
 		
 		g2.drawRenderedImage(image, objectTransform);
 	}
@@ -177,9 +180,15 @@ public class Object extends JComponent {
 								}
 							}
 							
-							if (!ignore && object.inside(position.add(velocity.scalar(speed*delta*manager.fixedFps)), Size)) {
+							if (!ignore && object.inside(position.add(velocity.scalar(speed)), Size)) {
 								Vector2 normal = object.side(position, Size);
-								totalCollision = totalCollision.sub(normal);
+								if (normal.x != 0) {
+									totalCollision.x = -normal.x;
+								}
+								
+								if (normal.y != 0) {
+									totalCollision.y = -normal.y;
+								}
 							}
 						}
 					}
@@ -194,20 +203,22 @@ public class Object extends JComponent {
 	public void step(double delta) {
 		paintLocation();
 		
-		if (!anchored && collidable) {
+		if (!anchored) {
 			offsetPosition = offsetPosition.add(velocity.add(checkCollision(delta)).scalar(speed*delta*manager.fixedFps));
 		}
 		
-		updatePosition();
+		update();
 	}
 	
-	public void updatePosition() {
+	public void update() {
 		try {
-			position = scalePosition.mult(manager.defaultScreen).add(offsetPosition).round();
+			Size = scaleSize.mult(manager.screen).add(offsetSize.mult(manager.ratio)).round();
+			position = scalePosition.mult(manager.screen).add(offsetPosition.mult(manager.ratio)).round();
 		} catch (java.lang.NullPointerException e) {
 			System.out.println("missing manager: " + this);
 			manager = (Manager) getParent().getParent();
-			position = scalePosition.mult(manager.defaultScreen).add(offsetPosition).round();
+			Size = scaleSize.mult(manager.screen).add(offsetSize.mult(manager.ratio)).round();
+			position = scalePosition.mult(manager.screen).add(offsetPosition.mult(manager.ratio)).round();
 		}
 	}
 	

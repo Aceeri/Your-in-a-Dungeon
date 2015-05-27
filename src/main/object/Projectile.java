@@ -18,24 +18,20 @@ public class Projectile extends Object {
 	public Color color = Color.ORANGE;
 	
 	public Projectile(Player parent, Vector2 direction, double damage, double range, double speed) {
-		super(parent.position.add(parent.Size.scalar(.5)).sub(new Vector2(2.5, 2.5)));
+		super(parent.offsetPosition.add(parent.offsetSize.scalar(.5)).sub(new Vector2(2.5, 2.5)).add(direction.mult(parent.offsetSize)));
 		
-		this.Size = new Vector2(5, 5);
+		
+		this.offsetSize = new Vector2(5, 5);
 		this.parent = parent;
 		this.velocity = direction;
 		this.damage = damage;
 		this.expiration = range;
 		this.speed = speed;
 		
-		/*rotation = Math.tan(direction.y/direction.x)*180/Math.PI;
-		System.out.println(rotation + " " + direction.y/direction.x);*/
-		
 		anchored = false;
 		collidable = false;
 		
 		type = "projectile";
-		
-		//setImage();
 	}
 	
 	public boolean expired() {
@@ -62,7 +58,6 @@ public class Projectile extends Object {
 								if (object instanceof Player) {
 									Player plr = (Player) object;
 									plr.health -= damage;
-									System.out.println(plr.health);
 								}
 								
 								expiration = 0;
@@ -77,13 +72,13 @@ public class Projectile extends Object {
 	}
 	
 	public void step(double delta) {
-		updatePosition();
 		paintLocation();
 		expiration -= speed*delta*manager.fixedFps;
 		
 		checkCollision(new Object[] { parent }, delta);
 		
 		offsetPosition = offsetPosition.add(velocity.scalar(speed*delta*manager.fixedFps));
+		update();
 	}
 	
 	public void paintComponent(Graphics g) {

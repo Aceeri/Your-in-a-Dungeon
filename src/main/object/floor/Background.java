@@ -17,7 +17,7 @@ public class Background extends main.object.Object {
 	
 	public Background(Vector2 s) {
 		super(new Vector2());
-		Size = s;
+		offsetSize = s;
 		stretch = true;
 		
 		type = "floor";
@@ -30,12 +30,12 @@ public class Background extends main.object.Object {
 		setImage();
 	}
 	
-	public void paintComponent(Graphics g) {
+	/*public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) manager.canvas.getGraphics();
 		
 		AffineTransform objectTransform = new AffineTransform();
 		objectTransform.scale(Size.x/image.getWidth(), Size.y/image.getHeight());
 		
 		g2.drawRenderedImage(image, objectTransform);
-	}
+	}*/
 }

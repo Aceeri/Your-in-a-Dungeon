@@ -23,14 +23,14 @@ public class Player extends main.object.Object {
 	
 	public Player(Vector2 position) {
 		super(position);
-		Size = new Vector2(50, 50);
+		offsetSize = new Vector2(50, 50);
 		
 		collidable = true;
 		anchored = false;
 		imageX = "center";
 		imageY = "bottom";
 		
-		setSize(this.Size.dimension());
+		setSize(Size.dimension());
 		setLocation(0, 0);
 		
 		speed = 3;
@@ -38,7 +38,6 @@ public class Player extends main.object.Object {
 		path = "resources/image/test.png";
 		
 		setImage();
-		System.out.println(toString());
 	}
 	
 	public void step(double delta) {

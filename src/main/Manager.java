@@ -74,7 +74,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public boolean displayEnemyMovements = false;
 	
 	public Vector2 defaultScreen = new Vector2(1920, 1080);
-	public Vector2 screen = new Vector2(1920, 1080);
+	public Vector2 screen = defaultScreen;
 	public Vector2 ratio = new Vector2(1, 1);
 	
 	public BufferedImage canvas;
@@ -87,7 +87,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int angle = 0;
 	public int counter = 0;
 	
-	public Music backgroundMusic = new Music("resources\\sound\\Garrison.wav");
+	public Music backgroundMusic = new Music("resources\\sound\\Big Mine.wav");
 	public Background bg;
 	public Wall w1;
 	public Font font;
@@ -95,7 +95,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Manager(Window window) {
 		this.window = window;
 		
-		canvas = new BufferedImage((int) defaultScreen.x, (int) defaultScreen.y, BufferedImage.TYPE_INT_RGB);
+		canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_RGB);
 		
 		// create default font
 		try {
@@ -151,15 +151,44 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "projectiles" });
 		
 		//create walls
-		w1 = new Wall(new Vector2(125, 0), new Vector2(700, 200));
+		w1 = new Wall("top", new Vector2(200, 0));
 		wallContainer.add(w1);
 		
-		w1 = new Wall(new Vector2(1095, 0), new Vector2(700, 200));
+		w1 = new Wall("top", new Vector2(1060, 0));
 		wallContainer.add(w1);
 		
-		//w1 = new Wall(new Vector2(0, 175), new Vector2(175, 525));
-		//w1.rotation = -90;
-		//wallContainer.add(w1);
+		Door d1 = new Door("top", new Vector2(860, 0));
+		wallContainer.add(d1);
+		
+		w1 = new Wall("bottom", new Vector2(200, 880));
+		wallContainer.add(w1);
+		
+		w1 = new Wall("bottom", new Vector2(1060, 880));
+		wallContainer.add(w1);
+		
+		Door d2 = new Door("bottom", new Vector2(860, 880));
+		wallContainer.add(d2);
+		
+		w1 = new Wall("left", new Vector2(0, 200));
+		wallContainer.add(w1);
+		
+		w1 = new Wall("left", new Vector2(0, 640));
+		wallContainer.add(w1);
+		
+		Door d3 = new Door("left", new Vector2(0, 440));
+		wallContainer.add(d3);
+		
+		w1 = new Wall("right", new Vector2(1720, 200));
+		wallContainer.add(w1);
+		
+		w1 = new Wall("right", new Vector2(1720, 640));
+		wallContainer.add(w1);
+		
+		Door d4 = new Door("right", new Vector2(1720, 440));
+		wallContainer.add(d4);
+		
+		Wall corner = new Wall("corner", new Vector2());
+		wallContainer.add(corner);
 		
 		addKeyListener(this);
 		addMouseListener(this);
@@ -240,9 +269,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					Object object = (Object) container.getComponent(j);
 					object.step(delta);
 					
-					
 					if (object instanceof Projectile) {
 						Projectile projectile = (Projectile) object;
+						
 						if (projectile.expired()) {
 							container.remove(object);
 						}
@@ -250,9 +279,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					
 					if (object instanceof Player) {
 						Player plr = (Player) object;
-						characters.add(plr);
+						
 						if (plr.health <= 0) {
 							playerContainer.remove(plr);
+						} else {
+							characters.add(plr);
 						}
 					}
 					
@@ -375,7 +406,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			//toggle fullscreen
 			case 122:
 				if (window.fullscreen) {
-					window.setWindowed(screen);
+					window.setWindowed();
 				} else {
 					window.setFullscreen();
 				}
@@ -449,6 +480,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			Vector2 currentScreen = new Vector2(window.frame.getContentPane().getSize());
 			ratio = currentScreen.div(defaultScreen);
 			screen = screen.mult(ratio);
+			canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_RGB);
 		}
 	}
 

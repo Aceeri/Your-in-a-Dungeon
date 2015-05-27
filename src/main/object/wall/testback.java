@@ -11,7 +11,7 @@ public class testback extends Object {
 	
 	public testback(Vector2 position) {
 		super(position);
-		Size = new Vector2(30, 30);
+		offsetSize = new Vector2(30, 30);
 		
 		collidable = true;
 		anchored = true;
@@ -20,7 +20,7 @@ public class testback extends Object {
 	
 	public testback(Vector2 position, Vector2 size) {
 		super(position);
-		Size = new Vector2(size.x, size.y);
+		offsetSize = new Vector2(size.x, size.y);
 		
 		collidable = true;
 		anchored = true;

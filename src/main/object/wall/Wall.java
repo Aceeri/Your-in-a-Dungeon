@@ -4,13 +4,36 @@ import main.misc.Vector2;
 
 public class Wall extends main.object.Object {
 
-	public Wall(Vector2 position, Vector2 size) {
+	public Wall(String orientation, Vector2 position) {
 		super(position);
-		Size = size;
 		
 		collidable = true;
 		stretch = true;
-		path = "resources\\image\\topwall1.png";
+		
+		switch(orientation) {
+			case "top":
+				path = "resources\\image\\wall_top.png";
+				offsetSize = new Vector2(660, 200);
+				break;
+			case "bottom":
+				path = "resources\\image\\wall_top.png";
+				rotation = 180;
+				offsetSize = new Vector2(660, 200);
+				break;
+			case "left":
+				path = "resources\\image\\wall_left.png";
+				offsetSize = new Vector2(200, 240);
+				break;
+			case "right":
+				path = "resources\\image\\wall_left.png";
+				rotation = 180;
+				offsetSize = new Vector2(200, 240);
+				break;
+			case "corner":
+				path = "resources\\image\\wall_corner.png";
+				offsetSize = new Vector2(200, 200);
+				break;
+		}
 		
 		setImage();
 	}

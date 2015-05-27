@@ -36,9 +36,10 @@ public class Window {
 		}
 	}
 	
-	public void setWindowed(Vector2 screen) {
+	public void setWindowed() {
 		newFrame();
 		
+		Vector2 screen = new Vector2();
 		frame.setLocation(screen.scalar(.1).point());
 		frame.setSize(screen.scalar(.85).dimension());
 		frame.pack();
