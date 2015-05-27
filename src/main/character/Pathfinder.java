@@ -152,14 +152,15 @@ public class Pathfinder {
 	}
 	
 	public Node[][] createMap(Vector2 from, Vector2 to, double nodeSize) {
-		int endX = (int) (Math.round(to.x/nodeSize));
-		int endY = (int) (Math.round(to.y/nodeSize));
+		nodeSize = nodeSize*Math.max(manager.ratio.x, manager.ratio.y);
+		int endX = (int) (Math.round(to.x/(nodeSize)));
+		int endY = (int) (Math.round(to.y/(nodeSize)));
 		
 		Vector2 mapSize = new Vector2((int) Math.ceil(manager.defaultScreen.x/nodeSize), (int) Math.ceil(manager.defaultScreen.y/nodeSize));
 		Node[][] nodeMap = new Node[(int) mapSize.x][(int) mapSize.y];
 		
-		for (int i = 0; i < mapSize.x; i ++) {
-			for (int j = 0; j < mapSize.y; j ++) {
+		for (int i = 0; i < (int) mapSize.x; i ++) {
+			for (int j = 0; j < (int) mapSize.y; j ++) {
 				double h = Math.abs(endX - i) + Math.abs(endY - j);
 				nodeMap[i][j] = new Node(new Vector2(i*nodeSize, j*nodeSize), new Vector2(i, j), h);
 			}

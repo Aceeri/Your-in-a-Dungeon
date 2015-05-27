@@ -35,7 +35,7 @@ public class Player extends main.object.Object {
 		
 		speed = 3;
 		type = "player";
-		path = "resources/image/test.png";
+		path = "resources/image/player.png";
 		
 		setImage();
 	}

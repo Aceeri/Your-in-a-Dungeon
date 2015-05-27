@@ -9,7 +9,9 @@ import main.object.wall.*;
 import main.object.floor.*;
 import main.object.Object;
 import main.object.Projectile;
+import main.ui.Button;
 import main.ui.UserInterface;
+
 
 
 //default java imports
@@ -44,6 +46,7 @@ import javax.swing.Timer;
 @SuppressWarnings("serial")
 public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener, ContainerListener {
 	
+	public boolean menu = true;
 	public boolean running = false;
 	public boolean info = false;
 	public boolean fullscreen = false;
@@ -71,6 +74,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Player player;
 	public long lastFrame = System.nanoTime();
 	public double fixedFps = 60.0;
+	public double fpsCap = 500.0;
 	public boolean displayEnemyMovements = false;
 	
 	public Vector2 defaultScreen = new Vector2(1920, 1080);
@@ -105,8 +109,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			e.printStackTrace();
 		}
 		
-		setBackground(Color.BLACK);
-		
 		uiContainer = new Container();
 		playerContainer = new Container();
 		projectileContainer = new Container();
@@ -121,14 +123,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		pathfinder = new Pathfinder(this);
 		
-		player = new Battlemage(new Vector2(500, 500));
-		
 		backgroundMusic.loop = true;
 		backgroundMusic.setVolume(1);
 		backgroundMusic.play();
-		
-		bg = new Background(defaultScreen);
-		floorContainer.add(bg);
 		
 		//add containers to JPanel
 		add(uiContainer);
@@ -136,8 +133,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		add(wallContainer);
 		add(projectileContainer);
 		add(floorContainer);
-		playerContainer.add(player);
-		playerContainer.add(new Enemy(new Vector2(100, 100)));
 		
 		ui = new UserInterface();
 		uiContainer.add(ui);
@@ -150,60 +145,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.addString(new String[] { "characters" });
 		ui.addString(new String[] { "projectiles" });
 		
-		//create walls
-		w1 = new Wall("top", new Vector2(200, 0));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("top", new Vector2(1060, 0));
-		wallContainer.add(w1);
-		
-		Door d1 = new Door("top", new Vector2(860, 0));
-		wallContainer.add(d1);
-		
-		w1 = new Wall("bottom", new Vector2(200, 880));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("bottom", new Vector2(1060, 880));
-		wallContainer.add(w1);
-		
-		Door d2 = new Door("bottom", new Vector2(860, 880));
-		wallContainer.add(d2);
-		
-		w1 = new Wall("left", new Vector2(0, 200));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("left", new Vector2(0, 640));
-		wallContainer.add(w1);
-		
-		Door d3 = new Door("left", new Vector2(0, 440));
-		wallContainer.add(d3);
-		
-		w1 = new Wall("right", new Vector2(1720, 200));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("right", new Vector2(1720, 640));
-		wallContainer.add(w1);
-		
-		Door d4 = new Door("right", new Vector2(1720, 440));
-		wallContainer.add(d4);
-		
-		Wall corner = new Wall("corner", new Vector2());
-		wallContainer.add(corner);
-		
-		corner = new Wall("corner", new Vector2(0, 880));
-		corner.rotation = 270;
-		wallContainer.add(corner);
-		
-		corner = new Wall("corner", new Vector2(1720, 880));
-		corner.rotation = 180;
-		wallContainer.add(corner);
-		
 		addKeyListener(this);
 		addMouseListener(this);
 		addComponentListener(this);
 		setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         requestFocus();
+        
+        menu();
         
 		gameTimer = new Timer(0, this);
 		gameTimer.start();
@@ -257,92 +206,172 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		ui.updateString(new String[] { "projectiles", String.valueOf(projectileContainer.getComponentCount()) });
 	}
 	
+	public void menu() {
+		ArrayList<Object> menuObjects = new ArrayList<Object> ();
+		
+		Button startButton = new Button("resources\\image\\missing.png", new Vector2(0, 500), new Vector2(300, 20));
+		menuObjects.add(startButton);
+		
+		Background menuBack = new Background(defaultScreen, "resources\\image\\bluescreen.png");
+		menuObjects.add(menuBack);
+		
+		
+		
+		for (int i = 0; i < menuObjects.size(); i++) {
+			uiContainer.add(menuObjects.get(i));
+		}
+	}
+	
+	public void start() {
+		bg = new Background(defaultScreen);
+		floorContainer.add(bg);
+		
+		//create walls
+		w1 = new Wall("top", new Vector2(200, 0));
+		wallContainer.add(w1);
+		
+		w1 = new Wall("top", new Vector2(1060, 0));
+		wallContainer.add(w1);
+		
+		Door d1 = new Door("top", new Vector2(860, 0));
+		wallContainer.add(d1);
+		
+		w1 = new Wall("bottom", new Vector2(200, 880));
+		wallContainer.add(w1);
+		
+		w1 = new Wall("bottom", new Vector2(1060, 880));
+		wallContainer.add(w1);
+		
+		Door d2 = new Door("bottom", new Vector2(860, 880));
+		wallContainer.add(d2);
+		
+		w1 = new Wall("left", new Vector2(0, 200));
+		wallContainer.add(w1);
+		
+		w1 = new Wall("left", new Vector2(0, 640));
+		wallContainer.add(w1);
+		
+		Door d3 = new Door("left", new Vector2(0, 440));
+		wallContainer.add(d3);
+		
+		w1 = new Wall("right", new Vector2(1720, 200));
+		wallContainer.add(w1);
+		
+		w1 = new Wall("right", new Vector2(1720, 640));
+		wallContainer.add(w1);
+		
+		Door d4 = new Door("right", new Vector2(1720, 440));
+		wallContainer.add(d4);
+		
+		Wall corner = new Wall("corner", new Vector2());
+		wallContainer.add(corner);
+		
+		corner = new Wall("corner", new Vector2(1720, 880));
+		corner.rotation = 180;
+		wallContainer.add(corner);
+		
+		corner = new Wall("corner2", new Vector2(0, 880));
+		corner.rotation = 180;
+		wallContainer.add(corner);
+		
+		corner = new Wall("corner2", new Vector2(1720, 0));
+		wallContainer.add(corner);
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		long now = System.nanoTime();
 		double delta = ((System.nanoTime()) - lastFrame) / 1000000;
 		delta = delta/1000;
-		lastFrame = now;
 		
-		ui.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
+		boolean skip = false;
+		if (1/delta > fpsCap) {
+			skip = true;
+		}
 		
-		ArrayList<Player> characters = new ArrayList<Player>();
 		
-		for (int i = 0; i < getComponentCount(); i++) {	
-			if (getComponent(i) instanceof Container) {
-				Container container = (Container) getComponent(i);
-				container.setSize(screen.dimension());
-				container.setLocation(0, 0);
-				
-				for (int j = 0; j < container.getComponentCount(); j++) {
-					Object object = (Object) container.getComponent(j);
-					object.step(delta);
+		if (!skip) {
+			lastFrame = now;
+			ui.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
+			
+			ArrayList<Player> characters = new ArrayList<Player>();
+			
+			for (int i = 0; i < getComponentCount(); i++) {	
+				if (getComponent(i) instanceof Container) {
+					Container container = (Container) getComponent(i);
+					container.setSize(screen.dimension());
+					container.setLocation(0, 0);
 					
-					if (object instanceof Projectile) {
-						Projectile projectile = (Projectile) object;
+					for (int j = 0; j < container.getComponentCount(); j++) {
+						Object object = (Object) container.getComponent(j);
+						object.step(delta);
 						
-						if (projectile.expired()) {
-							container.remove(object);
+						if (object instanceof Projectile) {
+							Projectile projectile = (Projectile) object;
+							
+							if (projectile.expired()) {
+								container.remove(object);
+							}
 						}
-					}
-					
-					if (object instanceof Player) {
-						Player plr = (Player) object;
 						
-						if (plr.health <= 0) {
-							playerContainer.remove(plr);
-						} else {
-							characters.add(plr);
+						if (object instanceof Player) {
+							Player plr = (Player) object;
+							
+							if (plr.health <= 0) {
+								playerContainer.remove(plr);
+							} else {
+								characters.add(plr);
+							}
 						}
-					}
-					
-					if (displayEnemyMovements) {
-						if (object instanceof Enemy) {
-							Enemy enemy = (Enemy) object;
-							enemy.drawPath(canvas);
+						
+						if (displayEnemyMovements) {
+							if (object instanceof Enemy) {
+								Enemy enemy = (Enemy) object;
+								enemy.drawPath(canvas);
+							}
 						}
 					}
 				}
 			}
-		}
-		
-		// Sort character list according to y position to assign z order
-		for (int i = 0; i + 1 < characters.size(); i++) {
-			if (characters.get(i).position.y < characters.get(i + 1).position.y) {
-				Player temp = characters.get(i);
-				characters.set(i, characters.get(i + 1));
-				characters.set(i + 1, temp);
-				i = 0;
-			}
-		}
-		
-		for (int i = 0; i < characters.size(); i++) {
-			playerContainer.setComponentZOrder(characters.get(i), i);
-		}
-		
-		int code = (keyPress[37] ? 37 : keyPress[38] ? 38 : keyPress[39] ? 39 : keyPress[40] ? 40 : 0);
-		if (code != 0) {
-			Vector2 direction = new Vector2();
-			switch (code) {
-				case 37:
-					direction = new Vector2(-1, 0);
-					break;
-				case 38:
-					direction = new Vector2(0, -1);
-					break;
-				case 39:
-					direction = new Vector2(1, 0);
-					break;
-				case 40:
-					direction = new Vector2(0, 1);
-					break;
+			
+			// Sort character list according to y position to assign z order
+			for (int i = 0; i + 1 < characters.size(); i++) {
+				if (characters.get(i).position.y < characters.get(i + 1).position.y) {
+					Player temp = characters.get(i);
+					characters.set(i, characters.get(i + 1));
+					characters.set(i + 1, temp);
+					i = 0;
+				}
 			}
 			
-			if (!paused) {
-				player.attack(direction);
+			for (int i = 0; i < characters.size(); i++) {
+				playerContainer.setComponentZOrder(characters.get(i), i);
 			}
+			
+			int code = (keyPress[37] ? 37 : keyPress[38] ? 38 : keyPress[39] ? 39 : keyPress[40] ? 40 : 0);
+			if (code != 0) {
+				Vector2 direction = new Vector2();
+				switch (code) {
+					case 37:
+						direction = new Vector2(-1, 0);
+						break;
+					case 38:
+						direction = new Vector2(0, -1);
+						break;
+					case 39:
+						direction = new Vector2(1, 0);
+						break;
+					case 40:
+						direction = new Vector2(0, 1);
+						break;
+				}
+				
+				if (!paused && player != null) {
+					player.attack(direction);
+				}
+			}
+			
+			repaint();
 		}
-		
-		repaint();
 	}
 
 	
@@ -362,55 +391,70 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			currentSecret = 0;
 		}
 		
-		if (!keyPress[code]) {
-			switch (code) {
-				//movement
-				//	68 -> D
-				//	65 -> A
-				//  83 -> W
-				//	87 -> S
-				case 68:
-					player.velocity.x += 1;
+		if (running && player != null) {
+			if (!keyPress[code]) {
+				switch (code) {
+					//movement
+					//	68 -> D
+					//	65 -> A
+					//  83 -> W
+					//	87 -> S
+					case 68:
+						player.velocity.x += 1;
+						break;
+					case 65:
+						player.velocity.x -= 1;
+						break;
+					case 83:
+						player.velocity.y += 1;
+						break;
+					case 87:
+						player.velocity.y -= 1;
+						break;
+				}
+			}
+			
+			switch(code) {
+				//attacking
+				//	37 -> left
+				//	38 -> up
+				//	39 -> right
+				//	40 -> down
+					
+				//abilities
+				//	81 -> Q
+				//	69 -> E
+				case 81:
+					player.ability1();
 					break;
-				case 65:
-					player.velocity.x -= 1;
+				case 69:
+					player.ability2();
 					break;
-				case 83:
-					player.velocity.y += 1;
+				
+				//toggle pathfinding drawing
+				case 86:
+					displayEnemyMovements = !displayEnemyMovements;
 					break;
-				case 87:
-					player.velocity.y -= 1;
+				
+				//pause
+				case 80:
+					if (paused) {
+						fixedFps = 60;
+					} else {
+						fixedFps = 0;
+					}
+					paused = !paused;
 					break;
 			}
 		}
 		
+		//key presses (all)
 		switch(code) {
-			//attacking
-			//	37 -> left
-			//	38 -> up
-			//	39 -> right
-			//	40 -> down
-				
-			//abilities
-			//	81 -> Q
-			//	69 -> E
-			case 81:
-				player.ability1();
-				break;
-			case 69:
-				player.ability2();
-				break;
-				
 			//toggle info
 			case 67:
 				ui.display = !ui.display;
 				break;
 			
-			//toggle pathfinding drawing
-			case 86:
-				displayEnemyMovements = !displayEnemyMovements;
-				break;
-				
 			//toggle fullscreen
 			case 122:
 				if (window.fullscreen) {
@@ -419,16 +463,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					window.setFullscreen();
 				}
 				break;
-			
-			//pause
-			case 80:
-				if (paused) {
-					fixedFps = 60;
-				} else {
-					fixedFps = 0;
+				
+			//exits fullscreen
+			case 27:
+				if (window.fullscreen) {
+					window.setWindowed();
 				}
-				paused = !paused;
-				break;
 		}
 		
 		keyPress[e.getKeyCode()] = true;
@@ -437,7 +477,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	@Override
 	public void keyReleased(KeyEvent e) {
 		int code = e.getKeyCode();
-		if (keyPress[code]) {
+		if (player != null && keyPress[code]) {
 			switch (code) {
 				case 68:
 					player.velocity.x -= 1;

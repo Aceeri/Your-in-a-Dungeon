@@ -18,8 +18,7 @@ public class Projectile extends Object {
 	public Color color = Color.ORANGE;
 	
 	public Projectile(Player parent, Vector2 direction, double damage, double range, double speed) {
-		super(parent.offsetPosition.add(parent.offsetSize.scalar(.5)).sub(new Vector2(2.5, 2.5)).add(direction.mult(parent.offsetSize)));
-		
+		super(parent.offsetPosition.add(parent.offsetSize.scalar(.5)).add(direction.mult(parent.offsetSize)));
 		
 		this.offsetSize = new Vector2(5, 5);
 		this.parent = parent;
@@ -54,7 +53,8 @@ public class Projectile extends Object {
 								}
 							}
 							
-							if (!ignore && object.inside(position.add(velocity.scalar(speed*delta*manager.fixedFps)), Size)) {
+							if (object != parent && !ignore && object.inside(position.add(velocity.scalar(speed*delta*manager.fixedFps)), Size)) {
+								System.out.println(position + " " + object);
 								if (object instanceof Player) {
 									Player plr = (Player) object;
 									plr.health -= damage;
@@ -75,6 +75,7 @@ public class Projectile extends Object {
 		paintLocation();
 		expiration -= speed*delta*manager.fixedFps;
 		
+		update();
 		checkCollision(new Object[] { parent }, delta);
 		
 		offsetPosition = offsetPosition.add(velocity.scalar(speed*delta*manager.fixedFps));
@@ -84,6 +85,6 @@ public class Projectile extends Object {
 	public void paintComponent(Graphics g) {
 		Graphics c = manager.canvas.getGraphics();
 		c.setColor(color);
-		c.fillRect((int) position.x, (int) position.y, 5, 5);
+		c.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
 	}
 }

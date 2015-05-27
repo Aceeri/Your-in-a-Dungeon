@@ -30,6 +30,15 @@ public class Background extends main.object.Object {
 		setImage();
 	}
 	
+	public Background(Vector2 s, String path) {
+		super(new Vector2());
+		offsetSize = s;
+		stretch = true;
+		
+		this.path = path;
+		setImage();
+	}
+	
 	/*public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) manager.canvas.getGraphics();
 		

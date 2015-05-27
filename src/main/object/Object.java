@@ -1,6 +1,7 @@
 package main.object;
 
 import main.misc.Vector2;
+import main.ui.Button;
 import main.Manager;
 
 import java.awt.Color;
@@ -205,6 +206,10 @@ public class Object extends JComponent {
 		
 		if (!anchored) {
 			offsetPosition = offsetPosition.add(velocity.add(checkCollision(delta)).scalar(speed*delta*manager.fixedFps));
+		}
+		
+		if (this instanceof Button) {
+			System.out.println(this);
 		}
 		
 		update();

@@ -17,6 +17,10 @@ public class UserInterface extends main.object.Object {
 		super(new Vector2());
 	}
 	
+	public UserInterface(Vector2 p) {
+		super(p);
+	}
+	
 	public void addString(String[] info) {
 		displayString.add(info);
 	}

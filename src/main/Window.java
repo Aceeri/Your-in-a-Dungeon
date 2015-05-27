@@ -11,10 +11,11 @@ import main.misc.Vector2;
 public class Window {
 	
 	public boolean fullscreen = false;
+	public Vector2 minimumSize = new Vector2(400, 300);
 	public Manager manager;
 	public JFrame frame;
 	private JFrame holder;
-	private String icon = "resources\\image\\missing.png";
+	private String icon = "resources\\image\\dungen.png";
 	
 	public Window() {
 		super();
@@ -58,7 +59,7 @@ public class Window {
 		
 		frame = new JFrame();
 		frame.setTitle("You're in a Dungeon");
-		frame.setMinimumSize(new Vector2(400, 300).dimension());
+		frame.setMinimumSize(minimumSize.dimension());
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		

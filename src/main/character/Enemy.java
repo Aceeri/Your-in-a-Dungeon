@@ -19,17 +19,20 @@ public class Enemy extends Player {
 		super.step(delta);
 		
 		Player nearestPlayer = getNearestPlayer();
+		
 		if (nearestPlayer != null) {
-			if (!intersectsAnyWall(position.add(Size.scalar(1/2)), nearestPlayer.position.add(nearestPlayer.Size.scalar(1/2)))) {
+			nearestPlayer.update();
+			update();
+			/*if (!intersectsAnyWall(position.add(Size.scalar(1/2)), nearestPlayer.position.add(nearestPlayer.Size.scalar(1/2)))) {
 				path = new Node[] { };
 				velocity = nearestPlayer.position.sub(position).normalize();
-			} else {
+			} else {*/
 				path = manager.pathfinder.route(position.add(Size.scalar(1/2)), nearestPlayer.position.add(nearestPlayer.Size.scalar(1/2)), 30);
 				
 				if (path.length > 0) {
 					velocity = path[1].position.sub(position).normalize();
 				}
-			}
+			//}
 		}
 	}
 	

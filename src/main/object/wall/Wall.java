@@ -33,6 +33,10 @@ public class Wall extends main.object.Object {
 				path = "resources\\image\\wall_corner.png";
 				offsetSize = new Vector2(200, 200);
 				break;
+			case "corner2":
+				path = "resources\\image\\wall_corner2.png";
+				offsetSize = new Vector2(200, 200);
+				break;
 		}
 		
 		setImage();
