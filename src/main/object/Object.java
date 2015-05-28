@@ -9,6 +9,7 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -39,11 +40,10 @@ public class Object extends JComponent {
 	public boolean collidable = false;
 	public boolean anchored = false;
 	public boolean stretch = false;
-	public boolean tile = false;
-	public Vector2 tileSize;
 	
 	public Manager manager;
 	protected String path = "resources\\image\\missing.png";
+	protected String previousPath = path;
 	protected BufferedImage image;
 	
 	public Object(Vector2 p) {
@@ -57,7 +57,23 @@ public class Object extends JComponent {
 		//positioning and size
 		AffineTransform objectTransform = new AffineTransform();
 		
-		
+		if (previousPath != path) {
+			if (manager.images.containsKey("resources\\image\\missing.png")) {
+				image = manager.images.get("resources\\image\\missing.png");
+			} else {
+				try {
+					File file = new File(path);
+					if (file.exists()) {
+						image = ImageIO.read(file);
+						manager.images.put(path, image);
+					} else {
+						image = ImageIO.read(new File("resources\\image\\missing.png"));
+						stretch = true;
+					}
+					previousPath = path;
+				} catch (java.io.IOException e) { }
+			}
+		}
 		
 		double posX = position.x;
 		double posY = position.y;
@@ -83,24 +99,11 @@ public class Object extends JComponent {
 		objectTransform.rotate(rotation*Math.PI/180);
 		objectTransform.translate(-Size.x*scale/2, -Size.y*scale/2);
 		
-		
 		if (stretch) {
 			objectTransform.scale(Size.x/image.getWidth(), Size.y/image.getHeight());
 		}
 		
 		g2.drawRenderedImage(image, objectTransform);
-	}
-	
-	public void setImage() {
-		try {
-			File file = new File(path);
-			if (file.exists()) {
-				image = ImageIO.read(file);
-			} else {
-				image = ImageIO.read(new File("resources\\image\\missing.png"));
-				stretch = true;
-			}
-		} catch (java.io.IOException e) { }
 	}
 	
 	public void paintLocation() {
@@ -206,10 +209,6 @@ public class Object extends JComponent {
 		
 		if (!anchored) {
 			offsetPosition = offsetPosition.add(velocity.add(checkCollision(delta)).scalar(speed*delta*manager.fixedFps));
-		}
-		
-		if (this instanceof Button) {
-			System.out.println(this);
 		}
 		
 		update();

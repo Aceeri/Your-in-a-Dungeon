@@ -38,8 +38,6 @@ public class Wall extends main.object.Object {
 				offsetSize = new Vector2(200, 200);
 				break;
 		}
-		
-		setImage();
 	}
 	
 	

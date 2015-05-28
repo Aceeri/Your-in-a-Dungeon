@@ -30,8 +30,6 @@ public class Door extends main.object.Object {
 				rotation = 180;
 				break;
 		}
-		
-		setImage();
 	}
 	
 	public void open() {

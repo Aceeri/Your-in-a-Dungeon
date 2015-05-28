@@ -35,9 +35,8 @@ public class Player extends main.object.Object {
 		
 		speed = 3;
 		type = "player";
-		path = "resources/image/player.png";
 		
-		setImage();
+		path = "resources/image/player.png";
 	}
 	
 	public void step(double delta) {

@@ -1,6 +1,5 @@
 package main;
 
-import main.misc.Vector2;
 import main.Manager;
 
 public class Main {

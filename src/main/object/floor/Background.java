@@ -26,8 +26,6 @@ public class Background extends main.object.Object {
 		String picked = imagePaths[(int) Math.round(Math.random() * (imagePaths.length - 1))];
 		path = picked;
 		System.out.println("floor picked: " + picked);
-		
-		setImage();
 	}
 	
 	public Background(Vector2 s, String path) {
@@ -36,7 +34,6 @@ public class Background extends main.object.Object {
 		stretch = true;
 		
 		this.path = path;
-		setImage();
 	}
 	
 	/*public void paintComponent(Graphics g) {

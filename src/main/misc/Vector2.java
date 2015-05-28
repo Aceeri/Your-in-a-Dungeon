@@ -3,6 +3,7 @@ package main.misc;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
@@ -33,7 +34,11 @@ public class Vector2 {
 		this.y = p.y;
 	}
 	
-	
+	public Vector2(Insets insets) {
+		this.x = insets.left;
+		this.y = insets.top;
+	}
+
 	//Basic math
 	public Vector2 add(Vector2 v) {
 		return new Vector2(this.x + v.x, this.y + v.y);

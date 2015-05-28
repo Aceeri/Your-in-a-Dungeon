@@ -4,15 +4,13 @@ package main;
 import main.misc.Vector2;
 import main.misc.Music;
 import main.character.*;
-import main.character.classes.Battlemage;
 import main.object.wall.*;
 import main.object.floor.*;
 import main.object.Object;
 import main.object.Projectile;
 import main.ui.Button;
+import main.ui.Debugger;
 import main.ui.UserInterface;
-
-
 
 //default java imports
 import javax.swing.*;
@@ -35,13 +33,13 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-
-import javax.swing.Timer;
+import java.util.HashMap;
 
 @SuppressWarnings("serial")
 public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener, ContainerListener {
@@ -71,6 +69,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Pathfinder pathfinder;
 	
 	public Timer gameTimer;
+	public Vector2 mouse = new Vector2();
 	public Player player;
 	public long lastFrame = System.nanoTime();
 	public double fixedFps = 60.0;
@@ -82,7 +81,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Vector2 ratio = new Vector2(1, 1);
 	
 	public BufferedImage canvas;
-	public UserInterface ui;
+	public Debugger debugger;
 	public String currentTween = "r";
 	public int tween = 1;
 	public int cr = 0;
@@ -95,6 +94,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Background bg;
 	public Wall w1;
 	public Font font;
+	
+	public HashMap<String, BufferedImage> images = new HashMap<String, BufferedImage> ();
+	public HashMap<String, Music> music = new HashMap<String, Music> ();
 	
 	public Manager(Window window) {
 		this.window = window;
@@ -134,16 +136,16 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		add(projectileContainer);
 		add(floorContainer);
 		
-		ui = new UserInterface();
-		uiContainer.add(ui);
+		debugger = new Debugger();
+		uiContainer.add(debugger);
 		
 		//info user interface
-		ui.addString(new String[] { "fps" });
-		ui.addString(new String[] { "key press" });
-		ui.addString(new String[] { "window size" });
-		ui.addString(new String[] { "fullscreen" });
-		ui.addString(new String[] { "characters" });
-		ui.addString(new String[] { "projectiles" });
+		debugger.addString(new String[] { "fps" });
+		debugger.addString(new String[] { "key press" });
+		debugger.addString(new String[] { "window size" });
+		debugger.addString(new String[] { "fullscreen" });
+		debugger.addString(new String[] { "characters" });
+		debugger.addString(new String[] { "projectiles" });
 		
 		addKeyListener(this);
 		addMouseListener(this);
@@ -152,6 +154,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         
+        //start();
         menu();
         
 		gameTimer = new Timer(0, this);
@@ -199,23 +202,21 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		}
 		
 		//info display
-		ui.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
-		ui.updateString(new String[] { "window size", screen.toString() });
-		ui.updateString(new String[] { "fullscreen", String.valueOf(fullscreen) });
-		ui.updateString(new String[] { "characters", String.valueOf(playerContainer.getComponentCount()) });
-		ui.updateString(new String[] { "projectiles", String.valueOf(projectileContainer.getComponentCount()) });
+		debugger.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
+		debugger.updateString(new String[] { "window size", screen.toString() });
+		debugger.updateString(new String[] { "fullscreen", String.valueOf(fullscreen) });
+		debugger.updateString(new String[] { "characters", String.valueOf(playerContainer.getComponentCount()) });
+		debugger.updateString(new String[] { "projectiles", String.valueOf(projectileContainer.getComponentCount()) });
 	}
 	
 	public void menu() {
 		ArrayList<Object> menuObjects = new ArrayList<Object> ();
 		
-		Button startButton = new Button("resources\\image\\missing.png", new Vector2(0, 500), new Vector2(300, 20));
+		Button startButton = new Button("resources\\image\\button.png", new Vector2(0, 600), new Vector2(700, 70));
 		menuObjects.add(startButton);
 		
-		Background menuBack = new Background(defaultScreen, "resources\\image\\bluescreen.png");
+		Background menuBack = new Background(defaultScreen, "resources\\image\\menu_back.png");
 		menuObjects.add(menuBack);
-		
-		
 		
 		for (int i = 0; i < menuObjects.size(); i++) {
 			uiContainer.add(menuObjects.get(i));
@@ -279,6 +280,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		mouse = new Vector2(MouseInfo.getPointerInfo().getLocation()).sub(new Vector2(window.frame.getLocation()).add(new Vector2(window.frame.getInsets())));
 		long now = System.nanoTime();
 		double delta = ((System.nanoTime()) - lastFrame) / 1000000;
 		delta = delta/1000;
@@ -291,7 +293,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		if (!skip) {
 			lastFrame = now;
-			ui.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
+			debugger.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
 			
 			ArrayList<Player> characters = new ArrayList<Player>();
 			
@@ -320,6 +322,15 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 								playerContainer.remove(plr);
 							} else {
 								characters.add(plr);
+							}
+						}
+						
+						if (object instanceof UserInterface) {
+							UserInterface ui = (UserInterface) object;
+							if (ui.inside(mouse) && !ui.hovering) {
+								ui.hovering = true;
+							} else if (!ui.inside(mouse)) {
+								ui.hovering = false;
 							}
 						}
 						
@@ -373,7 +384,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			repaint();
 		}
 	}
-
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -452,7 +462,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		switch(code) {
 			//toggle info
 			case 67:
-				ui.display = !ui.display;
+				debugger.display = !debugger.display;
 				break;
 			
 			//toggle fullscreen
@@ -501,7 +511,16 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public void keyTyped(KeyEvent arg0) { }
 
 	@Override
-	public void mouseClicked(MouseEvent e) { }
+	public void mouseClicked(MouseEvent e) {
+		for (int i = 0; i < uiContainer.getComponentCount(); i++) {
+			if (uiContainer.getComponent(i) instanceof UserInterface) {
+				UserInterface ui = (UserInterface) uiContainer.getComponent(i);
+				if (ui.inside(mouse)) {
+					ui.click();
+				}
+			}
+		}
+	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) { }
@@ -510,10 +529,28 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public void mouseExited(MouseEvent e) { }
 
 	@Override
-	public void mousePressed(MouseEvent e) { }
+	public void mousePressed(MouseEvent e) {
+		for (int i = 0; i < uiContainer.getComponentCount(); i++) {
+			if (uiContainer.getComponent(i) instanceof UserInterface) {
+				UserInterface ui = (UserInterface) uiContainer.getComponent(i);
+				if (ui.inside(mouse)) {
+					ui.clickDown();
+				}
+			}
+		}
+	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) { }
+	public void mouseReleased(MouseEvent e) {
+		for (int i = 0; i < uiContainer.getComponentCount(); i++) {
+			if (uiContainer.getComponent(i) instanceof UserInterface) {
+				UserInterface ui = (UserInterface) uiContainer.getComponent(i);
+				if (ui.inside(mouse)) {
+					ui.clickUp();
+				}
+			}
+		}
+	}
 
 	@Override
 	public void componentHidden(ComponentEvent e) { }
