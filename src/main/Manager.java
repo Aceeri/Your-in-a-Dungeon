@@ -4,6 +4,9 @@ package main;
 import main.misc.Vector2;
 import main.misc.Music;
 import main.character.*;
+import main.character.classes.Battlemage;
+import main.dungeon.Dungeon;
+import main.dungeon.Room;
 import main.object.wall.*;
 import main.object.floor.*;
 import main.object.Object;
@@ -11,6 +14,11 @@ import main.object.Projectile;
 import main.ui.Button;
 import main.ui.Debugger;
 import main.ui.UserInterface;
+
+
+
+
+
 
 //default java imports
 import javax.swing.*;
@@ -55,7 +63,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public Window window;
 	
-	public boolean[] keyPress = new boolean[255];
+	public boolean[] keyPress = new boolean[600];
 	public int lastKeyPress = 0;
 	
 	//highest -> lowest level containers: (highest is displayed above, lowest is displayed below)
@@ -73,7 +81,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Player player;
 	public long lastFrame = System.nanoTime();
 	public double fixedFps = 60.0;
-	public double fpsCap = 500.0;
+	public double fpsCap = 300.0;
 	public boolean displayEnemyMovements = false;
 	
 	public Vector2 defaultScreen = new Vector2(1920, 1080);
@@ -90,13 +98,16 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int angle = 0;
 	public int counter = 0;
 	
+	public Color transition = new Color(0, 0, 0, 0);
+	
 	public Music backgroundMusic = new Music("resources\\sound\\Big Mine.wav");
 	public Background bg;
 	public Wall w1;
 	public Font font;
 	
+	public ArrayList<Object> menuObjects = new ArrayList<Object> ();
+	
 	public HashMap<String, BufferedImage> images = new HashMap<String, BufferedImage> ();
-	public HashMap<String, Music> music = new HashMap<String, Music> ();
 	
 	public Manager(Window window) {
 		this.window = window;
@@ -154,14 +165,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         
-        //start();
         menu();
         
 		gameTimer = new Timer(0, this);
 		gameTimer.start();
 	}
 	
-	public void paintComponent(Graphics g) throws java.lang.ArithmeticException {
+	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
 		AffineTransform at = new AffineTransform();
@@ -201,6 +211,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
 		}
 		
+		g2.setColor(transition);
+		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
+		
 		//info display
 		debugger.updateString(new String[] { "key press", String.valueOf(lastKeyPress) });
 		debugger.updateString(new String[] { "window size", screen.toString() });
@@ -210,9 +223,36 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void menu() {
-		ArrayList<Object> menuObjects = new ArrayList<Object> ();
+		Dungeon test = new Dungeon("resources\\dungeons\\testdungeon.txt");
 		
-		Button startButton = new Button("resources\\image\\button.png", new Vector2(0, 600), new Vector2(700, 70));
+		Button startButton = new Button("Start", "resources\\image\\trans.png", new Vector2(0, 600), new Vector2(700, 70)) {
+			public void click() {
+				new Thread() {
+					public void run() {
+						for (int i = 0; i < 255; i++) {
+							try {
+								Thread.sleep(3);
+								transition = new Color(0, 0, 0, i);
+							} catch (InterruptedException e) { }
+						}
+						
+						manager.start();
+						backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");
+						
+						try {
+							Thread.sleep(900);
+						} catch (InterruptedException e) { }
+						
+						for (int i = 255; i > 0; i--) {
+							try {
+								Thread.sleep(3);
+								transition = new Color(0, 0, 0, i);
+							} catch (InterruptedException e) { }
+						}
+					}
+				}.start();
+			}
+		};
 		menuObjects.add(startButton);
 		
 		Background menuBack = new Background(defaultScreen, "resources\\image\\menu_back.png");
@@ -224,59 +264,24 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void start() {
+		for (int i = 0; i < menuObjects.size(); i++) {
+			uiContainer.remove(menuObjects.get(i));
+		}
+		menuObjects.clear();
+		
 		bg = new Background(defaultScreen);
 		floorContainer.add(bg);
 		
+		player = new Battlemage(new Vector2(500, 500));
+		playerContainer.add(player);
+		
 		//create walls
-		w1 = new Wall("top", new Vector2(200, 0));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("top", new Vector2(1060, 0));
-		wallContainer.add(w1);
-		
-		Door d1 = new Door("top", new Vector2(860, 0));
-		wallContainer.add(d1);
-		
-		w1 = new Wall("bottom", new Vector2(200, 880));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("bottom", new Vector2(1060, 880));
-		wallContainer.add(w1);
-		
-		Door d2 = new Door("bottom", new Vector2(860, 880));
-		wallContainer.add(d2);
-		
-		w1 = new Wall("left", new Vector2(0, 200));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("left", new Vector2(0, 640));
-		wallContainer.add(w1);
-		
-		Door d3 = new Door("left", new Vector2(0, 440));
-		wallContainer.add(d3);
-		
-		w1 = new Wall("right", new Vector2(1720, 200));
-		wallContainer.add(w1);
-		
-		w1 = new Wall("right", new Vector2(1720, 640));
-		wallContainer.add(w1);
-		
-		Door d4 = new Door("right", new Vector2(1720, 440));
-		wallContainer.add(d4);
-		
-		Wall corner = new Wall("corner", new Vector2());
-		wallContainer.add(corner);
-		
-		corner = new Wall("corner", new Vector2(1720, 880));
-		corner.rotation = 180;
-		wallContainer.add(corner);
-		
-		corner = new Wall("corner2", new Vector2(0, 880));
-		corner.rotation = 180;
-		wallContainer.add(corner);
-		
-		corner = new Wall("corner2", new Vector2(1720, 0));
-		wallContainer.add(corner);
+		Room test = new Room(0, 0);
+		test.generate();
+		for (int i = 0; i < test.objects.size(); i++) {
+			Object o = (Object) test.objects.get(i);
+			wallContainer.add(o);
+		}
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -401,7 +406,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			currentSecret = 0;
 		}
 		
-		if (running && player != null) {
+		if (player != null) {
 			if (!keyPress[code]) {
 				switch (code) {
 					//movement

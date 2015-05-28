@@ -54,7 +54,6 @@ public class Projectile extends Object {
 							}
 							
 							if (object != parent && !ignore && object.inside(position.add(velocity.scalar(speed*delta*manager.fixedFps)), Size)) {
-								System.out.println(position + " " + object);
 								if (object instanceof Player) {
 									Player plr = (Player) object;
 									plr.health -= damage;

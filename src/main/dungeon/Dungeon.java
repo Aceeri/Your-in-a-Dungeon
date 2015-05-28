@@ -1,44 +1,98 @@
 package main.dungeon;
 
-import java.util.ArrayList;
-
-import main.misc.Vector2;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Dungeon {
-	
+	public String path;
+	public char[][] charset;
 	public Room[][] rooms;
-	public Vector2 maxSize;
-	public boolean finished = false;
 	
-	public ArrayList<Room> branches = new ArrayList<Room> ();
-	
-	public Dungeon(Vector2 maxSize) {
-		this.maxSize = maxSize;
+	public Dungeon(String p) {
+		path = p;
+		assignCharset();
 	}
 	
-	/*public void generate() {
-		int startX = (int) (Math.random() * maxSize.x);
-		int startY = (int) (Math.random() * maxSize.y);
+	public void assignCharset() {
 		
-		Room start = new Room(startX, startY);
-		start.generate(-1, 0);
-		rooms[startX][startY] = start;
-		
-		Room current = start;
-		while (!finished) {
-			ArrayList<Vector2> open = current.directions();
+		try {
+			File file = new File(path);
+			Scanner scanner = new Scanner(file);
 			
-			for (int i = 0; i < open.size(); i++) {
-				Vector2 openDirection = open.get(i);
+			int x = 0;
+			int y = 0;
+			int row = 0;
+			
+			Pattern p = Pattern.compile("(\\w+):(\\d+)");
+			while (scanner.hasNext(p)) {
+				String str = scanner.next();
 				
-				if (!(openDirection.x > maxSize.x
-						|| openDirection.x < 0
-						|| openDirection.y > maxSize.y
-						|| openDirection.y < 0)) {
-					Room newRoom = new Room((int) openDirection.x, (int) openDirection.y);
-					newRoom.generate(entrance, roomsFromStart);, roomsFromStart);
+				Matcher m = p.matcher(str);
+				if (m.find()) {
+					if (m.group(1).equals("x")) {
+						x = Integer.valueOf(m.group(2));
+					} else if (m.group(1).equals("y")) {
+						y = Integer.valueOf(m.group(2));
+					}
+				}
+			}
+			
+			System.out.println("dimensions: " + x + ", " + y);
+			charset = new char[y][x];
+			rooms = new Room[(int) Math.floor(y/2)][(int) Math.floor(x/2)];
+			
+			while (scanner.hasNextLine()) {
+				String nextLine = scanner.nextLine();
+				if (!nextLine.equals("")) {
+					for (int i = 0; i < nextLine.length(); i++) {
+						charset[row][i] = nextLine.charAt(i);
+					}
+					row++;
+				}
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		generate();
+	}
+	
+	public void generate() {
+		for (int row = 1; row < charset.length; row += 2) {
+			for (int col = 1; col < charset[0].length; col += 2) {
+				char c = charset[row][col];
+				if (c != '0' || c != '-') {
+					rooms[(row-1)/2][(col-1)/2] = new Room((row-1)/2, (col-1)/2);
+					Room current = rooms[(row-1)/2][(col-1)/2];
+					
+					char top = charset[row - 1][col];
+					char bottom = charset[row + 1][col];
+					char left = charset[row][col - 1];
+					char right = charset[row][col + 1];
+					current.evaluateDoors(top == '|', left == '|', bottom == '|', right == '|');
+					
+					//if (c == 's') {
+					//	System.out.println(this);
+					//	for (int i = 0; i < current.doors.size(); i++) {
+					//		System.out.println("	" + current.doors.get(i));
+					//	}
+					//}
 				}
 			}
 		}
-	}*/
+	}
+	
+	public void printCharset() {
+		for (int i = 0; i < charset.length; i++) {
+			for (int j = 0; j < charset[0].length; j++) {
+				System.out.print(charset[i][j]);
+			}
+			System.out.println();
+		}
+	}
 }

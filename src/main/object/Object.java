@@ -1,23 +1,25 @@
 package main.object;
 
 import main.misc.Vector2;
-import main.ui.Button;
+import main.ui.TextLabel;
 import main.Manager;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
 @SuppressWarnings("serial")
 public class Object extends JComponent {
+	public Manager manager;
+	public String type = "object";
+	public ArrayList<TextLabel> labels = new ArrayList<TextLabel> ();
 	
 	public Vector2 scalePosition = new Vector2(0, 0); // dependent on screen size (e.g. (1, 0) will be displayed at the right of the screen)
 	public Vector2 offsetPosition = new Vector2(0, 0);
@@ -35,13 +37,10 @@ public class Object extends JComponent {
 	public String imageX; // "left", "right", "center"
 	public String imageY; // "top", "bottom", "center"
 	
-	public String type = "object";
-	
 	public boolean collidable = false;
 	public boolean anchored = false;
 	public boolean stretch = false;
 	
-	public Manager manager;
 	protected String path = "resources\\image\\missing.png";
 	protected String previousPath = path;
 	protected BufferedImage image;
@@ -104,6 +103,13 @@ public class Object extends JComponent {
 		}
 		
 		g2.drawRenderedImage(image, objectTransform);
+		
+		for (int i = 0; i < labels.size(); i++) {
+			TextLabel label = labels.get(i);
+			g2.setFont(manager.font.deriveFont((float) (label.size*Math.min(manager.ratio.x, manager.ratio.y))));
+			g2.setColor(label.color);
+			g2.drawString(label.text, (int) (position.x + label.position.x*manager.ratio.x), (int) (position.y + label.position.y*manager.ratio.y));
+		}
 	}
 	
 	public void paintLocation() {

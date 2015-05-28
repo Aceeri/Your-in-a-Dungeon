@@ -1,25 +1,35 @@
 package main.ui;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 
 import main.misc.Vector2;
+import main.object.Animator;
 
 @SuppressWarnings("serial")
 public class Button extends main.ui.UserInterface {
 	public String text = "Play";
+	public Animator animator;
 	
-	public Button(String imagePath, Vector2 position, Vector2 size) {
+	public Button(String name, String imagePath, Vector2 position, Vector2 size) {
 		super(position);
 		offsetSize = size;
 		stretch = true;
 		path = "resources\\image\\button.png";
+		
+		TextLabel playLabel = new TextLabel(name, new Vector2(50, 52));
+		playLabel.size = 65f;
+		labels.add(playLabel);
+		
+		animator = new Animator(this);
 	}
 	
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+	public void step(double delta) {
+		super.step(delta);
+		animator.step(delta);
 	}
 	
 	public void hoverEntered() {
@@ -31,8 +41,7 @@ public class Button extends main.ui.UserInterface {
 	}
 	
 	public void click() {
-		// start
-		System.out.println("clicked");
+		System.out.println("unset click");
 	}
 	
 	public void clickDown() {
@@ -45,5 +54,9 @@ public class Button extends main.ui.UserInterface {
 		} else {
 			path = "resources\\image\\button.png";
 		}
+	}
+	
+	public String toString() {
+		return "button";
 	}
 }

@@ -2,6 +2,7 @@ package main.object;
 
 import java.util.HashMap;
 
+import main.misc.Vector2;
 import main.object.Object;
 
 public class Animator {
@@ -34,9 +35,25 @@ public class Animator {
 		}
 	}
 	
+	public void tweenPosition(Vector2 newPosition, double time) {
+		currentAnimation = new Frame[] {
+				new Frame(parent.offsetPosition, newPosition, time)
+		};
+		currentAnimationFrame = 0;
+		currentFrame = currentAnimation[currentAnimationFrame];
+	}
+	
 	public void step(double delta) {
 		if (currentFrame != null) {
-			parent.path = currentFrame.path;
+			switch (currentFrame.behavior) {
+				case "regular":
+					parent.path = path;
+					break;
+				case "tween":
+					parent.offsetPosition = currentFrame.currentPosition;
+					break;
+			}
+			
 			if (currentFrame.step(delta)) {
 				currentAnimationFrame++;
 				if (currentAnimationFrame < currentAnimation.length) {

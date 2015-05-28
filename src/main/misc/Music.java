@@ -21,6 +21,10 @@ public class Music {
 	public float volume = 0;
 	
 	public Music(String p) {
+		setMusic(p);
+	}
+	
+	public void setMusic(String p) {
 		path = p;
 		file = new File(path);
 		if (!file.exists()) {
@@ -55,7 +59,6 @@ public class Music {
 	
 	public void stop() {
 		clip.stop();
-		clip.flush();
 	}
 	
 	public void setVolume(double volume) {
@@ -70,6 +73,24 @@ public class Music {
 		}
 		
 		volumeControl.setValue(decibels);
+	}
+	
+	public void fadeToNewSong(String pathToNewSong) {
+		System.out.println("New Song: " + pathToNewSong);
+		new Thread() {
+			public void run() {
+				float previousVolume = volumeControl.getValue();
+				for (float i = volumeControl.getValue(); i > -30; i -= .1) {
+					try {
+						Thread.sleep(10);
+						volumeControl.setValue(i);
+					} catch (InterruptedException e) { }
+				}
+				setMusic(pathToNewSong);
+				play();
+				volumeControl.setValue(previousVolume);
+			}
+		}.start();
 	}
 	
 	public void mute() {
