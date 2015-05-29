@@ -52,16 +52,16 @@ import java.util.HashMap;
 @SuppressWarnings("serial")
 public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener, ContainerListener {
 	
+	public Window window;
 	public boolean menu = true;
 	public boolean running = false;
+	public boolean debounce = false;
 	public boolean info = false;
 	public boolean fullscreen = false;
 	public boolean paused = false;
 	public int[] secret = new int[] { 38, 38, 40, 40, 37, 39, 37, 39 };
 	public int currentSecret = 0;
 	public boolean wub = false;
-	
-	public Window window;
 	
 	public boolean[] keyPress = new boolean[600];
 	public int lastKeyPress = 0;
@@ -97,7 +97,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int cb = 0;
 	public int angle = 0;
 	public int counter = 0;
-	
 	public Color transition = new Color(0, 0, 0, 0);
 	
 	public Music backgroundMusic = new Music("resources\\sound\\Big Mine.wav");
@@ -106,8 +105,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Font font;
 	
 	public ArrayList<Object> menuObjects = new ArrayList<Object> ();
-	
 	public HashMap<String, BufferedImage> images = new HashMap<String, BufferedImage> ();
+	
+	public Dungeon currentDungeon;
+	public Room currentRoom;
 	
 	public Manager(Window window) {
 		this.window = window;
@@ -223,34 +224,36 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void menu() {
-		Dungeon test = new Dungeon("resources\\dungeons\\testdungeon.txt");
-		
 		Button startButton = new Button("Start", "resources\\image\\trans.png", new Vector2(0, 600), new Vector2(700, 70)) {
 			public void click() {
-				new Thread() {
-					public void run() {
-						for (int i = 0; i < 255; i++) {
+				if (!debounce) {
+					debounce = true;
+					new Thread() {
+						public void run() {
+							for (int i = 0; i < 255; i++) {
+								try {
+									Thread.sleep(3);
+									transition = new Color(0, 0, 0, i);
+								} catch (InterruptedException e) { }
+							}
+							
+							manager.start();
+							backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");
+							
 							try {
-								Thread.sleep(3);
-								transition = new Color(0, 0, 0, i);
+								Thread.sleep(900);
 							} catch (InterruptedException e) { }
+							
+							for (int i = 255; i > 0; i--) {
+								try {
+									Thread.sleep(3);
+									transition = new Color(0, 0, 0, i);
+								} catch (InterruptedException e) { }
+							}
+							debounce = false;
 						}
-						
-						manager.start();
-						backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");
-						
-						try {
-							Thread.sleep(900);
-						} catch (InterruptedException e) { }
-						
-						for (int i = 255; i > 0; i--) {
-							try {
-								Thread.sleep(3);
-								transition = new Color(0, 0, 0, i);
-							} catch (InterruptedException e) { }
-						}
-					}
-				}.start();
+					}.start();
+				}
 			}
 		};
 		menuObjects.add(startButton);
@@ -269,19 +272,38 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		}
 		menuObjects.clear();
 		
-		bg = new Background(defaultScreen);
-		floorContainer.add(bg);
+		currentDungeon = new Dungeon("resources\\dungeons\\I_Swear_This_Is_Not_A_Swastika.txt");
+		currentDungeon.generate();
 		
 		player = new Battlemage(new Vector2(500, 500));
 		playerContainer.add(player);
 		
-		//create walls
-		Room test = new Room(0, 0);
-		test.generate();
-		for (int i = 0; i < test.objects.size(); i++) {
-			Object o = (Object) test.objects.get(i);
-			wallContainer.add(o);
+		enterRoom((int) currentDungeon.start.x, (int) currentDungeon.start.y);
+	}
+	
+	public void enterRoom(int x, int y) {
+		floorContainer.removeAll();
+		wallContainer.removeAll();
+		projectileContainer.removeAll();
+		playerContainer.removeAll();
+		playerContainer.add(player);
+		
+		currentRoom = currentDungeon.rooms[x][y];
+		
+		for (int i = 0; i < currentRoom.objects.size(); i++) {
+			Object o = (Object) currentRoom.objects.get(i);
+			if (o.type == "floor") {
+				floorContainer.add(o);
+			} else if (o.type == "wall") {
+				wallContainer.add(o);
+			} else if (o.type == "enemy") {
+				playerContainer.add(o);
+			}
 		}
+	}
+	
+	public void enterRoom(Vector2 v) {
+		enterRoom((int) v.y, (int) v.x);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -517,14 +539,18 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		for (int i = 0; i < uiContainer.getComponentCount(); i++) {
-			if (uiContainer.getComponent(i) instanceof UserInterface) {
-				UserInterface ui = (UserInterface) uiContainer.getComponent(i);
-				if (ui.inside(mouse)) {
-					ui.click();
+		new Thread() {
+			public void run() {
+				for (int i = 0; i < uiContainer.getComponentCount(); i++) {
+					if (uiContainer.getComponent(i) instanceof UserInterface) {
+						UserInterface ui = (UserInterface) uiContainer.getComponent(i);
+						if (ui.inside(mouse)) {
+							//ui.click();
+						}
+					}
 				}
 			}
-		}
+		}.start();
 	}
 
 	@Override
@@ -535,26 +561,35 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		for (int i = 0; i < uiContainer.getComponentCount(); i++) {
-			if (uiContainer.getComponent(i) instanceof UserInterface) {
-				UserInterface ui = (UserInterface) uiContainer.getComponent(i);
-				if (ui.inside(mouse)) {
-					ui.clickDown();
+		new Thread() {
+			public void run() {
+				for (int i = 0; i < uiContainer.getComponentCount(); i++) {
+					if (uiContainer.getComponent(i) instanceof UserInterface) {
+						UserInterface ui = (UserInterface) uiContainer.getComponent(i);
+						if (ui.inside(mouse)) {
+							ui.clickDown();
+							ui.click();
+						}
+					}
 				}
 			}
-		}
+		}.start();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		for (int i = 0; i < uiContainer.getComponentCount(); i++) {
-			if (uiContainer.getComponent(i) instanceof UserInterface) {
-				UserInterface ui = (UserInterface) uiContainer.getComponent(i);
-				if (ui.inside(mouse)) {
-					ui.clickUp();
+		new Thread() {
+			public void run() {
+				for (int i = 0; i < uiContainer.getComponentCount(); i++) {
+					if (uiContainer.getComponent(i) instanceof UserInterface) {
+						UserInterface ui = (UserInterface) uiContainer.getComponent(i);
+						if (ui.inside(mouse)) {
+							ui.clickUp();
+						}
+					}
 				}
 			}
-		}
+		}.start();
 	}
 
 	@Override

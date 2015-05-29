@@ -3,18 +3,23 @@ package main.dungeon;
 import java.util.ArrayList;
 
 
+
+
+import main.character.Player;
 import main.misc.Vector2;
+import main.object.floor.Background;
 import main.object.wall.Door;
 import main.object.wall.Wall;
 
 @SuppressWarnings("serial")
 public class Room {
 	
+	public ArrayList<Player> characters = new ArrayList<Player> ();
 	public ArrayList<Object> objects = new ArrayList<Object> ();
-	public ArrayList<Vector2> doors = new ArrayList<Vector2> ();
-	public boolean start = false;
+	public ArrayList<Door> doors = new ArrayList<Door> (); 
 	public int x;
 	public int y;
+	public String type = "regular";
 	
 	public Room(int gridX, int gridY) {
 		x = gridX;
@@ -22,6 +27,8 @@ public class Room {
 	}
 	
 	public void generate() {
+		objects.add(new Background(new Vector2(1920, 1080)));
+		
 		objects.add(new Wall("top", new Vector2(200, 0)));
 		
 		objects.add(new Wall("top", new Vector2(1060, 0)));
@@ -50,34 +57,38 @@ public class Room {
 		
 		objects.add(new Wall("corner2", new Vector2(1720, 0)));
 		
-		//Door d4 = new Door("right", new Vector2(1720, 440));
-		//objects.add(d4);
-		
-		//Door d1 = new Door("top", new Vector2(860, 0));
-		//objects.add(d1);
-		
-		//Door d2 = new Door("bottom", new Vector2(860, 880));
-		//objects.add(d2);
-		
-		//Door d3 = new Door("left", new Vector2(0, 440));
-		//objects.add(d3);
+		for (int i = 0; i < doors.size(); i++) {
+			objects.add(doors.get(i));
+		}
 	}
 	
 	public void evaluateDoors(boolean top, boolean left, boolean bottom, boolean right) {
 		if (top) {
-			doors.add(new Vector2(0, -1));
-		}
-		
-		if (left) {
-			doors.add(new Vector2(-1, 0));
+			doors.add(new Door("top"));
+		} else {
+			objects.add(new Wall("middle", new Vector2(860, 0)));
 		}
 		
 		if (bottom) {
-			doors.add(new Vector2(0, 1));
+			doors.add(new Door("bottom"));
+		} else {
+			objects.add(new Wall("middle", new Vector2(860, 880)) {{
+				rotation = 180;
+			}});
+		}
+		
+		if (left) {
+			doors.add(new Door("left"));
+		} else {
+			objects.add(new Wall("middle2", new Vector2(0, 440)));
 		}
 		
 		if (right) {
-			doors.add(new Vector2(1, 0));
+			doors.add(new Door("right"));
+		} else {
+			objects.add(new Wall("middle2", new Vector2(1720, 440)) {{
+				rotation = 180;
+			}});
 		}
 	}
 }

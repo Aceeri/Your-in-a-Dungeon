@@ -37,7 +37,17 @@ public class Wall extends main.object.Object {
 				path = "resources\\image\\wall_corner2.png";
 				offsetSize = new Vector2(200, 200);
 				break;
+			case "middle":
+				path = "resources\\image\\wall_middle.png";
+				offsetSize = new Vector2(200, 200);
+				break;
+			case "middle2":
+				path = "resources\\image\\wall_middle2.png";
+				offsetSize = new Vector2(200, 202);
+				break;
 		}
+		
+		type = "wall";
 	}
 	
 	

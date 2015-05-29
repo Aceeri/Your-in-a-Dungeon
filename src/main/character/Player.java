@@ -1,7 +1,9 @@
 package main.character;
 
 import main.misc.Vector2;
+import main.object.Object;
 import main.object.Projectile;
+import main.object.wall.Door;
 
 @SuppressWarnings("serial")
 public class Player extends main.object.Object {
@@ -20,6 +22,7 @@ public class Player extends main.object.Object {
 	public double cooldown = 0;
 	public double ability1 = 0;
 	public double ability2 = 0;
+	private double doorBox = 5;
 	
 	public Player(Vector2 position) {
 		super(position);
@@ -36,11 +39,22 @@ public class Player extends main.object.Object {
 		speed = 3;
 		type = "player";
 		
-		path = "resources/image/player.png";
+		path = "resources/image/missing.png";
 	}
 	
 	public void step(double delta) {
 		super.step(delta);
+		
+		for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
+			Object o = (Object) manager.wallContainer.getComponent(i);
+			if (o instanceof Door && o.inside(position.sub(new Vector2(doorBox, doorBox).mult(manager.ratio)), Size.add(new Vector2(doorBox*2, doorBox*2).mult(manager.ratio)))) {
+				Door door = (Door) o;
+				Vector2 nextRoom = door.doorVector();
+				offsetPosition = new Vector2(900, 490).add(Size.scalar(.5)).sub(new Vector2(700, 280).mult(nextRoom));
+				manager.enterRoom(manager.currentRoom.x + (int) nextRoom.y, manager.currentRoom.y + (int) nextRoom.x);
+				break;
+			}
+		}
 		
 		cooldown = cooldown > 0 ? cooldown - delta*1000*manager.fixedFps/60 : 0;
 		ability1 = ability1 > 0 ? ability1 - delta*1000*manager.fixedFps/60 : 0;

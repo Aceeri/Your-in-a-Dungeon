@@ -1,6 +1,7 @@
 package main.object;
 
 import main.misc.Vector2;
+import main.object.wall.Door;
 import main.ui.TextLabel;
 import main.Manager;
 

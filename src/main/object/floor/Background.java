@@ -25,7 +25,7 @@ public class Background extends main.object.Object {
 		// get random background image
 		String picked = imagePaths[(int) Math.round(Math.random() * (imagePaths.length - 1))];
 		path = picked;
-		System.out.println("floor picked: " + picked);
+		//System.out.println("floor picked: " + picked);
 	}
 	
 	public Background(Vector2 s, String path) {
