@@ -13,6 +13,7 @@ public class Animator {
 	public Frame[] currentAnimation;
 	public int currentAnimationFrame = 0;
 	public Frame currentFrame;
+	public boolean loop = false;
 	
 	public Animator(Object object) {
 		parent = object;
@@ -27,12 +28,20 @@ public class Animator {
 		animations.put(animationName, paths);
 	}
 	
-	public void playAnimation(String animationName) {
+	public void playAnimation(String animationName, boolean loop) {
 		if (animations.containsKey(animationName)) {
 			currentAnimation = animations.get(animationName);
 			currentAnimationFrame = 0;
 			currentFrame = currentAnimation[currentAnimationFrame];
+			this.loop = loop;
 		}
+	}
+	
+	public void stopAnimation() {
+		currentAnimation = null;
+		currentAnimationFrame = 0;
+		currentFrame = null;
+		loop = false;
 	}
 	
 	public void tweenPosition(Vector2 newPosition, double time) {
@@ -47,7 +56,7 @@ public class Animator {
 		if (currentFrame != null) {
 			switch (currentFrame.behavior) {
 				case "regular":
-					parent.path = path;
+					parent.path = currentFrame.path;
 					break;
 				case "tween":
 					parent.offsetPosition = currentFrame.currentPosition;
@@ -59,9 +68,14 @@ public class Animator {
 				if (currentAnimationFrame < currentAnimation.length) {
 					currentFrame = currentAnimation[currentAnimationFrame];
 				} else {
-					currentAnimation = null;
-					currentAnimationFrame = 0;
-					currentFrame = null;
+					if (loop) {
+						currentAnimationFrame = 0;
+						currentFrame = currentAnimation[currentAnimationFrame];
+					} else {
+						currentAnimation = null;
+						currentAnimationFrame = 0;
+						currentFrame = null;
+					}
 				}
 			}
 		}

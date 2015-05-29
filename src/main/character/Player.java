@@ -1,6 +1,8 @@
 package main.character;
 
 import main.misc.Vector2;
+import main.object.Animator;
+import main.object.Frame;
 import main.object.Object;
 import main.object.Projectile;
 import main.object.wall.Door;
@@ -24,12 +26,15 @@ public class Player extends main.object.Object {
 	public double ability2 = 0;
 	private double doorBox = 5;
 	
+	public Animator animator;
+	
 	public Player(Vector2 position) {
 		super(position);
 		offsetSize = new Vector2(50, 50);
 		
 		collidable = true;
 		anchored = false;
+		stretch = true;
 		imageX = "center";
 		imageY = "bottom";
 		
@@ -38,8 +43,14 @@ public class Player extends main.object.Object {
 		
 		speed = 3;
 		type = "player";
+		path = "resources/image/player.png";
 		
-		path = "resources/image/missing.png";
+		animator = new Animator(this);
+		animator.defineAnimation("idle", new Frame[] {
+				new Frame("resources/image/wall_left.png", 2),
+				new Frame("resources/image/wall_top.png", 2),
+		});
+		animator.playAnimation("idle", true);
 	}
 	
 	public void step(double delta) {
@@ -55,6 +66,8 @@ public class Player extends main.object.Object {
 				break;
 			}
 		}
+		
+		animator.step(delta);
 		
 		cooldown = cooldown > 0 ? cooldown - delta*1000*manager.fixedFps/60 : 0;
 		ability1 = ability1 > 0 ? ability1 - delta*1000*manager.fixedFps/60 : 0;

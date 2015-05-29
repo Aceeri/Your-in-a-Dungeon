@@ -33,6 +33,7 @@ public class Frame {
 			currentPosition = currentPosition.add(tweenPosition.scalar(delta/max));
 		}
 		if (current >= max) {
+			current = 0.0;
 			return true;
 		}
 		return false;
