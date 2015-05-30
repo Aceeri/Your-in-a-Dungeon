@@ -6,6 +6,7 @@ import main.character.*;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 @SuppressWarnings("serial")
 public class Projectile extends Object {
@@ -82,8 +83,11 @@ public class Projectile extends Object {
 	}
 	
 	public void paintComponent(Graphics g) {
-		Graphics c = manager.canvas.getGraphics();
-		c.setColor(color);
-		c.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
+		if (g2 == null) {
+			g2 = (Graphics2D) manager.canvas.getGraphics();
+		}
+		
+		g2.setColor(color);
+		g2.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
 	}
 }

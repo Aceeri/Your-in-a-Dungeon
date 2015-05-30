@@ -45,6 +45,7 @@ public class Object extends JComponent {
 	protected String path = "resources\\image\\missing.png";
 	protected String previousPath = path;
 	protected BufferedImage image;
+	public Graphics2D g2;
 	
 	public Object(Vector2 p) {
 		offsetPosition = p;
@@ -52,7 +53,9 @@ public class Object extends JComponent {
 	}
 	
 	public void paintComponent(Graphics g) {
-		Graphics2D g2 = (Graphics2D) manager.canvas.getGraphics();
+		if (g2 == null) {
+			g2 = (Graphics2D) manager.canvas.getGraphics();
+		}
 		
 		//positioning and size
 		AffineTransform objectTransform = new AffineTransform();
@@ -95,9 +98,11 @@ public class Object extends JComponent {
 		//rotation
 		objectTransform.scale(scale, scale);
 		
-		objectTransform.translate(Size.x*scale/2, Size.y*scale/2);
-		objectTransform.rotate(rotation*Math.PI/180);
-		objectTransform.translate(-Size.x*scale/2, -Size.y*scale/2);
+		if (rotation != 0) {
+			objectTransform.translate(Size.x*scale/2, Size.y*scale/2);
+			objectTransform.rotate(rotation*Math.PI/180);
+			objectTransform.translate(-Size.x*scale/2, -Size.y*scale/2);
+		}
 		
 		if (stretch) {
 			objectTransform.scale(Size.x/image.getWidth(), Size.y/image.getHeight());
@@ -214,7 +219,7 @@ public class Object extends JComponent {
 	public void step(double delta) {
 		paintLocation();
 		
-		if (!anchored) {
+		if (!anchored && !manager.entering) {
 			offsetPosition = offsetPosition.add(velocity.add(checkCollision(delta)).scalar(speed*delta*manager.fixedFps));
 		}
 		

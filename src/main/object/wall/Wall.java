@@ -3,10 +3,13 @@ package main.object.wall;
 import main.misc.Vector2;
 
 public class Wall extends main.object.Object {
+	
+	public String orientation = "top";
 
 	public Wall(String orientation, Vector2 position) {
 		super(position);
 		
+		this.orientation = orientation;
 		collidable = true;
 		stretch = true;
 		
@@ -49,6 +52,4 @@ public class Wall extends main.object.Object {
 		
 		type = "wall";
 	}
-	
-	
 }

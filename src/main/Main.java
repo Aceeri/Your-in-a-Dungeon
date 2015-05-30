@@ -1,6 +1,7 @@
 package main;
 
 import main.Manager;
+import main.misc.Vector2;
 
 public class Main {
 	
@@ -12,6 +13,7 @@ public class Main {
 		manager = new Manager(window);
 		window.manager = manager;
 		
-		window.setWindowed();
+		//window.setWindowed();
+		window.setFullscreen();
 	}
 }

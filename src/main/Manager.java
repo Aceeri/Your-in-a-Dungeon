@@ -20,6 +20,9 @@ import main.ui.UserInterface;
 
 
 
+
+
+
 //default java imports
 import javax.swing.*;
 
@@ -50,12 +53,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @SuppressWarnings("serial")
-public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener, ContainerListener {
+public class Manager extends JPanel implements ActionListener, KeyListener, MouseListener, ComponentListener, ContainerListener, Runnable {
 	
 	public Window window;
 	public boolean menu = true;
 	public boolean running = false;
 	public boolean debounce = false;
+	public boolean entering = false;
 	public boolean info = false;
 	public boolean fullscreen = false;
 	public boolean paused = false;
@@ -81,7 +85,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Player player;
 	public long lastFrame = System.nanoTime();
 	public double fixedFps = 60.0;
-	public double fpsCap = 300.0;
+	public double fpsCap = 200.0;
 	public boolean displayEnemyMovements = false;
 	
 	public Vector2 defaultScreen = new Vector2(1920, 1080);
@@ -168,8 +172,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
         
         menu();
         
-		gameTimer = new Timer(0, this);
-		gameTimer.start();
+		//gameTimer = new Timer(0, this);
+		//gameTimer.start();
+        Thread gameThread = new Thread(this);
+        gameThread.start();
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -230,9 +236,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					debounce = true;
 					new Thread() {
 						public void run() {
-							for (int i = 0; i < 255; i++) {
+							for (int i = 0; i < 255; i += 3) {
 								try {
-									Thread.sleep(3);
+									Thread.sleep(8);
 									transition = new Color(0, 0, 0, i);
 								} catch (InterruptedException e) { }
 							}
@@ -241,12 +247,12 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 							backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");
 							
 							try {
-								Thread.sleep(900);
+								Thread.sleep(1000);
 							} catch (InterruptedException e) { }
 							
-							for (int i = 255; i > 0; i--) {
+							for (int i = 255; i > 0; i -= 3) {
 								try {
-									Thread.sleep(3);
+									Thread.sleep(6);
 									transition = new Color(0, 0, 0, i);
 								} catch (InterruptedException e) { }
 							}
@@ -278,35 +284,63 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		player = new Battlemage(new Vector2(500, 500));
 		playerContainer.add(player);
 		
-		enterRoom((int) currentDungeon.start.x, (int) currentDungeon.start.y);
+		enterRoom(new Vector2(), (int) currentDungeon.start.x, (int) currentDungeon.start.y);
 	}
 	
-	public void enterRoom(int x, int y) {
-		floorContainer.removeAll();
-		wallContainer.removeAll();
-		projectileContainer.removeAll();
-		playerContainer.removeAll();
-		playerContainer.add(player);
-		
-		currentRoom = currentDungeon.rooms[x][y];
-		
-		for (int i = 0; i < currentRoom.objects.size(); i++) {
-			Object o = (Object) currentRoom.objects.get(i);
-			if (o.type == "floor") {
-				floorContainer.add(o);
-			} else if (o.type == "wall") {
-				wallContainer.add(o);
-			} else if (o.type == "enemy") {
-				playerContainer.add(o);
+	public void enterRoom(Vector2 entrance, int x, int y) {
+		new Thread() {
+			public void run() {
+				entering = true;
+				if (!entrance.equals(new Vector2())) {
+					for (int i = 0; i < 255; i += 5) {
+						try {
+							Thread.sleep(6);
+							transition = new Color(0, 0, 0, i);
+						} catch (InterruptedException e) { }
+					}
+				}
+				
+				floorContainer.removeAll();
+				wallContainer.removeAll();
+				projectileContainer.removeAll();
+				playerContainer.removeAll();
+				player.offsetPosition = new Vector2(900, 490).add(player.Size.scalar(.5)).sub(new Vector2(700, 280).mult(entrance));
+				playerContainer.add(player);
+				
+				currentRoom = currentDungeon.rooms[x][y];
+				
+				for (int i = 0; i < currentRoom.objects.size(); i++) {
+					Object o = (Object) currentRoom.objects.get(i);
+					if (o.type == "floor") {
+						floorContainer.add(o);
+					} else if (o.type == "wall") {
+						wallContainer.add(o);
+					} else if (o.type == "enemy") {
+						playerContainer.add(o);
+					}
+				}
+				
+				if (!entrance.equals(new Vector2())) {
+					for (int i = 255; i > 0; i -= 5) {
+						try {
+							Thread.sleep(4);
+							transition = new Color(0, 0, 0, i);
+						} catch (InterruptedException e) { }
+					}
+				}
+				entering = false;
 			}
+		}.start();
+	}
+	
+	public void run() {
+		running = true;
+		while (running) {
+			step();
 		}
 	}
 	
-	public void enterRoom(Vector2 v) {
-		enterRoom((int) v.y, (int) v.x);
-	}
-	
-	public void actionPerformed(ActionEvent e) {
+	public void step() {
 		mouse = new Vector2(MouseInfo.getPointerInfo().getLocation()).sub(new Vector2(window.frame.getLocation()).add(new Vector2(window.frame.getInsets())));
 		long now = System.nanoTime();
 		double delta = ((System.nanoTime()) - lastFrame) / 1000000;
@@ -382,7 +416,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			}
 			
 			for (int i = 0; i < characters.size(); i++) {
-				playerContainer.setComponentZOrder(characters.get(i), i);
+				if (characters.get(i).getParent() != null) {
+					playerContainer.setComponentZOrder(characters.get(i), i);
+				}
 			}
 			
 			int code = (keyPress[37] ? 37 : keyPress[38] ? 38 : keyPress[39] ? 39 : keyPress[40] ? 40 : 0);
@@ -406,6 +442,18 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				if (!paused && player != null) {
 					player.attack(direction);
 				}
+			}
+			
+			if (player != null) {
+				//movement
+				//	68 -> D
+				//	65 -> A
+				//  83 -> W
+				//	87 -> S
+				///player.velocity.x = keyPress[68] ? 1 : 0;
+				//player.velocity.x = keyPress[65] ? -1 : player.velocity.x;
+				//player.velocity.y = keyPress[83] ? 1 : 0;
+				//player.velocity.y = keyPress[87] ? -1 : player.velocity.y;
 			}
 			
 			repaint();
@@ -600,12 +648,30 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 
 	@Override
 	public void componentResized(ComponentEvent e) {
+		resolutionChange();
+	}
+	
+	public void resolutionChange() {
+		System.out.println("called resolution change");
 		if (window != null) {
 			screen = screen.div(ratio);
 			Vector2 currentScreen = new Vector2(window.frame.getContentPane().getSize());
+			//Vector2 currentScreen = new Vector2(800, 600);
 			ratio = currentScreen.div(defaultScreen);
 			screen = screen.mult(ratio);
 			canvas = new BufferedImage((int) screen.x, (int) screen.y, BufferedImage.TYPE_INT_RGB);
+			
+			Graphics2D newG2 = (Graphics2D) canvas.getGraphics();
+			for (int i = 0; i < getComponentCount(); i++) {	
+				if (getComponent(i) instanceof Container) {
+					Container container = (Container) getComponent(i);
+					
+					for (int j = 0; j < container.getComponentCount(); j++) {
+						Object object = (Object) container.getComponent(j);
+						object.g2 = newG2;
+					}
+				}
+			}
 		}
 	}
 
@@ -622,4 +688,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 
 	@Override
 	public void componentRemoved(ContainerEvent e) { }
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -15,7 +15,7 @@ public class Battlemage extends Player {
 		
 		health = 15;
 		maxHealth = 15;
-		speed = 10; //don't fucking go over 8
+		speed = 5; //don't fucking go over 8
 		damage = 5;
 		range = 800;
 		attackspeed = 500;

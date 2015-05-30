@@ -56,14 +56,15 @@ public class Player extends main.object.Object {
 	public void step(double delta) {
 		super.step(delta);
 		
-		for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
-			Object o = (Object) manager.wallContainer.getComponent(i);
-			if (o instanceof Door && o.inside(position.sub(new Vector2(doorBox, doorBox).mult(manager.ratio)), Size.add(new Vector2(doorBox*2, doorBox*2).mult(manager.ratio)))) {
-				Door door = (Door) o;
-				Vector2 nextRoom = door.doorVector();
-				offsetPosition = new Vector2(900, 490).add(Size.scalar(.5)).sub(new Vector2(700, 280).mult(nextRoom));
-				manager.enterRoom(manager.currentRoom.x + (int) nextRoom.y, manager.currentRoom.y + (int) nextRoom.x);
-				break;
+		if (!manager.entering) {
+			for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
+				Object o = (Object) manager.wallContainer.getComponent(i);
+				if (o instanceof Door && o.inside(position.sub(new Vector2(doorBox, doorBox).mult(manager.ratio)), Size.add(new Vector2(doorBox*2, doorBox*2).mult(manager.ratio)))) {
+					Door door = (Door) o;
+					Vector2 nextRoom = door.doorVector();
+					manager.enterRoom(nextRoom, manager.currentRoom.x + (int) nextRoom.y, manager.currentRoom.y + (int) nextRoom.x);
+					break;
+				}
 			}
 		}
 		
