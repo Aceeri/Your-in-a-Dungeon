@@ -13,7 +13,7 @@ public class Main {
 		manager = new Manager(window);
 		window.manager = manager;
 		
-		//window.setWindowed();
-		window.setFullscreen();
+		window.setWindowed();
+		//window.setFullscreen();
 	}
 }

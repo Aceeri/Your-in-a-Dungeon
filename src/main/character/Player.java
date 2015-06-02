@@ -63,6 +63,7 @@ public class Player extends main.object.Object {
 		
 		healthui = new TextLabel(health + "/" + maxHealth);
 		healthui.position = new Vector2(-(offsetSize.x/4), -5);
+		
 		labels.add(healthui);
 	}
 	
@@ -80,6 +81,8 @@ public class Player extends main.object.Object {
 	
 	public void step(double delta) {
 		super.step(delta);
+		
+		healthui.text = health + "/" + maxHealth;
 		
 		if (!manager.entering) {
 			for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
