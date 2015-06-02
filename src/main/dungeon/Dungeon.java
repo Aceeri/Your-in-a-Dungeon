@@ -1,8 +1,11 @@
 package main.dungeon;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import main.misc.Vector2;
 
@@ -32,7 +35,7 @@ public class Dungeon {
 				x = str.length();
 				y++;
 			}
-			scanner.close();
+				
 			
 			System.out.println("dimensions: " + x + ", " + y);
 			charset = new char[y][x];
@@ -48,7 +51,7 @@ public class Dungeon {
 					row++;
 				}
 			}
-			scanner.close();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

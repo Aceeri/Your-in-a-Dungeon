@@ -2,10 +2,6 @@ package main.dungeon;
 
 import java.util.ArrayList;
 
-
-
-
-
 import main.character.Player;
 import main.misc.Vector2;
 import main.object.Background;

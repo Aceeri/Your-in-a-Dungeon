@@ -53,7 +53,7 @@ public class Player extends main.object.Object {
 		
 		speed = 3;
 		type = "player";
-		path = "resources/image/player.png";
+		path = "resources/image/missing.png";
 		
 		animator = new Animator(this);
 		animator.defineAnimation("idle", new Frame[] {
@@ -80,9 +80,8 @@ public class Player extends main.object.Object {
 	
 	public void step(double delta) {
 		super.step(delta);
-		healthui.text = health + "/" + maxHealth;
 		
-		if (!manager.entering && type == "player") {
+		if (!manager.entering) {
 			for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
 				Object o = (Object) manager.wallContainer.getComponent(i);
 				if (o instanceof Door && o.inside(position.sub(new Vector2(doorBox, doorBox).mult(manager.ratio)), Size.add(new Vector2(doorBox*2, doorBox*2).mult(manager.ratio)))) {

@@ -19,6 +19,11 @@ import main.ui.UserInterface;
 
 //default java imports
 import javax.swing.*;
+
+
+//default java imports
+import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -57,7 +62,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public boolean info = false;
 	public boolean fullscreen = false;
 	public boolean paused = false;
-	
 	public int[] secret = new int[] { 38, 38, 40, 40, 37, 39, 37, 39 };
 	public int currentSecret = 0;
 	public boolean wub = false;
@@ -401,6 +405,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		mouse = new Vector2(MouseInfo.getPointerInfo().getLocation()).sub(new Vector2(window.frame.getLocation()).add(new Vector2(window.frame.getInsets())));
 		
 		// get delta and frames per second
+		mouse = new Vector2(MouseInfo.getPointerInfo().getLocation()).sub(new Vector2(window.frame.getLocation()).add(new Vector2(window.frame.getInsets())));
 		long now = System.nanoTime();
 		double delta = ((System.nanoTime()) - lastFrame) / 1000000;
 		delta = delta/1000;
@@ -420,6 +425,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			for (int i = 0; i < getComponentCount(); i++) {	
 				if (getComponent(i) instanceof Container) {
 					Container container = (Container) getComponent(i);
+					
 					// fix container size and location
 					container.setSize(screen.dimension());
 					container.setLocation(0, 0);
@@ -435,7 +441,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 						
 						if (object instanceof Projectile) {
 							Projectile projectile = (Projectile) object;
-							
 							if (projectile.expired()) {
 								container.remove(object);
 							}
@@ -716,7 +721,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public void resolutionChange() {
 		if (window != null) {
-			// find new window size
 			screen = screen.div(ratio);
 			Vector2 currentScreen = new Vector2(window.frame.getContentPane().getSize());
 			ratio = currentScreen.div(defaultScreen);

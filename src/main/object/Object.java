@@ -32,7 +32,6 @@ public class Object extends JComponent {
 	public Vector2 Size = new Vector2(0, 0);
 	public Vector2 velocity = new Vector2(0, 0); // how much the object moves every 1 delta
 	public int direction = 1;
-	public double previousDelta = 0;
 	
 	public double rotation = 0; // displayed rotation (in degrees)
 	public double speed = 0;
@@ -71,6 +70,24 @@ public class Object extends JComponent {
 		}
 		
 		// position for where to draw image
+		if (previousPath != path) {
+			if (manager.images.containsKey("resources\\image\\missing.png")) {
+				image = manager.images.get("resources\\image\\missing.png");
+			} else {
+				try {
+					File file = new File(path);
+					if (file.exists()) {
+						image = ImageIO.read(file);
+						manager.images.put(path, image);
+					} else {
+						image = ImageIO.read(new File("resources\\image\\missing.png"));
+						stretch = true;
+					}
+					previousPath = path;
+				} catch (java.io.IOException e) { }
+			}
+		}
+		
 		double posX = position.x;
 		double posY = position.y;
 		if (!stretch) {
@@ -88,10 +105,9 @@ public class Object extends JComponent {
 		}
 		objectTransform.translate(posX, posY);
 		
-		// scale
+		//rotation
 		objectTransform.scale(scale, scale);
 		
-		// rotation
 		if (rotation != 0) {
 			objectTransform.translate(Size.x*scale/2, Size.y*scale/2);
 			objectTransform.rotate(rotation*Math.PI/180);
@@ -258,7 +274,6 @@ public class Object extends JComponent {
 		paintLocation();
 		
 		if (!anchored && !manager.entering) {
-			previousDelta = delta;
 			offsetPosition = offsetPosition.add(velocity.add(checkCollision(delta)).scalar(speed*delta*manager.fixedFps));
 		}
 		
