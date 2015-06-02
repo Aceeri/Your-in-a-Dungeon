@@ -19,7 +19,11 @@ public class Spider extends Enemy {
 		sight = 300;
 		range = 35;
 		damage = 1;
+		speed = 4;
 		score = 100;
+		
+		health = 8;
+		maxHealth = 8;
 		
 		animator.defineAnimation("walk", new Frame[] {
 				new Frame("resources\\image\\spider.png", .2),

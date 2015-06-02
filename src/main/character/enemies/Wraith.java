@@ -13,7 +13,7 @@ public class Wraith extends Enemy {
 		super(p);
 		
 		stretch = false;
-		offsetSize = new Vector2(40, 60);
+		offsetSize = new Vector2(60, 70);
 		scale = 3;
 		imageY = "bottom";
 		imageX = "center";
@@ -21,8 +21,12 @@ public class Wraith extends Enemy {
 		sight = 600;
 		range = 500;
 		damage = 1;
-		score = 90;
+		score = 150;
 		attackspeed = 500;
+		projectilespeed = 20;
+		
+		health = 12;
+		maxHealth = 12;
 		
 		animator.defineAnimation("attack", new Frame[] {
 				new Frame("resources\\image\\wraith_attack_1.png", .2),
@@ -34,7 +38,7 @@ public class Wraith extends Enemy {
 	
 	public void attack(Player player) {
 		try {
-			Thread.sleep(450);
+			Thread.sleep(550);
 		} catch (InterruptedException e) { }
 		
 		if (getParent() != null) {

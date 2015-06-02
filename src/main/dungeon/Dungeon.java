@@ -62,14 +62,27 @@ public class Dungeon {
 			for (int col = 1; col < charset[0].length; col += 2) {
 				char c = charset[row][col];
 				if (c != '0' || c != '-') {
-					rooms[(row-1)/2][(col-1)/2] = new Room((row-1)/2, (col-1)/2);
-					Room current = rooms[(row-1)/2][(col-1)/2];
+					int x = (row-1)/2;
+					int y = (col-1)/2;
+					Room current = new Room(x, y);
+					
 					switch (c) {
 						case 's':
+							current = new Room(x, y);
 							current.type = "start";
 							start = new Vector2(current.x, current.y);
 							break;
+						case 'b':
+							current = new BossRoom(x, y);
+							break;
+						case '1':
+							current = new Room(x, y);
+							break;
+						case '2':
+							current = new SpiderRoom(x, y);
+							break;
 					}
+					rooms[(row-1)/2][(col-1)/2] = current;
 					
 					char top = charset[row - 1][col];
 					char bottom = charset[row + 1][col];

@@ -5,6 +5,7 @@ import main.misc.Vector2;
 import main.misc.Music;
 import main.character.*;
 import main.character.classes.Battlemage;
+import main.character.classes.Deprived;
 import main.character.enemies.Spider;
 import main.character.enemies.Wraith;
 import main.dungeon.Dungeon;
@@ -17,10 +18,9 @@ import main.ui.Button;
 import main.ui.Debugger;
 import main.ui.UserInterface;
 
+
 //default java imports
 import javax.swing.*;
-
-
 //default java imports
 import javax.swing.*;
 
@@ -199,7 +199,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			if (screenEffect.equals(new Color(0, 0, 0, 0))) {
 				new Thread() {
 					public void run() {
-						for (int i = 0; i < 150; i += 5) {
+						for (int i = 0; i < 100; i += 5) {
 							try {
 								Thread.sleep(8);
 								screenEffect = new Color(0, 255, 255, i);
@@ -243,10 +243,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		
 		if (gameOver) {
 			g2.setColor(fadeGame);
-			g2.setFont(font.deriveFont(256f));
-		    g2.drawString("Game Over", 225, 440);
-		    g2.setFont(font.deriveFont(72f));
-		    g2.drawString("score: " + score, 440, 550);
+			g2.setFont(font.deriveFont((float) (256f*ratio.x)));
+		    g2.drawString("Game Over", (int) (225*ratio.x), (int) (440*ratio.y));
+		    g2.setFont(font.deriveFont((float) (72f*ratio.x)));
+		    g2.drawString("score: " + score, (int) (440*ratio.x), (int) (550*ratio.y));
 		}
 		
 		//info display
@@ -301,24 +301,30 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void start() {
+		// remove all objects from the menu
 		for (int i = 0; i < menuObjects.size(); i++) {
 			uiContainer.remove(menuObjects.get(i));
 		}
 		menuObjects.clear();
 		
-		currentDungeon = new Dungeon("resources\\dungeons\\I_Swear_This_Is_Not_A_Swastika.txt");
+		// add dungeon
+		currentDungeon = new Dungeon("resources\\dungeons\\why.txt");// new Dungeon("resources\\dungeons\\I_Swear_This_Is_Not_A_Swastika.txt");
 		currentDungeon.generate();
 		
+		// add player
 		player = new Battlemage(new Vector2(500, 500));
 		playerContainer.add(player);
 		
+		// enter starting room
 		enterRoom(new Vector2(), (int) currentDungeon.start.x, (int) currentDungeon.start.y);
 		
+		// reset key values
 		player.velocity = new Vector2();
 		keyPress = new boolean[600];
 	}
 	
 	public void gameOver() {
+		// display game over screen
 		new Thread() {
 			public void run() {
 				gameOver = true;
@@ -362,10 +368,9 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				playerContainer.removeAll();
 				player.offsetPosition = new Vector2(900, 490).add(player.Size.scalar(.5)).sub(new Vector2(700, 280).mult(entrance));
 				playerContainer.add(player);
-				playerContainer.add(new Wraith(new Vector2(300, 300)));
-				playerContainer.add(new Spider(new Vector2(700, 300)));
 				currentRoom = currentDungeon.rooms[x][y];
 				
+				// add rooms objects and enemies
 				for (int i = 0; i < currentRoom.objects.size(); i++) {
 					Object o = (Object) currentRoom.objects.get(i);
 					if (o.type == "floor") {
@@ -377,6 +382,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 					}
 				}
 				
+				// check if entered from elsewhere
 				if (!entrance.equals(new Vector2())) {
 					for (int i = 255; i > 0; i -= 5) {
 						try {

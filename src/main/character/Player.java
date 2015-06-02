@@ -82,9 +82,9 @@ public class Player extends main.object.Object {
 	public void step(double delta) {
 		super.step(delta);
 		
-		healthui.text = health + "/" + maxHealth;
+		healthui.text = String.format("%.0f", health) + "/" + String.format("%.0f", maxHealth);
 		
-		if (!manager.entering) {
+		if (type == "player" && !manager.entering) {
 			for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
 				Object o = (Object) manager.wallContainer.getComponent(i);
 				if (o instanceof Door && o.inside(position.sub(new Vector2(doorBox, doorBox).mult(manager.ratio)), Size.add(new Vector2(doorBox*2, doorBox*2).mult(manager.ratio)))) {

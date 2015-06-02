@@ -25,6 +25,16 @@ public class Enemy extends Player {
 		
 		Player nearestPlayer = getNearestPlayer();
 		
+		for (int i = 0; i < manager.playerContainer.getComponentCount(); i++) {
+			Player player = (Player) manager.playerContainer.getComponent(i);
+			if (player instanceof Enemy) {
+				Enemy enemy = (Enemy) player;
+				if (enemy.aggro != null && enemy.position.distance(position) < sight) {
+					aggro = enemy.aggro;
+				}
+			}
+		}
+		
 		if (nearestPlayer != null && offsetPosition.distance(nearestPlayer.offsetPosition) - offsetSize.distance(nearestPlayer.offsetSize) < range) {
 			velocity = new Vector2();
 			if (cooldown <= 0) {
@@ -33,6 +43,24 @@ public class Enemy extends Player {
 					public void run() {
 						animator.playAnimation("attack", false);
 						attack(nearestPlayer);
+					}
+				}.start();
+			}
+			
+			if (ability1 <= 0) {
+				ability1 += ability1speed;
+				new Thread() {
+					public void run() {
+						ability1();
+					}
+				}.start();
+			}
+			
+			if (ability2 <= 0) {
+				ability2 += ability2speed;
+				new Thread() {
+					public void run() {
+						ability2();
 					}
 				}.start();
 			}
@@ -92,6 +120,12 @@ public class Enemy extends Player {
 		}
 		
 		return distance;
+	}
+	
+	public void takeDamage(double damage) {
+		super.takeDamage(damage);
+		Player player = getNearestPlayer();
+		aggro = player;
 	}
 	
 	public void drawPath(BufferedImage canvas) {
