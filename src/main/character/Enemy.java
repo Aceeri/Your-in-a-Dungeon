@@ -17,7 +17,7 @@ public class Enemy extends Player {
 		super(position);
 		
 		type = "enemy";
-		name = "illegal alien";
+		name = "xX1ll3g4l4l13n420swagXx";
 	}
 	
 	public void step(double delta) {

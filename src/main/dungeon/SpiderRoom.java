@@ -19,8 +19,8 @@ public class SpiderRoom extends Room {
 		};
 		
 		SpawnLocation topLeft = new SpawnLocation(enemyList, new Vector2(300, 300), new Vector2(1320, 840));
-		topLeft.maximum = 25;
-		topLeft.minimum = 15;
+		topLeft.maximum = 15;
+		topLeft.minimum = 7;
 		topLeft.minimumScale = .8;
 		topLeft.maximumScale = 1.3;
 		Enemy[] enemies = topLeft.generateEnemies();

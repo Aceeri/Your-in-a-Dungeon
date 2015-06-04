@@ -80,29 +80,32 @@ public class Player extends main.object.Object {
 		
 		double posX = position.x;
 		double posY = position.y;
-		double width = image.getWidth();
-		double height = image.getHeight();
+		double width = image.getWidth()*scale*manager.ratio.x;
+		double height = image.getHeight()*scale*manager.ratio.y;
 		if (!stretch) {
 			if (imageX == "center") {
-				posX = position.x + (Size.x - image.getWidth()*manager.ratio.x*scale)/2;
+				posX = position.x + (Size.x - width)/2;
 			} else if (imageX == "right") {
-				posX = position.x + Size.x - image.getWidth()*manager.ratio.x*scale;
+				posX = position.x + Size.x - width;
 			}
 			
 			if (imageY == "center") {
-				posY = position.y + (Size.y - image.getHeight()*manager.ratio.y*scale)/2;
+				posY = position.y + (Size.y - height)/2;
 			} else if (imageY == "bottom") {
-				posY = position.y + Size.y - image.getHeight()*manager.ratio.y*scale;
+				posY = position.y + Size.y - height;
 			}
 		} else {
 			width = Size.x;
 			height = Size.y;
 		}
 		
+		double sizeX = 70*manager.ratio.x;
+		double sizeY = 3.5*manager.ratio.y;
+		
 		g2.setColor(Color.RED);
-		g2.fillRect((int) (posX + width/2) - 35, (int) (posY - 15), 70, 3);
+		g2.fillRect((int) (posX + width/2 - sizeX/2), (int) (posY - 15*manager.ratio.y), (int) (sizeX), (int) (sizeY));
 		g2.setColor(Color.GREEN);
-		g2.fillRect((int) (posX + width/2) - 35, (int) (posY - 15), (int) (health/maxHealth * 70), 3);
+		g2.fillRect((int) (posX + width/2 - sizeX/2), (int) (posY - 15*manager.ratio.y), (int) (health/maxHealth * sizeX), (int) (sizeY));
 	}
 	
 	public void step(double delta) {

@@ -81,7 +81,6 @@ public class Object extends JComponent {
 						manager.images.put(path, image);
 					} else {
 						image = ImageIO.read(new File("resources\\image\\missing.png"));
-						stretch = true;
 					}
 					previousPath = path;
 				} catch (java.io.IOException e) { }
