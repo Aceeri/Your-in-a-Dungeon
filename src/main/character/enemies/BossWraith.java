@@ -11,16 +11,16 @@ public class BossWraith extends Wraith {
 		health = 50;
 		maxHealth = 50;
 		scale = 3;
+		score = 10000;
 		
-		attackspeed = 1000;
-		damage = 5;
+		attackspeed = 200;
+		damage = 1;
 	}
 	
 	public void ability1() {
 		if (aggro != null) {
 			Vector2 originalPosition = aggro.position;
 			double angleToPosition = Math.atan2((originalPosition.y - position.y), (originalPosition.x - position.x));
-			System.out.println(angleToPosition*180/Math.PI);
 			for (int i = 0; i < 45; i++) {
 				Vector2 projectileDirection = new Vector2(Math.cos((i - 22.5)*Math.PI/180 + angleToPosition), Math.sin((i - 22.5)*Math.PI/180 + angleToPosition)).normalize();
 				
@@ -33,6 +33,12 @@ public class BossWraith extends Wraith {
 				Projectile p = new Projectile(this, projectileDirection, .5, range, 6);
 				manager.projectileContainer.add(p);
 			}
+		}
+	}
+	
+	public void ability2() {
+		if (aggro != null) {
+			
 		}
 	}
 }

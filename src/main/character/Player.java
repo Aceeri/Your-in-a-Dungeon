@@ -64,7 +64,7 @@ public class Player extends main.object.Object {
 		healthui = new TextLabel(health + "/" + maxHealth);
 		healthui.position = new Vector2(-(offsetSize.x/4), -5);
 		
-		labels.add(healthui);
+		//labels.add(healthui);
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -77,6 +77,32 @@ public class Player extends main.object.Object {
 			uiTransform.scale(1.5 * manager.ratio.x, 1 * manager.ratio.y);
 			uiTransform.translate(0, 10 * manager.ratio.y);
 		}
+		
+		double posX = position.x;
+		double posY = position.y;
+		double width = image.getWidth();
+		double height = image.getHeight();
+		if (!stretch) {
+			if (imageX == "center") {
+				posX = position.x + (Size.x - image.getWidth()*manager.ratio.x*scale)/2;
+			} else if (imageX == "right") {
+				posX = position.x + Size.x - image.getWidth()*manager.ratio.x*scale;
+			}
+			
+			if (imageY == "center") {
+				posY = position.y + (Size.y - image.getHeight()*manager.ratio.y*scale)/2;
+			} else if (imageY == "bottom") {
+				posY = position.y + Size.y - image.getHeight()*manager.ratio.y*scale;
+			}
+		} else {
+			width = Size.x;
+			height = Size.y;
+		}
+		
+		g2.setColor(Color.RED);
+		g2.fillRect((int) (posX + width/2) - 35, (int) (posY - 15), 70, 3);
+		g2.setColor(Color.GREEN);
+		g2.fillRect((int) (posX + width/2) - 35, (int) (posY - 15), (int) (health/maxHealth * 70), 3);
 	}
 	
 	public void step(double delta) {
