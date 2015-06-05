@@ -2,11 +2,6 @@ package main.ui;
 
 import main.misc.Vector2;
 
-import java.awt.Color;
-import java.awt.MouseInfo;
-import java.awt.Graphics;
-import java.util.ArrayList;
-
 @SuppressWarnings("serial")
 public class UserInterface extends main.object.Object {
 	

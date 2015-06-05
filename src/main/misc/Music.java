@@ -39,26 +39,27 @@ public class Music {
 	        muteControl = (BooleanControl) clip.getControl(BooleanControl.Type.MUTE);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Error while setting music");
 		}
 	}
 	
 	public void play() {
 		try {
 	        if (loop) {
-	        	clip.setLoopPoints(0, -1);
-	        	clip.loop(Clip.LOOP_CONTINUOUSLY);
+		        clip.setLoopPoints(0, -1);
+		        clip.loop(Clip.LOOP_CONTINUOUSLY);
 	        } else {
+	        	clip.setFramePosition(0);
 	        	clip.start();
 	        }
-	    } catch(Exception ex) {
-	        System.out.println("Error with playing sound.");
-	        ex.printStackTrace();
+	    } catch(IllegalArgumentException e) {
+	        play();
 	    }
 	}
 	
 	public void stop() {
 		clip.stop();
+		clip.flush();
 	}
 	
 	public void setVolume(double volume) {
@@ -76,21 +77,24 @@ public class Music {
 	}
 	
 	public void fadeToNewSong(String pathToNewSong) {
-		System.out.println("New Song: " + pathToNewSong);
-		new Thread() {
-			public void run() {
-				float previousVolume = volumeControl.getValue();
-				for (float i = volumeControl.getValue(); i > -30; i -= .1) {
-					try {
-						Thread.sleep(10);
-						volumeControl.setValue(i);
-					} catch (InterruptedException e) { }
+		Music song = this;
+		if (!pathToNewSong.equals(path)) {
+			new Thread() {
+				public void run() {
+					float previousVolume = volumeControl.getValue();
+					for (float i = volumeControl.getValue(); i > -30; i -= .1) {
+						try {
+							Thread.sleep(8);
+							volumeControl.setValue(i);
+						} catch (InterruptedException e) { }
+					}
+					song.stop();
+					setMusic(pathToNewSong);
+					play();
+					volumeControl.setValue(previousVolume);
 				}
-				setMusic(pathToNewSong);
-				play();
-				volumeControl.setValue(previousVolume);
-			}
-		}.start();
+			}.start();
+		}
 	}
 	
 	public void mute() {

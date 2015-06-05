@@ -22,8 +22,8 @@ public class Wraith extends Enemy {
 		range = 500;
 		damage = 1;
 		score = 150;
-		attackspeed = 500;
-		projectilespeed = 20;
+		attackspeed = 1000;
+		projectilespeed = 10;
 		
 		health = 12;
 		maxHealth = 12;
@@ -34,6 +34,8 @@ public class Wraith extends Enemy {
 				new Frame("resources\\image\\wraith_attack_1.png", .1),
 				new Frame("resources\\image\\wraith.png", .01),
 		});
+		
+		name = "Wraith";
 	}
 	
 	public void attack(Player player) {

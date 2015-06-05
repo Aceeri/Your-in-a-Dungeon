@@ -19,13 +19,8 @@ import main.ui.Debugger;
 import main.ui.TextLabel;
 import main.ui.UserInterface;
 
-
-
 //default java imports
 import javax.swing.*;
-//default java imports
-import javax.swing.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -72,7 +67,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public int lastKeyPress = 0;
 	
 	//highest -> lowest level containers: (highest is displayed above, lowest is displayed below)
-	//	ui -> wall -> player -> projectile -> floor
+	//	ui -> player -> wall -> projectile -> floor
 	public Container uiContainer;
 	public Container playerContainer;
 	public Container projectileContainer;
@@ -129,7 +124,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			InputStream myStream = new BufferedInputStream(new FileInputStream("resources\\pixelfont.ttf"));
 			font = Font.createFont(Font.TRUETYPE_FONT, myStream).deriveFont(24f);
 		} catch (IOException | FontFormatException e) {
-			e.printStackTrace();
+			System.out.println("Font could not be made");
 		}
 		
 		uiContainer = new Container();
@@ -160,8 +155,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		// create default ui
 		debugger = new Debugger();
 		uiContainer.add(debugger);
-		scoreLabel = new TextLabel("Score: 0", new Vector2(10, 30));
-		uiContainer.add(scoreLabel);
+		scoreLabel = new TextLabel("Score: 0", new Vector2(20, 40));
+		scoreLabel.size = 48f;
 		
 		// info user interface
 		debugger.addString(new String[] { "fps" });
@@ -207,7 +202,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawRenderedImage(canvas, at);
 		
-		// check if player is a battlemage and time is slowed
+		// check if player is a Battlemage and time is slowed
 		if (player != null && player instanceof Battlemage && ((Battlemage) player).timeSlowed) {
 			// tint screen cyan
 			if (screenEffect.equals(new Color(0, 0, 0, 0))) {
@@ -289,7 +284,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 							}
 							
 							manager.start();
-							backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");
 							
 							try {
 								Thread.sleep(1000);
@@ -309,7 +303,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		};
 		menuObjects.add(startButton);
 		
-		Background menuBack = new Background(defaultScreen, "resources\\image\\menu_back.png");
+		Background menuBack = new Background(defaultScreen, "resources\\image\\titlescreen.png");
 		menuObjects.add(menuBack);
 		
 		// add menu ui to screen
@@ -325,8 +319,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		}
 		menuObjects.clear();
 		
+		// score displaying
+		uiContainer.add(scoreLabel);
+		
 		// add dungeon
-		currentDungeon = new Dungeon("resources\\dungeons\\why.txt");// new Dungeon("resources\\dungeons\\I_Swear_This_Is_Not_A_Swastika.txt");
+		currentDungeon = new Dungeon("resources\\dungeons\\floor1.txt");
 		currentDungeon.generate();
 		
 		// add player
@@ -336,7 +333,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		// enter starting room
 		enterRoom(new Vector2(), (int) currentDungeon.start.x, (int) currentDungeon.start.y);
 		
-		// reset key values
+		// reset key values to prevent player velocity problems
 		player.velocity = new Vector2();
 		keyPress = new boolean[600];
 	}
@@ -368,6 +365,15 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		new Thread() {
 			public void run() {
 				entering = true;
+				currentRoom = currentDungeon.rooms[x][y];
+				
+				switch (currentRoom.type) {
+					case "boss":
+						backgroundMusic.fadeToNewSong("resources\\sound\\Cathedral.wav");
+					default:
+						backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");
+						
+				}
 				
 				// fade black
 				if (!entrance.equals(new Vector2())) {
@@ -386,7 +392,6 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				playerContainer.removeAll();
 				player.offsetPosition = new Vector2(900, 490).add(player.Size.scalar(.5)).sub(new Vector2(700, 280).mult(entrance));
 				playerContainer.add(player);
-				currentRoom = currentDungeon.rooms[x][y];
 				
 				// add rooms objects and enemies
 				for (int i = 0; i < currentRoom.objects.size(); i++) {

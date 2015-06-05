@@ -1,9 +1,7 @@
 package main.dungeon;
 
 import main.character.Enemy;
-import main.character.enemies.Spider;
 import main.misc.Vector2;
-import main.object.wall.Wall;
 
 public class SpiderRoom extends Room {
 	
@@ -18,9 +16,9 @@ public class SpiderRoom extends Room {
 				"Spider",
 		};
 		
-		SpawnLocation topLeft = new SpawnLocation(enemyList, new Vector2(300, 300), new Vector2(1320, 840));
-		topLeft.maximum = 15;
-		topLeft.minimum = 7;
+		SpawnLocation topLeft = new SpawnLocation(enemyList, new Vector2(500, 500), new Vector2(1120, 640));
+		topLeft.maximum = 8;
+		topLeft.minimum = 3;
 		topLeft.minimumScale = .8;
 		topLeft.maximumScale = 1.3;
 		Enemy[] enemies = topLeft.generateEnemies();

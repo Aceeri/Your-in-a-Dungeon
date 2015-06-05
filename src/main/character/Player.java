@@ -4,11 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 
+import main.misc.Music;
 import main.misc.Vector2;
 import main.object.Animator;
-import main.object.Frame;
 import main.object.Object;
 import main.object.Projectile;
 import main.object.wall.Door;
@@ -26,7 +25,7 @@ public class Player extends main.object.Object {
 	public double ability1speed = 3000; // time before abilities are ready (milliseconds);
 	public double ability2speed = 3000;
 	
-	public String name = "hooman"; // name displayed over character
+	public String name = ""; // name displayed over character
 	public String projectilePath = ""; // default projectile image
 	
 	public double cooldown = 0; // attack debounces
@@ -38,6 +37,7 @@ public class Player extends main.object.Object {
 	public Animator animator;
 	public BufferedImage ui;
 	public TextLabel healthui;
+	private Music attackSound = new Music("resources\\sound\\Attack.wav");
 	
 	public Player(Vector2 position) {
 		super(position);
@@ -45,7 +45,6 @@ public class Player extends main.object.Object {
 		
 		collidable = true;
 		anchored = false;
-		stretch = true;
 		imageX = "center";
 		imageY = "bottom";
 		
@@ -56,6 +55,8 @@ public class Player extends main.object.Object {
 		type = "player";
 		path = "resources/image/missing.png";
 		
+		attackSound.setVolume(.25);
+		
 		animator = new Animator(this);
 		
 		// update health ui
@@ -65,14 +66,6 @@ public class Player extends main.object.Object {
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (type == "player") {
-			if (ui == null) {
-				ui = getImage("resources\\image\\HealthUI.png");
-			}
-			AffineTransform uiTransform = new AffineTransform();
-			uiTransform.scale(1.5 * manager.ratio.x, 1 * manager.ratio.y);
-			uiTransform.translate(0, 10 * manager.ratio.y);
-		}
 		
 		// get top left of image
 		double posX = position.x;
@@ -97,17 +90,33 @@ public class Player extends main.object.Object {
 		}
 		
 		double sizeX = 70*manager.ratio.x;
-		double sizeY = 3.5*manager.ratio.y;
+		double sizeY = 6*manager.ratio.y;
 		
 		// display health bar for character
-		g2.setColor(Color.RED);
-		g2.fillRect((int) (posX + width/2 - sizeX/2), (int) (posY - 15*manager.ratio.y), (int) (sizeX), (int) (sizeY));
+		g2.setColor(Color.GRAY);
+		g2.fillRect((int) (posX), (int) (posY - 10*manager.ratio.y), (int) (sizeX), (int) (sizeY));
 		g2.setColor(Color.GREEN);
-		g2.fillRect((int) (posX + width/2 - sizeX/2), (int) (posY - 15*manager.ratio.y), (int) (health/maxHealth * sizeX), (int) (sizeY));
+		g2.fillRect((int) (posX), (int) (posY - 10*manager.ratio.y), (int) (health/maxHealth * sizeX), (int) (sizeY));
+		
+		g2.setFont(manager.font.deriveFont((float) (24f*Math.min(manager.ratio.x, manager.ratio.y))));
+		g2.setColor(Color.WHITE);
+		g2.drawString(name, (int) (posX), (int) (posY - 18f * manager.ratio.y));
+		
+		if (manager.keyPress[9]) {
+			g2.setColor(Color.GREEN);
+			g2.drawString("(" + String.format("%.0f", health) + "/" + String.format("%.0f", maxHealth) + ")", (int) (posX + g2.getFontMetrics(g2.getFont()).stringWidth(name) + 3), (int) (posY - 18f * manager.ratio.y));
+		}
 	}
 	
 	public void step(double delta) {
 		super.step(delta);
+		
+		if (health < maxHealth) {
+			health += delta/2;
+			if (health > maxHealth) {
+				health = maxHealth;
+			}
+		}
 		
 		healthui.text = String.format("%.0f", health) + "/" + String.format("%.0f", maxHealth);
 		
@@ -139,6 +148,9 @@ public class Player extends main.object.Object {
 	
 	public void attack(Vector2 direction) {
 		if (cooldown <= 0) {
+			animator.playAnimation("attack", false);
+			attackSound.play();
+			
 			Projectile p = new Projectile(this, projectilePath, direction, damage, range, projectilespeed);
 			
 			// make player face direction of projectile

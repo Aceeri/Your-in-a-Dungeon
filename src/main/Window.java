@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.DisplayMode;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;

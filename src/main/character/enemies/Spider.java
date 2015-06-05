@@ -22,6 +22,8 @@ public class Spider extends Enemy {
 		speed = 4;
 		score = 100;
 		
+		stretch = true;
+		
 		health = 8;
 		maxHealth = 8;
 		

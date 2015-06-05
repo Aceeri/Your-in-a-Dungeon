@@ -1,11 +1,8 @@
 package main.dungeon;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import main.misc.Vector2;
 
@@ -21,6 +18,7 @@ public class Dungeon {
 		assignCharset();
 	}
 	
+	// convert file to char[][] to evaluate
 	public void assignCharset() {
 		try {
 			File file = new File(path);
@@ -35,7 +33,8 @@ public class Dungeon {
 				x = str.length();
 				y++;
 			}
-				
+			
+			scanner.close();
 			
 			System.out.println("dimensions: " + x + ", " + y);
 			charset = new char[y][x];
@@ -52,6 +51,7 @@ public class Dungeon {
 				}
 			}
 			
+			scanner.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -66,14 +66,18 @@ public class Dungeon {
 					int y = (col-1)/2;
 					Room current = new Room(x, y);
 					
+					// evaluate character for room type
 					switch (c) {
 						case 's':
 							current = new Room(x, y);
 							current.type = "start";
 							start = new Vector2(current.x, current.y);
 							break;
-						case 'b':
-							current = new BossRoom(x, y);
+						case 'S':
+							current = new BossRoom("Spider", x, y);
+							break;
+						case 'W':
+							current = new BossRoom("Wraith", x, y);
 							break;
 						case '1':
 							current = new Room(x, y);
@@ -81,9 +85,16 @@ public class Dungeon {
 						case '2':
 							current = new SpiderRoom(x, y);
 							break;
+						case '3':
+							current = new WraithRoom(x, y);
+							break;
+						case '4':
+							current = new CombinedRoom(x, y);
+							break;
 					}
 					rooms[(row-1)/2][(col-1)/2] = current;
 					
+					// check characters surrounding room type char for doors
 					char top = charset[row - 1][col];
 					char bottom = charset[row + 1][col];
 					char left = charset[row][col - 1];

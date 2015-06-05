@@ -1,8 +1,6 @@
 package main.character;
 
 import main.misc.Vector2;
-
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 @SuppressWarnings("serial")

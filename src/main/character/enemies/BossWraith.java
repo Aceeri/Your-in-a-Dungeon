@@ -10,11 +10,13 @@ public class BossWraith extends Wraith {
 		
 		health = 90;
 		maxHealth = 90;
-		scale = 3;
-		score = 10000;
+		scale = 5;
+		score = 30000;
 		
 		attackspeed = 200;
 		damage = 1;
+		
+		name = "Boss Wraith";
 	}
 	
 	// sweep of projectiles towards player

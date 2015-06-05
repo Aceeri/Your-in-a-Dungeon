@@ -5,20 +5,18 @@ import main.character.*;
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 
 @SuppressWarnings("serial")
 public class Projectile extends Object {
 	
 	private double damage;
 	private double expiration;
-	private Player parent;
+	private Object parent;
 	
 	public boolean bounce = true;
 	public Color color = Color.ORANGE;
 	
-	public Projectile(Player parent, String path, Vector2 direction, double damage, double range, double speed) {
+	public Projectile(Object parent, String path, Vector2 direction, double damage, double range, double speed) {
 		super(parent.offsetPosition.add(parent.offsetSize.scalar(.5)).add(direction.mult(parent.offsetSize)));
 		
 		this.offsetSize = new Vector2(5, 5);

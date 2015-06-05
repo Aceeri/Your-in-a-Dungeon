@@ -22,17 +22,19 @@ public class BossSpider extends Spider {
 		name = "Boss Spider";
 		stretch = false;
 		
-		range = -290;
-		damage = 1;
-		speed = 4;
-		score = 10000;
+		range = -270;
+		damage = 5;
+		speed = 5;
+		score = 20000;
 		
+		ability1 = 5000;
+		ability2 = 20000;
 		ability1speed = 8500;
-		ability2speed = 10000;
+		ability2speed = 5000;
 		
 		spiders = new SpawnLocation(new String[] { "Spider" }, new Vector2(300, 300), new Vector2(1320, 840));
 		spiders.minimum = 1;
-		spiders.maximum = 3;
+		spiders.maximum = 6;
 	}
 	
 	public void step(double delta) {
@@ -49,7 +51,7 @@ public class BossSpider extends Spider {
 			Spider s = (Spider) spiderList[i];
 			s.health = 1;
 			s.maxHealth = 1;
-			s.damage = 1;
+			s.damage = .5;
 			s.score = 25;
 			manager.playerContainer.add(s);
 		}
@@ -62,11 +64,11 @@ public class BossSpider extends Spider {
 		while (chargeTime > 0) {
 			try {
 				Thread.sleep(5);
-				speed = 10;
+				speed = 8;
 			} catch (InterruptedException e) { }
 		}
 		
-		speed = 4;
+		speed = 5;
 		chargeTime = 0;
 	}
 }
