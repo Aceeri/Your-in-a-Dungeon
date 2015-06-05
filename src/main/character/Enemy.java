@@ -15,7 +15,7 @@ public class Enemy extends Player {
 		super(position);
 		
 		type = "enemy";
-		name = "monster";
+		name = "defaultEnemy";
 	}
 	
 	public void step(double delta) {

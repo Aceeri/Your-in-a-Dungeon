@@ -13,6 +13,7 @@ public class Wall extends main.object.Object {
 		collidable = true;
 		stretch = true;
 		
+		// picture list and rotation settings
 		switch(orientation) {
 			case "top":
 				path = "resources\\image\\wall_top.png";

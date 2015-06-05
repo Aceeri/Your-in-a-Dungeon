@@ -70,23 +70,6 @@ public class Object extends JComponent {
 		}
 		
 		// position for where to draw image
-		if (previousPath != path) {
-			if (manager.images.containsKey("resources\\image\\missing.png")) {
-				image = manager.images.get("resources\\image\\missing.png");
-			} else {
-				try {
-					File file = new File(path);
-					if (file.exists()) {
-						image = ImageIO.read(file);
-						manager.images.put(path, image);
-					} else {
-						image = ImageIO.read(new File("resources\\image\\missing.png"));
-					}
-					previousPath = path;
-				} catch (java.io.IOException e) { }
-			}
-		}
-		
 		double posX = position.x;
 		double posY = position.y;
 		if (!stretch) {
@@ -155,25 +138,7 @@ public class Object extends JComponent {
 	}
 	
 	public BufferedImage getImage(String path) {
-		BufferedImage image;
-		
-		// check if manager's image list already has path, if not make new image and add to list
-		if (manager.images.containsKey(path)) {
-			return manager.images.get(path);
-		} else {
-			try {
-				File file = new File(path);
-				if (file.exists()) {
-					image = ImageIO.read(file);
-					manager.images.put(path, image);
-					return image;
-				} else {
-					return ImageIO.read(new File("resources\\image\\missing.png"));
-				}
-			} catch (java.io.IOException e) {
-				return null;
-			}
-		}
+		return manager.getImage(path);
 	}
 	
 	// rectangle inside

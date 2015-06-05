@@ -18,6 +18,7 @@ public class UserInterface extends main.object.Object {
 	
 	public void step(double delta) {
 		paintLocation();
+		// fire userinterfaces that use hover
 		if (hovering != previousHovering) {
 			if (hovering) {
 				hoverEntered();
@@ -30,18 +31,13 @@ public class UserInterface extends main.object.Object {
 		update();
 	}
 	
-	// Override
 	public void click() { }
 	
-	// Override
 	public void clickDown() { }
 	
-	// Override
 	public void clickUp() { }
 	
-	// Override
 	public void hoverEntered() { }
 	
-	// Override
 	public void hoverLeft() { }
 }

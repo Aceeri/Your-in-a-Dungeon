@@ -4,7 +4,8 @@ import main.character.Player;
 import main.misc.Vector2;
 
 public class Deprived extends Player {
-
+	
+	// unused player class
 	public Deprived(Vector2 position) {
 		super(position);
 		

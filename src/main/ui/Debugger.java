@@ -15,6 +15,7 @@ public class Debugger extends main.object.Object {
 	}
 	
 	public void addString(String[] info) {
+		// add key to debugger
 		displayString.add(info);
 	}
 	
@@ -27,7 +28,7 @@ public class Debugger extends main.object.Object {
 	}
 	
 	public void paintComponent(Graphics g) {
-		//Graphics c = manager.canvas.getGraphics();
+		// display in list form with information
 		
 		if (display) {
 			int currentY = 15;

@@ -26,6 +26,7 @@ public class Button extends main.ui.UserInterface {
 		animator.step(delta);
 	}
 	
+	// hooked to events
 	public void hoverEntered() {
 		path = "resources\\image\\button_hover.png";
 	}

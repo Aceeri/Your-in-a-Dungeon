@@ -27,6 +27,7 @@ public class SpawnLocation {
 		ArrayList<Enemy> enemyList = new ArrayList<Enemy> ();
 		int maxEnemies = (int) (Math.round(minimum + Math.random()*maximum));
 		
+		// spawn a random amount of enemies between given vars
 		for (int i = 0; i < maxEnemies; i++) {
 			String newEnemy = enemies[(int) (Math.round(Math.random()*(enemies.length - 1)))];
 			Enemy enemy = evaluateString(newEnemy);
@@ -53,6 +54,7 @@ public class SpawnLocation {
 		return convertedList;
 	}
 	
+	// evaluate strings to enemy classes
 	public Enemy evaluateString(String enemyName) {
 		switch (enemyName) {
 			case "Wraith":

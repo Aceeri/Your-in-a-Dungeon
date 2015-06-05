@@ -1,5 +1,9 @@
 package main.dungeon;
 
+import main.Manager;
+import main.object.Background;
+import main.object.Object;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
@@ -11,9 +15,11 @@ public class Dungeon {
 	public char[][] charset;
 	public Room[][] rooms;
 	public Vector2 start;
+	private Manager manager;
 	
-	public Dungeon(String p) {
+	public Dungeon(Manager manager, String p) {
 		System.out.println("New Dungeon: " + p);
+		this.manager = manager;
 		path = p;
 		assignCharset();
 	}
@@ -72,6 +78,10 @@ public class Dungeon {
 							current = new Room(x, y);
 							current.type = "start";
 							start = new Vector2(current.x, current.y);
+							break;
+						case 'e':
+							current = new Room(x, y);
+							current.type = "end";
 							break;
 						case 'S':
 							current = new BossRoom("Spider", x, y);

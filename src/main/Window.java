@@ -1,8 +1,6 @@
 package main;
 
 import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.io.FileInputStream;
 
 import javax.imageio.ImageIO;
@@ -15,8 +13,6 @@ public class Window {
 	public boolean fullscreen = false;
 	public Vector2 minimumSize = new Vector2(400, 300);
 	public Manager manager;
-	public GraphicsEnvironment ge;
-	public GraphicsDevice gd;
 	public JFrame frame;
 	private JFrame holder;
 	private String icon = "resources\\image\\dungen.png";
@@ -24,14 +20,12 @@ public class Window {
 	public Window() {
 		super();
 		newFrame();
-		
-		ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		gd = ge.getDefaultScreenDevice();
 	}
 	
 	public void setFullscreen() {
 		newFrame();
 		
+		// removes borders and extends to entire screen
 		frame.setUndecorated(true);
 		frame.pack();
 		frame.add(manager);
@@ -49,8 +43,9 @@ public class Window {
 	public void setWindowed() {
 		newFrame();
 		
+		// keeps borders and maximizes to screen
 		Vector2 screen = new Vector2();
-		frame.setLocation(screen.scalar(.1).point());
+		frame.setLocation(screen.scalar(.1).point()); // set minimized screen location and size
 		frame.setSize(screen.scalar(.85).dimension());
 		frame.pack();
 		frame.add(manager);
@@ -68,6 +63,7 @@ public class Window {
 	}
 	
 	private void newFrame() {
+		// create default JPanel
 		holder = frame;
 		
 		frame = new JFrame();

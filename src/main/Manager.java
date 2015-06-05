@@ -19,8 +19,11 @@ import main.ui.Debugger;
 import main.ui.TextLabel;
 import main.ui.UserInterface;
 
+
+import javax.imageio.ImageIO;
 //default java imports
 import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -41,6 +44,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +65,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public boolean paused = false;
 	public int[] secret = new int[] { 38, 38, 40, 40, 37, 39, 37, 39 };
 	public int currentSecret = 0;
-	public boolean wub = false;
+	public boolean konami = false;
 	
 	public boolean[] keyPress = new boolean[600];
 	public int lastKeyPress = 0;
@@ -133,6 +137,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		wallContainer = new Container();
 		floorContainer = new Container();
 		
+		// add listeners to check for objects to be added
 		uiContainer.addContainerListener(this);
 		playerContainer.addContainerListener(this);
 		projectileContainer.addContainerListener(this);
@@ -145,7 +150,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		backgroundMusic.setVolume(1);
 		backgroundMusic.play();
 		
-		//add containers to JPanel
+		// add containers to JPanel
 		add(uiContainer);
 		add(playerContainer);
 		add(wallContainer);
@@ -191,7 +196,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
 		
 		// konami code thing
-		if (wub) {
+		if (konami) {
 			at.translate(canvas.getWidth()/2, canvas.getHeight()/2);
 			at.rotate(angle*Math.PI/180);
 			at.translate(-canvas.getWidth()/2, -canvas.getHeight()/2);
@@ -222,7 +227,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		}
 		
 		// other konami code thing
-		if (wub) {
+		if (konami) {
 			if (currentTween.equals("r")) {
 				cr += 5*tween;
 				if ((tween == 1 && cr >= 255) || (tween == -1 && cr <= 0)) {
@@ -323,7 +328,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		uiContainer.add(scoreLabel);
 		
 		// add dungeon
-		currentDungeon = new Dungeon("resources\\dungeons\\floor1.txt");
+		currentDungeon = new Dungeon(this, "resources\\dungeons\\floor1.txt");
 		currentDungeon.generate();
 		
 		// add player
@@ -367,12 +372,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				entering = true;
 				currentRoom = currentDungeon.rooms[x][y];
 				
+				System.out.println(currentRoom.type);
 				switch (currentRoom.type) {
 					case "boss":
-						backgroundMusic.fadeToNewSong("resources\\sound\\Cathedral.wav");
+						backgroundMusic.fadeToNewSong("resources\\sound\\Colosseum.wav");
+					case "end":
+						backgroundMusic.fadeToNewSong("resources\\sound\\Ending.wav");
 					default:
-						backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");
-						
+						backgroundMusic.fadeToNewSong("resources\\sound\\Garrison.wav");	
 				}
 				
 				// fade black
@@ -390,30 +397,55 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 				wallContainer.removeAll();
 				projectileContainer.removeAll();
 				playerContainer.removeAll();
-				player.offsetPosition = new Vector2(900, 490).add(player.Size.scalar(.5)).sub(new Vector2(700, 280).mult(entrance));
-				playerContainer.add(player);
 				
-				// add rooms objects and enemies
-				for (int i = 0; i < currentRoom.objects.size(); i++) {
-					Object o = (Object) currentRoom.objects.get(i);
-					if (o.type == "floor") {
-						floorContainer.add(o);
-					} else if (o.type == "wall") {
-						wallContainer.add(o);
-					} else if (o.type == "enemy") {
-						playerContainer.add(o);
+				if (currentRoom.type.equals("end") ){
+					uiContainer.removeAll();
+					
+					TextLabel s = new TextLabel(scoreLabel.text);
+					s.size = 128f;
+					s.color = Color.WHITE;
+					
+					s.position = new Vector2(defaultScreen.x/2 - 350, 700);
+					uiContainer.add(s);
+					
+					Background winBack = new Background(defaultScreen, "resources\\image\\winscreen.png");
+					uiContainer.add(winBack);
+					
+					if (!entrance.equals(new Vector2())) {
+						for (int i = 255; i > 0; i -= 3) {
+							try {
+								Thread.sleep(10);
+								transition = new Color(0, 0, 0, i);
+							} catch (InterruptedException e) { }
+						}
+					}
+				} else {
+					player.offsetPosition = new Vector2(900, 490).add(player.Size.scalar(.5)).sub(new Vector2(700, 280).mult(entrance));
+					playerContainer.add(player);
+					
+					// add rooms objects and enemies
+					for (int i = 0; i < currentRoom.objects.size(); i++) {
+						Object o = (Object) currentRoom.objects.get(i);
+						if (o.type == "floor") {
+							floorContainer.add(o);
+						} else if (o.type == "wall") {
+							wallContainer.add(o);
+						} else if (o.type == "enemy") {
+							playerContainer.add(o);
+						}
+					}
+					
+					// check if entered from elsewhere
+					if (!entrance.equals(new Vector2())) {
+						for (int i = 255; i > 0; i -= 5) {
+							try {
+								Thread.sleep(4);
+								transition = new Color(0, 0, 0, i);
+							} catch (InterruptedException e) { }
+						}
 					}
 				}
 				
-				// check if entered from elsewhere
-				if (!entrance.equals(new Vector2())) {
-					for (int i = 255; i > 0; i -= 5) {
-						try {
-							Thread.sleep(4);
-							transition = new Color(0, 0, 0, i);
-						} catch (InterruptedException e) { }
-					}
-				}
 				entering = false;
 			}
 		}.start();
@@ -569,6 +601,28 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		}
 	}
 	
+	public BufferedImage getImage(String path) {
+		BufferedImage image;
+		
+		// check if manager's image list already has path, if not make new image and add to list
+		if (images.containsKey(path)) {
+			return images.get(path);
+		} else {
+			try {
+				File file = new File(path);
+				if (file.exists()) {
+					image = ImageIO.read(file);
+					images.put(path, image);
+					return image;
+				} else {
+					return ImageIO.read(new File("resources\\image\\missing.png"));
+				}
+			} catch (java.io.IOException e) {
+				return null;
+			}
+		}
+	}
+	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int code = e.getKeyCode();
@@ -579,7 +633,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			currentSecret++;
 			if (currentSecret == secret.length) {
 				currentSecret = 0;
-				wub = !wub;
+				konami = !konami;
 				angle = 0;
 			}
 		} else {

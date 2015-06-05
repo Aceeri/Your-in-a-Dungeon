@@ -34,9 +34,11 @@ public class Projectile extends Object {
 	}
 	
 	public boolean expired() {
+		// return true if projectile has lasted longer than range
 		return expiration <= 0;
 	}
 	
+	// go through all objects to see if colliding to anything that isn't the parent or a friendly
 	public Vector2 checkCollision(Object[] ignoreList, double delta) {
 		for (int i = 0; i < manager.getComponentCount(); i++) {
 			if (manager.getComponent(i) instanceof Container && manager.getComponent(i) != manager.projectileContainer) {
@@ -53,6 +55,7 @@ public class Projectile extends Object {
 								}
 							}
 							
+							// damage if not friendly and not inanimate
 							if (object != parent && !object.type.equals(parent.type) && !ignore && object.inside(position.add(velocity.scalar(speed*delta*manager.fixedFps)), Size)) {
 								if (object instanceof Player) {
 									Player plr = (Player) object;
@@ -80,13 +83,4 @@ public class Projectile extends Object {
 		offsetPosition = offsetPosition.add(velocity.scalar(speed*delta*manager.fixedFps));
 		update();
 	}
-	
-	/*public void paintComponent(Graphics g) {
-		if (g2 == null) {
-			g2 = (Graphics2D) manager.canvas.getGraphics();
-		}
-		
-		g2.setColor(color);
-		g2.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
-	}*/
 }

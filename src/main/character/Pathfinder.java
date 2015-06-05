@@ -1,6 +1,5 @@
 package main.character;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 import main.Manager;
@@ -14,6 +13,7 @@ public class Pathfinder {
 		manager = m;
 	}
 	
+	// check if two boxes intersect
 	public boolean intersectingBox(Vector2 position, double size) {
 		for (int i = 0; i < manager.wallContainer.getComponentCount(); i++) {
 			Object object = (Object) manager.wallContainer.getComponent(i);
@@ -24,6 +24,7 @@ public class Pathfinder {
 		return false;
 	}
 	
+	// returns a list of positions for something to follow to get to the destination
 	public Node[] route(Vector2 from, Vector2 to, double nodeSize) {
 		nodeSize = nodeSize*Math.max(manager.ratio.x, manager.ratio.y);
 		Node[][] nodeMap = createMap(from, to, nodeSize);
@@ -32,6 +33,8 @@ public class Pathfinder {
 		double startDistance = -1;
 		Node endNode = null;
 		double endDistance = -1;
+		
+		// find nodes that are closest to the start and end
 		for (int i = 0; i < nodeMap.length; i++) {
 			for (int j = 0; j < nodeMap[0].length; j++) {
 				Node node = nodeMap[i][j];
@@ -46,15 +49,8 @@ public class Pathfinder {
 				}
 			}
 		}
-		endNode.color = Color.YELLOW;
 		
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		for (int i = 0; i < nodeMap.length; i++) {
-			for (int j = 0; j < nodeMap[0].length; j++) {
-				nodes.add(nodeMap[i][j]);
-			}
-		}
-		
+		// simple return if start node is where the end node is, just return no positions
 		if (startNode == endNode) {
 			return new Node[] { };
 		}
@@ -79,13 +75,13 @@ public class Pathfinder {
 				}
 			}
 			
-			currentNode.color = Color.GREEN;
 			openSet.remove(currentNode);
 			closedSet.add(currentNode);
 			navigatedSet.add(currentNode);
 			
 			Node[] surrounding;
 			try {
+				// all surrounding nodes
 				surrounding = new Node[] {
 						nodeMap[currentNode.x - 1][currentNode.y],
 						nodeMap[currentNode.x + 1][currentNode.y],
@@ -101,21 +97,24 @@ public class Pathfinder {
 				return new Node[] { };
 			}
 			
+			// check if reached end node
 			if (currentNode == endNode) {
-				endNode.color = Color.YELLOW;
 				ArrayList<Node> path = new ArrayList<Node>();
 				path.add(endNode);
 				currentNode = endNode;
+				
+				// recreate path
 				int tries = 0;
 				while (true) {
 					tries++;
+					
+					// if taking too long, quit
 					if (tries > 100) {
 						return new Node[] { };
 					}
 					
 					currentNode = currentNode.parent;
 					path.add(currentNode);
-					currentNode.color = Color.YELLOW;
 					
 					if (currentNode.equals(startNode)) {
 						Node[] sortedPath = new Node[path.size()];
@@ -127,6 +126,7 @@ public class Pathfinder {
 				}
 			}
 			
+			// check if surrounding node is in closed or open sets or if intersecting
 			for (int i = 0; i < surrounding.length; i++) {
 				if (!closedSet.contains(surrounding[i])
 						&& surrounding[i].x == 0
@@ -135,15 +135,13 @@ public class Pathfinder {
 						|| surrounding[i].y == nodeMap[0].length - 1
 						|| intersectingBox(surrounding[i].position, nodeSize)) {
 					closedSet.add(surrounding[i]);
-					surrounding[i].color = Color.BLUE;
 				} else if (!closedSet.contains(surrounding[i]) && !openSet.contains(surrounding[i])) {
 					surrounding[i].parent = currentNode;
 					openSet.add(surrounding[i]);
-					surrounding[i].color = Color.CYAN;
 				}
 			}
 			
-			
+			// break if too long
 			if (counter > 200) {
 				break;
 			}
@@ -152,6 +150,7 @@ public class Pathfinder {
 		return new Node[] { };
 	}
 	
+	// returns a two dimensional array of nodes according to the manager's canvas size
 	public Node[][] createMap(Vector2 from, Vector2 to, double nodeSize) {
 		int endX = (int) (Math.round(to.x/(nodeSize)));
 		int endY = (int) (Math.round(to.y/(nodeSize)));
@@ -169,6 +168,7 @@ public class Pathfinder {
 		return nodeMap;
 	}
 	
+	// returns positions in node set as vectors
 	public Vector2[] nodeToVectorSet(ArrayList<Node> set) {
 		Vector2[] list = new Vector2[set.size()];
 		

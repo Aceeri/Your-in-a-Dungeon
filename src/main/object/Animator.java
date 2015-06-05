@@ -26,6 +26,7 @@ public class Animator {
 	}
 	
 	public void defineAnimation(String animationName, Frame[] paths) {
+		// add animation to list of animations for this animator for future reference
 		animations.put(animationName, paths);
 	}
 	
@@ -48,6 +49,7 @@ public class Animator {
 	}
 	
 	public void tweenPosition(Vector2 newPosition, double time) {
+		// set to interpolation
 		currentAnimation = new Frame[] {
 				new Frame(parent.offsetPosition, newPosition, time)
 		};
@@ -57,6 +59,8 @@ public class Animator {
 	
 	public void step(double delta) {
 		if (currentFrame != null) {
+			// regular -> plays images in sequences with set delays
+			// tween -> interpolates between original and final position
 			switch (currentFrame.behavior) {
 				case "regular":
 					parent.path = currentFrame.path;
@@ -66,11 +70,15 @@ public class Animator {
 					break;
 			}
 			
+			// check if current frame is done
 			if (currentFrame.step(delta)) {
 				currentAnimationFrame++;
 				if (currentAnimationFrame < currentAnimation.length) {
 					currentFrame = currentAnimation[currentAnimationFrame];
 				} else {
+					// decide what to do after ended
+					// if looped then just start from beginning
+					// otherwise reset variables
 					if (loop) {
 						currentAnimationFrame = 0;
 						currentFrame = currentAnimation[currentAnimationFrame];

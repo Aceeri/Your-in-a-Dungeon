@@ -32,6 +32,7 @@ public class Music {
 		}
 		
 		try {
+			// get audio from file and set controls for volume and mute
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
 	        clip = AudioSystem.getClip();
 	        clip.open(audioInputStream);
@@ -45,6 +46,7 @@ public class Music {
 	
 	public void play() {
 		try {
+			// start from beginning and play
 	        if (loop) {
 		        clip.setLoopPoints(0, -1);
 		        clip.loop(Clip.LOOP_CONTINUOUSLY);
@@ -52,21 +54,23 @@ public class Music {
 	        	clip.setFramePosition(0);
 	        	clip.start();
 	        }
-	    } catch(IllegalArgumentException e) {
+	    } catch (IllegalArgumentException e) {
+	    	// clip could not play, stop and try again
+	    	stop();
+	    	clip.setFramePosition(0);
 	        play();
 	    }
 	}
 	
 	public void stop() {
 		clip.stop();
-		clip.flush();
 	}
 	
 	public void setVolume(double volume) {
-		//convert to decibels
+		// convert to decibels
 		float decibels = (float) (((Math.log(volume) / Math.log(10.0f) * 20.0f))); 
 		
-		//clamp
+		// clamp
 		if (decibels > volumeControl.getMaximum()) {
 			decibels = volumeControl.getMaximum();
 		} else if (decibels < volumeControl.getMinimum()) {
@@ -81,6 +85,8 @@ public class Music {
 		if (!pathToNewSong.equals(path)) {
 			new Thread() {
 				public void run() {
+					// start at current volume and iterate down then play new song for smoother transition
+					
 					float previousVolume = volumeControl.getValue();
 					for (float i = volumeControl.getValue(); i > -30; i -= .1) {
 						try {
@@ -88,6 +94,7 @@ public class Music {
 							volumeControl.setValue(i);
 						} catch (InterruptedException e) { }
 					}
+					
 					song.stop();
 					setMusic(pathToNewSong);
 					play();
