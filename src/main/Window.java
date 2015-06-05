@@ -43,22 +43,8 @@ public class Window {
 		if (holder != null) {
 			holder.dispose(); // disposes of old window
 		}
-	}
-	
-	public void setFullscreen(Vector2 resolution) {
-		setFullscreen();
 		
-		System.out.println(gd.isFullScreenSupported());
-		if (gd.isFullScreenSupported()) {
-			gd.setFullScreenWindow(frame);
-		}
-		System.out.println(gd.isDisplayChangeSupported());
-		if (gd.isDisplayChangeSupported()) {
-			DisplayMode dm = new DisplayMode((int) resolution.x, (int) resolution.y, DisplayMode.BIT_DEPTH_MULTI, DisplayMode.REFRESH_RATE_UNKNOWN);
-			gd.setDisplayMode(dm);
-		}
-		
-		manager.resolutionChange();
+		System.out.println("Fullscreen mode");
 	}
 	
 	public void setWindowed() {
@@ -78,6 +64,8 @@ public class Window {
 		}
 		
 		manager.resolutionChange();
+		
+		System.out.println("Windowed mode");
 	}
 	
 	private void newFrame() {

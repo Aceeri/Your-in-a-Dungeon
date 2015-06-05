@@ -17,7 +17,7 @@ public class Enemy extends Player {
 		super(position);
 		
 		type = "enemy";
-		name = "xX1ll3g4l4l13n420swagXx";
+		name = "monster";
 	}
 	
 	public void step(double delta) {
@@ -25,6 +25,7 @@ public class Enemy extends Player {
 		
 		Player nearestPlayer = getNearestPlayer();
 		
+		// check if any enemies around it were attacked within sight of enemy
 		for (int i = 0; i < manager.playerContainer.getComponentCount(); i++) {
 			Player player = (Player) manager.playerContainer.getComponent(i);
 			if (player instanceof Enemy) {
@@ -35,18 +36,8 @@ public class Enemy extends Player {
 			}
 		}
 		
-		if (nearestPlayer != null && offsetPosition.distance(nearestPlayer.offsetPosition) - offsetSize.distance(nearestPlayer.offsetSize) < range) {
-			velocity = new Vector2();
-			if (cooldown <= 0) {
-				cooldown += attackspeed;
-				new Thread() {
-					public void run() {
-						animator.playAnimation("attack", false);
-						attack(nearestPlayer);
-					}
-				}.start();
-			}
-			
+		// check ability timers
+		if (nearestPlayer != null) {
 			if (ability1 <= 0) {
 				ability1 += ability1speed;
 				new Thread() {
@@ -64,14 +55,32 @@ public class Enemy extends Player {
 					}
 				}.start();
 			}
+		}
+		
+		// check if player exists and if they are within attack distance
+		if (nearestPlayer != null && offsetPosition.distance(nearestPlayer.offsetPosition) - offsetSize.distance(nearestPlayer.offsetSize) < range) {
+			velocity = new Vector2();
+			if (cooldown <= 0) {
+				cooldown += attackspeed;
+				new Thread() {
+					public void run() {
+						animator.playAnimation("attack", false);
+						attack(nearestPlayer);
+					}
+				}.start();
+			}
+		
+		// otherwise check if they are within sight of the enemy then set aggro to the player
 		} else if (nearestPlayer != null && (offsetPosition.distance(nearestPlayer.offsetPosition) - offsetSize.distance(nearestPlayer.offsetSize) < sight || aggro != null)) {
 			aggro = nearestPlayer;
 			nearestPlayer.update();
 			update();
+			// get a new route
 			if (route == null || (route.length > 0 && route[route.length - 1].position.distance(nearestPlayer.position) > 30)) {
 				route = manager.pathfinder.route(position.add(Size.scalar(.5)), nearestPlayer.position.add(Size.scalar(.5)), 30);
 			}
 			
+			// check if next node is closer than current
 			if (route.length > 0) {
 				Node closest = null;
 				double distance = -1;
@@ -86,6 +95,7 @@ public class Enemy extends Player {
 					velocity = closest.position.sub(position.add(Size.scalar(.5))).normalize();
 				}
 			}
+		// if no aggro and no player in sight then stop moving
 		} else {
 			velocity = new Vector2();
 		}
@@ -97,6 +107,7 @@ public class Enemy extends Player {
 		Player current = null;
 		double distance = -1;
 		
+		// go through player container to find player
 		for (int i = 0; i < manager.playerContainer.getComponentCount(); i++) {
 			Player plr = (Player) manager.playerContainer.getComponent(i);
 			double toPlayer = position.distance(plr.position);
@@ -109,26 +120,16 @@ public class Enemy extends Player {
 		return current;
 	}
 	
-	public double getDistanceToNearestPlayer() {
-		double distance = -1;
-		for (int i = 0; i < manager.playerContainer.getComponentCount(); i++) {
-			Player plr = (Player) manager.playerContainer.getComponent(i);
-			double toPlayer = position.distance(plr.position);
-			if (plr.type == "player" && (toPlayer < distance || distance == -1)) {
-				distance = toPlayer;
-			}
-		}
-		
-		return distance;
-	}
-	
 	public void takeDamage(double damage) {
 		super.takeDamage(damage);
+		
+		// set aggro to player if attacked
 		Player player = getNearestPlayer();
 		aggro = player;
 	}
 	
 	public void drawPath(BufferedImage canvas) {
+		// display path on panel
 		if (route != null && route.length > 0) {
 			for (int i = 0; i + 1 < route.length; i++) {
 				route[i].position.drawVector(canvas, route[i + 1].position);

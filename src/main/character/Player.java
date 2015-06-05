@@ -26,13 +26,14 @@ public class Player extends main.object.Object {
 	public double ability1speed = 3000; // time before abilities are ready (milliseconds);
 	public double ability2speed = 3000;
 	
-	public String name = "hooman";
+	public String name = "hooman"; // name displayed over character
+	public String projectilePath = ""; // default projectile image
 	
-	public double cooldown = 0;
+	public double cooldown = 0; // attack debounces
 	public double ability1 = 0;
 	public double ability2 = 0;
 	public double hitcooldown = 0;
-	private double doorBox = 5;
+	private double doorBox = 5; // distance to doors before moving rooms
 	
 	public Animator animator;
 	public BufferedImage ui;
@@ -56,15 +57,10 @@ public class Player extends main.object.Object {
 		path = "resources/image/missing.png";
 		
 		animator = new Animator(this);
-		animator.defineAnimation("idle", new Frame[] {
-				new Frame("resources/image/wall_left.png", 2),
-				new Frame("resources/image/wall_top.png", 2),
-		});
 		
+		// update health ui
 		healthui = new TextLabel(health + "/" + maxHealth);
 		healthui.position = new Vector2(-(offsetSize.x/4), -5);
-		
-		//labels.add(healthui);
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -78,6 +74,7 @@ public class Player extends main.object.Object {
 			uiTransform.translate(0, 10 * manager.ratio.y);
 		}
 		
+		// get top left of image
 		double posX = position.x;
 		double posY = position.y;
 		double width = image.getWidth()*scale*manager.ratio.x;
@@ -102,6 +99,7 @@ public class Player extends main.object.Object {
 		double sizeX = 70*manager.ratio.x;
 		double sizeY = 3.5*manager.ratio.y;
 		
+		// display health bar for character
 		g2.setColor(Color.RED);
 		g2.fillRect((int) (posX + width/2 - sizeX/2), (int) (posY - 15*manager.ratio.y), (int) (sizeX), (int) (sizeY));
 		g2.setColor(Color.GREEN);
@@ -129,8 +127,10 @@ public class Player extends main.object.Object {
 			animator.playAnimation("walk", false);
 		}
 		
+		// play animation step if playing
 		animator.step(delta);
 		
+		// remove debounces on attacks
 		hitcooldown = hitcooldown > 0 ? hitcooldown - delta*1000*manager.fixedFps/60 : 0;
 		cooldown = cooldown > 0 ? cooldown - delta*1000*manager.fixedFps/60 : 0;
 		ability1 = ability1 > 0 ? ability1 - delta*1000*manager.fixedFps/60 : 0;
@@ -139,8 +139,19 @@ public class Player extends main.object.Object {
 	
 	public void attack(Vector2 direction) {
 		if (cooldown <= 0) {
-			Projectile p = new Projectile(this, direction, damage, range, projectilespeed);
+			Projectile p = new Projectile(this, projectilePath, direction, damage, range, projectilespeed);
+			
+			// make player face direction of projectile
+			if (direction.x > 0) {
+				this.direction = -1;
+			} else {
+				this.direction = 1;
+			}
+			
+			// add to panel
 			manager.projectileContainer.add(p);
+			
+			// set cooldown debounce
 			cooldown += attackspeed;
 		}
 	}

@@ -50,7 +50,7 @@ public class Wraith extends Enemy {
 				direction = 1;
 			}
 			
-			Projectile p = new Projectile(this, projectileDirection, damage, range, projectilespeed);
+			Projectile p = new Projectile(this, "resources\\image\\wraithshot.png", projectileDirection, damage, range, projectilespeed);
 			manager.projectileContainer.add(p);
 		}
 	}

@@ -45,10 +45,10 @@ public class Object extends JComponent {
 	public boolean anchored = false;
 	public boolean stretch = false;
 	
-	protected String path = "resources\\image\\missing.png";
+	protected String path = "resources\\image\\missing.png"; // default image
 	protected String previousPath = path;
 	protected BufferedImage image;
-	public Graphics2D g2;
+	public Graphics2D g2; // canvas to be updated by manager
 	
 	public Object(Vector2 p) {
 		offsetPosition = p;
@@ -102,9 +102,11 @@ public class Object extends JComponent {
 				posY = position.y + Size.y - image.getHeight()*manager.ratio.y*scale;
 			}
 		}
+		
+		// move object to correct position on screen
 		objectTransform.translate(posX, posY);
 		
-		//rotation
+		// rotation
 		objectTransform.scale(scale, scale);
 		
 		if (rotation != 0) {
@@ -306,8 +308,8 @@ public class Object extends JComponent {
 		return false;
 	}
 	
+	//checks if vector intersects sides of rectangle, or if they are inside the rectangle
 	public boolean intersects(Vector2 o2, Vector2 d2) {
-		//checks if vector intersects sides of rectangle, or if they are inside the rectangle
 		if (intersects(position, position.add(new Vector2(Size.x, 0)), o2, d2)
 				|| intersects(position, position.add(new Vector2(0, Size.y)), o2, d2)
 				|| intersects(position.add(Size), position.add(new Vector2(-Size.x, 0)), o2, d2)

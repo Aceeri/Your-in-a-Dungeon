@@ -8,8 +8,8 @@ public class BossWraith extends Wraith {
 	public BossWraith(Vector2 p) {
 		super(p);
 		
-		health = 50;
-		maxHealth = 50;
+		health = 90;
+		maxHealth = 90;
 		scale = 3;
 		score = 10000;
 		
@@ -17,6 +17,7 @@ public class BossWraith extends Wraith {
 		damage = 1;
 	}
 	
+	// sweep of projectiles towards player
 	public void ability1() {
 		if (aggro != null) {
 			Vector2 originalPosition = aggro.position;
@@ -30,7 +31,7 @@ public class BossWraith extends Wraith {
 					direction = 1;
 				}
 				
-				Projectile p = new Projectile(this, projectileDirection, .5, range, 6);
+				Projectile p = new Projectile(this, "resources\\image\\wraithshot.png", projectileDirection, .5, range, 6);
 				manager.projectileContainer.add(p);
 			}
 		}

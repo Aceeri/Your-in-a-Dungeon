@@ -18,7 +18,7 @@ public class Projectile extends Object {
 	public boolean bounce = true;
 	public Color color = Color.ORANGE;
 	
-	public Projectile(Player parent, Vector2 direction, double damage, double range, double speed) {
+	public Projectile(Player parent, String path, Vector2 direction, double damage, double range, double speed) {
 		super(parent.offsetPosition.add(parent.offsetSize.scalar(.5)).add(direction.mult(parent.offsetSize)));
 		
 		this.offsetSize = new Vector2(5, 5);
@@ -27,6 +27,7 @@ public class Projectile extends Object {
 		this.damage = damage;
 		this.expiration = range;
 		this.speed = speed;
+		this.path = path;
 		
 		anchored = false;
 		collidable = false;
@@ -82,12 +83,12 @@ public class Projectile extends Object {
 		update();
 	}
 	
-	public void paintComponent(Graphics g) {
+	/*public void paintComponent(Graphics g) {
 		if (g2 == null) {
 			g2 = (Graphics2D) manager.canvas.getGraphics();
 		}
 		
 		g2.setColor(color);
 		g2.fillRect((int) position.x, (int) position.y, (int) Size.x, (int) Size.y);
-	}
+	}*/
 }

@@ -16,7 +16,9 @@ import main.object.Object;
 import main.object.Projectile;
 import main.ui.Button;
 import main.ui.Debugger;
+import main.ui.TextLabel;
 import main.ui.UserInterface;
+
 
 
 //default java imports
@@ -115,6 +117,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	public Dungeon currentDungeon;
 	public Room currentRoom;
 	public int score = 0;
+	public TextLabel scoreLabel;
 	
 	public Manager(Window window) {
 		this.window = window;
@@ -154,10 +157,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		add(projectileContainer);
 		add(floorContainer);
 		
+		// create default ui
 		debugger = new Debugger();
 		uiContainer.add(debugger);
+		scoreLabel = new TextLabel("Score: 0", new Vector2(10, 30));
+		uiContainer.add(scoreLabel);
 		
-		//info user interface
+		// info user interface
 		debugger.addString(new String[] { "fps" });
 		debugger.addString(new String[] { "key press" });
 		debugger.addString(new String[] { "window size" });
@@ -165,6 +171,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		debugger.addString(new String[] { "characters" });
 		debugger.addString(new String[] { "projectiles" });
 		
+		// add listeners
 		addKeyListener(this);
 		addMouseListener(this);
 		addComponentListener(this);
@@ -172,8 +179,10 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
         setFocusTraversalKeysEnabled(false);
         requestFocus();
         
+        // open menu
         menu();
         
+        // start game thread
         Thread gameThread = new Thread(this);
         gameThread.start();
 	}
@@ -182,9 +191,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		super.paintComponent(g);
 		
 		AffineTransform at = new AffineTransform();
+		
+		// resize canvas to fit screen
 		at.scale(screen.x/canvas.getWidth(), screen.y/canvas.getHeight());
 		
-		//supar rotut
+		// konami code thing
 		if (wub) {
 			at.translate(canvas.getWidth()/2, canvas.getHeight()/2);
 			at.rotate(angle*Math.PI/180);
@@ -192,10 +203,13 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			angle += 1;
 		}
 		
+		// draw canvas onto panel
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawRenderedImage(canvas, at);
 		
+		// check if player is a battlemage and time is slowed
 		if (player != null && player instanceof Battlemage && ((Battlemage) player).timeSlowed) {
+			// tint screen cyan
 			if (screenEffect.equals(new Color(0, 0, 0, 0))) {
 				new Thread() {
 					public void run() {
@@ -212,7 +226,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			screenEffect = new Color(0, 0, 0, 0);
 		}
 		
-		//supar seizur
+		// other konami code thing
 		if (wub) {
 			if (currentTween.equals("r")) {
 				cr += 5*tween;
@@ -235,12 +249,14 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 			g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
 		}
 		
+		// set screen effects
 		g2.setColor(screenEffect);
 		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
 		
 		g2.setColor(transition);
 		g2.fillRect(0, 0, (int) screen.x, (int) screen.y);
 		
+		// check if game is over
 		if (gameOver) {
 			g2.setColor(fadeGame);
 			g2.setFont(font.deriveFont((float) (256f*ratio.x)));
@@ -258,6 +274,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void menu() {
+		// initialize menu
 		Button startButton = new Button("Start", "resources\\image\\trans.png", new Vector2(0, 600), new Vector2(700, 70)) {
 			public void click() {
 				if (!debounce) {
@@ -295,6 +312,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		Background menuBack = new Background(defaultScreen, "resources\\image\\menu_back.png");
 		menuObjects.add(menuBack);
 		
+		// add menu ui to screen
 		for (int i = 0; i < menuObjects.size(); i++) {
 			uiContainer.add(menuObjects.get(i));
 		}
@@ -324,7 +342,7 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	}
 	
 	public void gameOver() {
-		// display game over screen
+		// fade into game over screen
 		new Thread() {
 			public void run() {
 				gameOver = true;
@@ -398,6 +416,8 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 	
 	public void run() {
 		running = true;
+		
+		// start game drawing and updating
 		while (running) {
 			try {
 				Thread.sleep(1);
@@ -425,10 +445,11 @@ public class Manager extends JPanel implements ActionListener, KeyListener, Mous
 		if (!skip) {
 			lastFrame = now;
 			debugger.updateString(new String[] { "fps", String.format("%.0f", 1/delta) });
+			scoreLabel.text = "Score: " + score;
 			
 			ArrayList<Player> characters = new ArrayList<Player>();
 			
-			for (int i = 0; i < getComponentCount(); i++) {	
+			for (int i = 0; i < getComponentCount(); i++) {
 				if (getComponent(i) instanceof Container) {
 					Container container = (Container) getComponent(i);
 					
